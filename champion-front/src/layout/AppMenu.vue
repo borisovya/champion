@@ -10,6 +10,7 @@ const model = ref([
       {label: 'Dashboard', icon: 'pi pi-fw pi-home', to: '/'},
       {label: 'Login', icon: 'pi pi-fw pi-user', to: '/login'},
       {label: 'Registration', icon: 'pi pi-fw pi-user-plus', to: '/register'},
+      {label: 'PasswordReset', icon: 'pi pi-fw pi-key', to: '/password-reset'},
     ],
   },
 ]);
