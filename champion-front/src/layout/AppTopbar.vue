@@ -3,12 +3,11 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from '@/layout/composables/layout.ts';
 import { useRouter } from 'vue-router';
 
-const { layoutConfig, onMenuToggle } = useLayout();
+const { onMenuToggle } = useLayout();
 
 const outsideClickListener = ref(null);
 const topbarMenuActive = ref(false);
 const router = useRouter();
-const championLogo = 'layout/images/ChampionPartners_full_logo.svg'
 
 onMounted(() => {
     bindOutsideClickListener();
@@ -16,10 +15,6 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     unbindOutsideClickListener();
-});
-
-const logoUrl = computed(() => {
-    return `layout/images/${layoutConfig.darkTheme.value ? 'logo-white' : 'logo-dark'}.svg`;
 });
 
 const onTopBarMenuButton = () => {
@@ -64,7 +59,7 @@ const isOutsideClicked = (event) => {
 <template>
     <div class="layout-topbar">
         <router-link to="/" class="layout-topbar-logo">
-            <img :src="championLogo" alt="logo" style="height: 80px;"  />
+            <img src="/layout/images/ChampionPartners_full_logo.svg" alt="logo" style="height: 80px;"  />
         </router-link>
 
         <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
