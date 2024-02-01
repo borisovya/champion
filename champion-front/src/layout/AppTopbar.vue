@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useLayout } from '@/layout/composables/layout.ts';
 import { useRouter } from 'vue-router';
+import Button from 'primevue/button';
 
 const { onMenuToggle } = useLayout();
 
@@ -20,10 +21,11 @@ onBeforeUnmount(() => {
 const onTopBarMenuButton = () => {
     topbarMenuActive.value = !topbarMenuActive.value;
 };
-const onSettingsClick = () => {
+const onProfileClick = () => {
     topbarMenuActive.value = false;
-    router.push('/documentation');
+    router.push('/admin/profile');
 };
+
 const topbarMenuClasses = computed(() => {
     return {
         'layout-topbar-menu-mobile-active': topbarMenuActive.value
@@ -54,6 +56,11 @@ const isOutsideClicked = (event) => {
 
     return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
 };
+
+const onExitClickHandler = () => {
+  router.push('/');
+};
+
 </script>
 
 <template>
@@ -71,18 +78,14 @@ const isOutsideClicked = (event) => {
         </button>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
-            <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
-                <i class="pi pi-calendar"></i>
-                <span>Calendar</span>
-            </button>
-            <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
+          <Button @click="onExitClickHandler" class="p-link layout-topbar-button">
+                <i class="pi pi-sign-out"></i>
+                <span>Выйти из админ панели</span>
+            </Button>
+            <Button @click="onProfileClick" class="p-link layout-topbar-button">
                 <i class="pi pi-user"></i>
-                <span>Profile</span>
-            </button>
-            <button @click="onSettingsClick()" class="p-link layout-topbar-button">
-                <i class="pi pi-cog"></i>
-                <span>Settings</span>
-            </button>
+                <span>Профиль</span>
+            </Button>
         </div>
     </div>
 </template>

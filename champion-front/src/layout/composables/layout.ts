@@ -1,15 +1,14 @@
-import { toRefs, reactive, computed } from 'vue';
+import {toRefs, reactive, computed, watch, onMounted} from 'vue';
 
 const layoutConfig = reactive({
     ripple: false,
-    darkTheme: false,
+    darkTheme: localStorage.getItem('theme') === 'dark',
     inputStyle: 'outlined',
     menuMode: 'static',
-    theme: 'lara-light-indigo',
+    theme: localStorage.getItem('theme') === 'dark' ? 'aura-dark-purple' : 'aura-light-purple',
     scale: 14,
     activeMenuItem: null
 });
-
 const layoutState = reactive({
     staticMenuDesktopInactive: false,
     overlayMenuActive: false,
@@ -48,6 +47,22 @@ export function useLayout() {
     const isSidebarActive = computed(() => layoutState.overlayMenuActive || layoutState.staticMenuMobileActive);
 
     const isDarkTheme = computed(() => layoutConfig.darkTheme);
+
+    watch(isDarkTheme, (newVal) => {
+        if (newVal) {
+            layoutConfig.theme = 'aura-dark-purple';
+        } else {
+            layoutConfig.theme = 'aura-light-purple';
+        }
+    });
+
+    onMounted(() => {
+        document.documentElement.classList.add('aura-dark-purple');
+
+        !localStorage.getItem('theme') && localStorage.setItem('theme', 'light')
+        layoutConfig.darkTheme = localStorage.getItem('theme') === 'dark'
+    });
+
 
     return { layoutConfig: toRefs(layoutConfig), layoutState: toRefs(layoutState), changeThemeSettings, setScale, onMenuToggle, isSidebarActive, isDarkTheme, setActiveMenuItem };
 }

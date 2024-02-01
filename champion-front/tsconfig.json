@@ -12,5 +12,12 @@
     {
       "path": "./tsconfig.app.json"
     }
-  ]
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "types": ["vite/client"],
+      "@/*": ["src/*"],
+    }
+  }
 }

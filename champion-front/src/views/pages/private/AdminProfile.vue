@@ -2,5 +2,5 @@
 </script>
 
 <template>
-  <h1>HI MAFUCKA</h1>
+  <h1>Admin profile page</h1>
 </template>

@@ -1,34 +1,59 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/pages/HomeView.vue'
 import AppLayout from '@/layout/AppLayout.vue';
+import Shop from '@/views/pages/private/Shop.vue';
+import Partners from '@/views/pages/private/Partners.vue';
+import News from '@/views/pages/private/News.vue';
+import PublicShop from '@/views/pages/public/PublicShop.vue';
+import AdminProfile from '@/views/pages/private/AdminProfile.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      component: AppLayout,
       children:[
         {
           path: '/',
-          component: HomeView
+          component: PublicShop
+        },
+      ]
+    },
+    {
+      path: '/admin',
+      component: AppLayout,
+      children:[
+        {
+          path: '/admin',
+          component: Partners
+        },
+        {
+          path: '/admin/shop',
+          component: Shop
+        },
+        {
+          path: '/admin/news',
+          component: News
+        },
+        {
+          path: '/admin/profile',
+          component: AdminProfile
         }
       ]
     },
     {
       path: '/login',
       name: 'login',
-      component: () => import('@/views/pages/auth/Login.vue')
+      component: () => import('@/views/pages/public/auth/Login.vue')
     },
     {
       path: '/register',
       name: 'register',
-      component: () => import('@/views/pages/auth/Register.vue')
+      component: () => import('@/views/pages/public/auth/Register.vue')
     },
     {
       path: '/password-reset',
       name: 'password-reset',
-      component: () => import('@/views/pages/auth/PasswordReset.vue')
+      component: () => import('@/views/pages/public/auth/PasswordReset.vue')
     },
   ]
 })
