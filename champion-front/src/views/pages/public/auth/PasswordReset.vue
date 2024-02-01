@@ -68,7 +68,7 @@ const submit = () => {
           </form>
 
           <div class="text-center mt-5">
-            <a href="/"
+            <a href="/admin"
                class="font-lg no-underline cursor-pointer text-xl"
                style="color: #A815EDFF ">
               На главную
