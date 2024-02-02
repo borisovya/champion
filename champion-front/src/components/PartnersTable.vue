@@ -64,6 +64,7 @@ const filters = ref({
         </template>
 
         <Column field="championId" header="Champion Id" style="min-width: 12rem; height: 60px"/>
+        <Column field="championLogin" header="Champion Login" style="min-width: 12rem; height: 60px"/>
         <Column field="email" header="Email" style="min-width: 12rem"/>
         <Column field="telegram" header="Телеграм" style="min-width: 14rem"/>
         <Column field="bonusBalance" header="Бонусный баланс" style="min-width: 12rem"/>

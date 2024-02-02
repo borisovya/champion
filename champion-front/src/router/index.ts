@@ -5,6 +5,7 @@ import Partners from '@/views/pages/private/Partners.vue';
 import News from '@/views/pages/private/News.vue';
 import PublicShop from '@/views/pages/public/PublicShop.vue';
 import AdminProfile from '@/views/pages/private/AdminProfile.vue';
+import Notification from '@/views/pages/private/Notifications.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,6 +34,10 @@ const router = createRouter({
         {
           path: '/admin/news',
           component: News
+        },
+        {
+          path: '/admin/notifications',
+          component: Notification
         },
         {
           path: '/admin/profile',

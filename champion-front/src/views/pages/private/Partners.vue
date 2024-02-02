@@ -16,6 +16,7 @@ onMounted(() => {
         email: 'eeeee.mail.ru',
         telegram: '@ivan',
         championId: 1,
+        championLogin: '123fff',
         bonusBalance: 1000
       },
       {
@@ -24,6 +25,7 @@ onMounted(() => {
         email: 'eeeee2.mail.ru',
         telegram: '@ivan2',
         championId: 2,
+        championLogin: '123fff',
         bonusBalance: 2000
       },
       {
@@ -32,10 +34,11 @@ onMounted(() => {
         email: 'eeeee3.mail.ru',
         telegram: '@ivan3',
         championId: 3,
+        championLogin: '123fff',
         bonusBalance: 3000
       },
     ];
-    loading.value = false
+    loading.value = false;
   }, 2000);
 });
 </script>
