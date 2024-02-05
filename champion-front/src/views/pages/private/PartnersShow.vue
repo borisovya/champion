@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {onMounted, reactive, ref, watchEffect} from 'vue';
+import {computed, onMounted, reactive, ref, toRefs, watchEffect} from 'vue';
 import type {Partner} from '@/types/Partner';
 import ProgressBar from 'primevue/progressbar';
 import InputText from 'primevue/inputtext';
@@ -11,7 +11,8 @@ import Toast from 'primevue/toast';
 import { useConfirm } from "primevue/useconfirm";
 import { useToast } from "primevue/usetoast";
 import ConfirmDialog from 'primevue/confirmdialog';
-
+import {required, email, minValue, numeric} from '@vuelidate/validators';
+import useVuelidate from '@vuelidate/core'
 
 const confirm = useConfirm();
 const toast = useToast();
@@ -19,6 +20,16 @@ const partner = ref<Partner | null>(null);
 const loading = ref(false);
 const isSaveDisabled = ref(true);
 
+const rules = computed(()=>{
+  return {
+    email: { required, email },
+    championId: { required, numeric, minValue: minValue(1) },
+    telegram: { required },
+    championLogin: { required },
+    bonusBalance: { required, numeric, minValue: minValue(1) },
+  };
+
+})
 const partnerFieldsData = reactive({
   id: null,
   name: '',
@@ -54,7 +65,7 @@ onMounted(() => {
         partnerFieldsData.bonusBalance = partner.value.bonusBalance;
 
     loading.value = false;
-  }, 1000);
+  }, 100);
 });
 const requireConfirmation = () => {
   confirm.require({
@@ -68,12 +79,12 @@ const requireConfirmation = () => {
 }
 const getIsSaveDisabled = (): boolean => {
 
-  if (!partnerFieldsData.email) {
-    return true;
-  }
-  if (!partnerFieldsData.telegram) {
-    return true;
-  }
+  // if (!partnerFieldsData.email) {
+  //   return true;
+  // }
+  // if (!partnerFieldsData.telegram) {
+  //   return true;
+  // }
   if (!partnerFieldsData.championId) {
     return true;
   }
@@ -107,7 +118,6 @@ const messageSendClickHandler = () => {
   partnerFieldsData.messageForPartner = ''
   toast.add({severity: 'success', summary: 'Confirmed', detail: 'Сообщение отправлено', life: 3000});
 }
-
 const onChampionIdChange = (event: Event) => {
   const inputElement = event.target as HTMLInputElement;
   const digitsOnly = inputElement.value.replace(/\D/g, '');
@@ -127,9 +137,22 @@ const onBonusBalanceChange = (event: Event) => {
   }
 };
 
-const onSaveClickHandler = () => {
-  console.log(partnerFieldsData);
+const v$ = useVuelidate(rules, toRefs(partnerFieldsData));
+
+const onSubmit = async () => {
+
+  const isValid = await v$.value.$validate()
+
+  console.log(v$.value);
+
+  if(!isValid) {
+    toast.add({severity: 'error', summary: 'Confirmed', detail: 'Ошибка валидации. Проверьте введенные данные.', life: 3000});
+    return
+  }
+
+  toast.add({severity: 'success', summary: 'Confirmed', detail: 'Данные пользователя успешно изменены.', life: 3000});
 };
+
 
 watchEffect(() => {
   isSaveDisabled.value = getIsSaveDisabled();
@@ -174,7 +197,7 @@ watchEffect(() => {
   <div class="card" style="min-height: 80vh">
     <ProgressBar v-if="!partner" mode="indeterminate" style="height: 6px"></ProgressBar>
 
-    <div v-else class="p-grid p-fluid p-justify-center">
+    <form v-else class="p-grid p-fluid p-justify-center" @submit.prevent.stop="onSubmit">
       <h3 class="ml-3">Данные партнера {{ partnerFieldsData.id }}:</h3>
 
       <div class="lg:flex border-round inputBlocksPaddingBottom">
@@ -189,6 +212,12 @@ watchEffect(() => {
                          v-model="partnerFieldsData.email"
               />
             </span>
+          <span v-for="error in v$.value?.email?.$erros" :key="error.$uid">
+            {{error?.$message}}
+          </span>
+          <span v-if="v$.email?.$errors[0]?.$message">
+            {{ v$.email?.$errors[0]?.$message }}
+          </span>
         </div>
 
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
@@ -281,17 +310,18 @@ watchEffect(() => {
           </div>
           <div class="flex">
             <Button label="Сохранить"
+                    type="submit"
                     :disabled="isSaveDisabled"
                     icon="pi pi-save"
                     severity="success"
-                    @click="onSaveClickHandler"
+
                     text
             />
           </div>
         </div>
       </div>
 
-    </div>
+    </form>
   </div>
 </template>
 
