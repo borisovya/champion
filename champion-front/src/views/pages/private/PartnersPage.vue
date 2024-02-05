@@ -2,6 +2,7 @@
 import PartnersTable from '@/components/PartnersTable.vue';
 import {onMounted, ref} from 'vue';
 import type {Partner} from '@/types/Partner';
+import ProgressBar from 'primevue/progressbar';
 
 const partners = ref<Partner[]>([]);
 const loading = ref(false);
@@ -39,10 +40,15 @@ onMounted(() => {
       },
     ];
     loading.value = false;
-  }, 2000);
+  }, 1000);
 });
 </script>
 
 <template>
-  <PartnersTable :partnersData="partners" :isLoading="loading"/>
+  <div class="card " style="height: 80vh">
+    <PartnersTable v-if="!loading" :partnersData="partners" :isLoading="loading"/>
+
+    <ProgressBar v-else mode="indeterminate" style="height: 6px"></ProgressBar>
+  </div>
+
 </template>

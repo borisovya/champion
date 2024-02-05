@@ -6,10 +6,10 @@ import InputText from 'primevue/inputtext';
 import ProgressBar from 'primevue/progressbar';
 import type {Partner} from '@/types/Partner';
 import Dropdown from 'primevue/dropdown';
-
+import Button from 'primevue/button';
 
 import Paginator from 'primevue/paginator';
-
+import {useRouter} from 'vue-router';
 
 const {partnersData, isLoading} = defineProps({
   partnersData: {
@@ -21,6 +21,8 @@ const {partnersData, isLoading} = defineProps({
     required: true,
   }
 });
+
+const route = useRouter()
 
 const dropdownValues = ref([
   {name: 'Champion Id', code: 'championId'},
@@ -37,7 +39,7 @@ const filters = ref({
 </script>
 
 <template>
-  <div class="card flex flex-column" >
+  <div class=" flex flex-column" >
     <h3>Партнеры</h3>
 
     <div v-if="!isLoading" class="flex flex-column justify-content-between">
@@ -70,15 +72,13 @@ const filters = ref({
         <Column field="bonusBalance" header="Бонусный баланс" style="min-width: 12rem"/>
         <Column header="" style="min-width: 3rem">
           <template v-slot:header></template>
-          <template v-slot:body="">
-            <i class="pi pi-eye" style="font-size: 1.5rem"></i>
+          <template v-slot:body="{data}">
+            <Button text rounded size="large" icon="pi pi-eye" severity="secondary" @click="route.push(`/admin/partner/show/${data.id}`)"></Button>
           </template>
         </Column>
       </DataTable>
 
       <Paginator :rows="filters.rows" :totalRecords="partnersData.length" :rowsPerPageOptions="[10, 20, 30]"/>
     </div>
-
-    <ProgressBar v-else mode="indeterminate" style="height: 6px"></ProgressBar>
   </div>
 </template>
