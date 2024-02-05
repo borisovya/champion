@@ -79,12 +79,12 @@ const requireConfirmation = () => {
 }
 const getIsSaveDisabled = (): boolean => {
 
-  // if (!partnerFieldsData.email) {
-  //   return true;
-  // }
-  // if (!partnerFieldsData.telegram) {
-  //   return true;
-  // }
+  if (!partnerFieldsData.email) {
+    return true;
+  }
+  if (!partnerFieldsData.telegram) {
+    return true;
+  }
   if (!partnerFieldsData.championId) {
     return true;
   }
