@@ -15,6 +15,7 @@ coverage
 *.local
 .idea
 .vscode
+.vite
 
 /cypress/videos/
 /cypress/screenshots/
@@ -22,7 +23,6 @@ coverage
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
 *.suo
 *.ntvs*
 *.njsproj

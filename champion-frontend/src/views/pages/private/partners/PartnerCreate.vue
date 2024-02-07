@@ -15,7 +15,7 @@ const loading = ref(false);
 const rules = computed(() => {
   return {
     email: {required, email},
-    championId: {required, numeric, minValue: minValue(1)},
+    championId: {required, numeric, minValue: minValue(10)},
     telegram: {required},
     championLogin: {required},
     bonusBalance: {required, numeric, minValue: minValue(1)},
@@ -38,7 +38,6 @@ const onSubmit = async () => {
 
   try {
     const isValid = await v$.value.$validate();
-    console.log(v$.value);
     if (!isValid) {
       toast.add({severity: 'error', summary: 'Ошибка', detail: 'Проверьте введенные данные.', life: 3000});
       loading.value = false;

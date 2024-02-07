@@ -1,4 +1,3 @@
 .idea/*
 .vscode/*
 .DS_Store
-/champion-frontend/node_modules/*
