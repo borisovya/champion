@@ -1,6 +1,5 @@
 <script setup>
 import {reactive} from 'vue';
-import AppConfig from '@/layout/AppConfig.vue';
 import Password from 'primevue/password';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
@@ -47,8 +46,7 @@ const submit = () => {
   <div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
     <Toast position="bottom-right"/>
     <div class="flex flex-column align-items-center justify-content-center">
-      <div
-          style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, #A815EDFF 10%, rgba(33, 150, 243, 0) 30%); ">
+      <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, #A815EDFF 10%, rgba(33, 150, 243, 0) 30%)">
         <div class="w-full surface-card py-8 px-5 sm:px-8" style="border-radius: 53px">
           <div class="text-center mb-5">
             <img src="/layout/images/ChampionPartners_full_logo.svg" alt="logo" style="height: 80px;"/>
@@ -94,7 +92,6 @@ const submit = () => {
       </div>
     </div>
   </div>
-  <AppConfig simple/>
 </template>
 
 <style scoped></style>

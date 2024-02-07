@@ -5,12 +5,18 @@ import AppMenuItem from './AppMenuItem.vue';
 const model = ref([
   {
     items: [
-      {label: 'Партнеры', icon: 'pi pi-fw pi-users', to: '/admin'},
-      {label: 'Витрина', icon: 'pi pi-fw pi-shopping-bag', to: '/admin/shop'},
-      {label: 'Новости', icon: 'pi pi-fw pi-list', to: '/admin/news'},
-      {label: 'Login', icon: 'pi pi-fw pi-user', to: '/login'},
-      {label: 'Registration', icon: 'pi pi-fw pi-user-plus', to: '/register'},
-      {label: 'PasswordReset', icon: 'pi pi-fw pi-key', to: '/password-reset'},
+      {label: 'Партнеры', icon: 'pi pi-users', to: '/admin'},
+      {label: 'Витрина', icon: 'pi pi-shopping-bag', to: '/admin/shop'},
+      {label: 'Новости', icon: 'pi pi-list', to: '/admin/news'},
+      {label: 'Рассылка', icon: 'pi pi-send', to: '/admin/notifications'},
+    ],
+  },
+  {
+    label: '------Не будет в сайд баре-------',
+    items: [
+      {label: 'Login', icon: 'pi pi-user', to: '/login'},
+      {label: 'Registration', icon: 'pi pi-user-plus', to: '/register'},
+      {label: 'PasswordReset', icon: 'pi  pi-key', to: '/password-reset'},
     ],
   },
 ]);

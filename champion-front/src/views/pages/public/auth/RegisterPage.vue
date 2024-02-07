@@ -1,6 +1,5 @@
 <script setup>
 import {reactive} from 'vue';
-import AppConfig from '@/layout/AppConfig.vue';
 import Password from 'primevue/password';
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
@@ -85,7 +84,6 @@ const submit = () => {
       </div>
     </div>
   </div>
-  <AppConfig simple />
 </template>
 
 <style scoped>

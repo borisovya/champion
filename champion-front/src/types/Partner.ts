@@ -4,5 +4,6 @@ export interface Partner {
   email: string,
   telegram: string,
   championId: number,
+  championLogin: string,
   bonusBalance: number
 }
