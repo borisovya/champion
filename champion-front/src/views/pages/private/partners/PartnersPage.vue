@@ -38,6 +38,15 @@ onMounted(() => {
         championLogin: '123fff',
         bonusBalance: 3000
       },
+      {
+        id: 4,
+        name: 'Iv4',
+        email: 'eeeee344.mail.ru',
+        telegram: '@iv4',
+        championId: 4,
+        championLogin: '12444',
+        bonusBalance: 1000
+      },
     ];
     loading.value = false;
   }, 1000);
@@ -45,7 +54,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="card " style="height: 80vh">
+  <div class="card " style="height: 80vh; overflow: auto">
     <PartnersTable v-if="!loading" :partnersData="partners" :isLoading="loading"/>
 
     <ProgressBar v-else mode="indeterminate" style="height: 6px"></ProgressBar>

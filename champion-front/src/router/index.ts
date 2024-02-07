@@ -1,13 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AppLayout from '@/layout/AppLayout.vue';
 import Shop from '@/views/pages/private/Shop.vue';
-import Partners from '@/views/pages/private/PartnersPage.vue';
+import Partners from '@/views/pages/private/partners/PartnersPage.vue';
 import News from '@/views/pages/private/News.vue';
 import PublicShop from '@/views/pages/public/PublicShop.vue';
 import AdminProfile from '@/views/pages/private/AdminProfile.vue';
 import Notification from '@/views/pages/private/Notifications.vue';
-import PartnersShow from '@/views/pages/private/PartnersShow.vue';
+import PartnersShow from '@/views/pages/private/partners/PartnersShow.vue';
 import NotFound from '@/views/pages/public/NotFound.vue';
+import PartnerCreate from '@/views/pages/private/partners/PartnerCreate.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -32,6 +33,10 @@ const router = createRouter({
         {
           path: '/admin/partner/show/:id',
           component: PartnersShow
+        },
+        {
+          path: '/admin/partner/create',
+          component: PartnerCreate
         },
         {
           path: '/admin/shop',

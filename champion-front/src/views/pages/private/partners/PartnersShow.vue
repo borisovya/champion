@@ -8,11 +8,11 @@ import router from '@/router';
 import Textarea from 'primevue/textarea';
 import Dialog from 'primevue/dialog';
 import Toast from 'primevue/toast';
-import { useConfirm } from "primevue/useconfirm";
-import { useToast } from "primevue/usetoast";
+import {useConfirm} from 'primevue/useconfirm';
+import {useToast} from 'primevue/usetoast';
 import ConfirmDialog from 'primevue/confirmdialog';
-import {required, email, minValue, numeric} from '@vuelidate/validators';
-import useVuelidate from '@vuelidate/core'
+import useVuelidate from '@vuelidate/core';
+import {email, minValue, numeric, required} from '@vuelidate/validators';
 
 const confirm = useConfirm();
 const toast = useToast();
@@ -20,16 +20,16 @@ const partner = ref<Partner | null>(null);
 const loading = ref(false);
 const isSaveDisabled = ref(true);
 
-const rules = computed(()=>{
+const rules = computed(() => {
   return {
-    email: { required, email },
-    championId: { required, numeric, minValue: minValue(1) },
-    telegram: { required },
-    championLogin: { required },
-    bonusBalance: { required, numeric, minValue: minValue(1) },
+    email: {required, email},
+    championId: {required, numeric, minValue: minValue(1)},
+    telegram: {required},
+    championLogin: {required},
+    bonusBalance: {required, numeric, minValue: minValue(1)},
   };
 
-})
+});
 const partnerFieldsData = reactive({
   id: null,
   name: '',
@@ -73,10 +73,10 @@ const requireConfirmation = () => {
     header: 'Уверены, что хотите сбросить пароль?',
     message: 'Пожалуйста, подтвердите действие.',
     accept: () => {
-      toast.add({severity: 'success', summary: 'Confirmed', detail: 'Пароль успешно сброшен.', life: 3000});
+      toast.add({severity: 'success', summary: 'Пароль успешно сброшен', life: 3000});
     },
   });
-}
+};
 const getIsSaveDisabled = (): boolean => {
 
   if (!partnerFieldsData.email) {
@@ -107,52 +107,33 @@ const getIsSaveDisabled = (): boolean => {
     return true;
   }
 
-  return false
-}
-const messageCancelClickHandler = () => {
-  partnerFieldsData.showMessageModal = false
-  partnerFieldsData.messageForPartner = ''
-}
-const messageSendClickHandler = () => {
-  partnerFieldsData.showMessageModal = false
-  partnerFieldsData.messageForPartner = ''
-  toast.add({severity: 'success', summary: 'Confirmed', detail: 'Сообщение отправлено', life: 3000});
-}
-const onChampionIdChange = (event: Event) => {
-  const inputElement = event.target as HTMLInputElement;
-  const digitsOnly = inputElement.value.replace(/\D/g, '');
-  if(digitsOnly === '') {
-    partnerFieldsData.championId=''
-  } else {
-    partnerFieldsData.championId = Number(digitsOnly);
-  }
+  return false;
 };
-const onBonusBalanceChange = (event: Event) => {
-  const inputElement = event.target as HTMLInputElement;
-  const digitsOnly = inputElement.value.replace(/\D/g, '');
-  if(digitsOnly === '') {
-    partnerFieldsData.bonusBalance=''
-  } else {
-    partnerFieldsData.bonusBalance = Number(digitsOnly);
-  }
+const messageCancelClickHandler = () => {
+  partnerFieldsData.showMessageModal = false;
+  partnerFieldsData.messageForPartner = '';
+};
+const messageSendClickHandler = () => {
+  partnerFieldsData.showMessageModal = false;
+  partnerFieldsData.messageForPartner = '';
+  toast.add({severity: 'success', summary: 'Confirmed', detail: 'Сообщение отправлено', life: 3000});
 };
 
 const v$ = useVuelidate(rules, toRefs(partnerFieldsData));
 
 const onSubmit = async () => {
 
-  const isValid = await v$.value.$validate()
+  const isValid = await v$.value.$validate();
 
-  console.log(v$.value);
+  console.log(partnerFieldsData);
 
-  if(!isValid) {
-    toast.add({severity: 'error', summary: 'Confirmed', detail: 'Ошибка валидации. Проверьте введенные данные.', life: 3000});
-    return
+  if (!isValid) {
+    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Проверьте введенные данные.', life: 3000});
+    return;
   }
 
   toast.add({severity: 'success', summary: 'Confirmed', detail: 'Данные пользователя успешно изменены.', life: 3000});
 };
-
 
 watchEffect(() => {
   isSaveDisabled.value = getIsSaveDisabled();
@@ -162,7 +143,8 @@ watchEffect(() => {
 
 <template>
   <Toast/>
-  <Dialog v-model:visible="partnerFieldsData.showMessageModal" modal :header="'Отправка сообщения ' + partnerFieldsData.telegram"  :style="{ width: '45rem' }">
+  <Dialog v-model:visible="partnerFieldsData.showMessageModal" modal
+          :header="'Отправка сообщения ' + partnerFieldsData.telegram" :style="{ width: '45rem' }">
     <span class="p-text-secondary block mb-3">Текст сообщения:</span>
     <div class="flex align-items-center gap-3 mb-3">
       <Textarea id="message"
@@ -174,7 +156,8 @@ watchEffect(() => {
     </div>
     <div class="flex justify-content-end gap-2">
       <Button type="button" label="Отменить" severity="secondary" @click="messageCancelClickHandler"></Button>
-      <Button type="button" label="Отправить" :disabled="!partnerFieldsData.messageForPartner" @click="messageSendClickHandler"></Button>
+      <Button type="button" label="Отправить" :disabled="!partnerFieldsData.messageForPartner"
+              @click="messageSendClickHandler"></Button>
     </div>
   </Dialog>
 
@@ -212,10 +195,7 @@ watchEffect(() => {
                          v-model="partnerFieldsData.email"
               />
             </span>
-          <span v-for="error in v$.value?.email?.$erros" :key="error.$uid">
-            {{error?.$message}}
-          </span>
-          <span v-if="v$.email?.$errors[0]?.$message">
+          <span v-if="v$.email?.$errors[0]?.$message" class="text-red-400">
             {{ v$.email?.$errors[0]?.$message }}
           </span>
         </div>
@@ -231,6 +211,9 @@ watchEffect(() => {
                          v-model="partnerFieldsData.telegram"
               />
             </span>
+          <span v-if="v$.telegram?.$errors[0]?.$message" class="text-red-400">
+                {{ v$.telegram?.$errors[0]?.$message }}
+              </span>
         </div>
       </div>
 
@@ -240,13 +223,15 @@ watchEffect(() => {
           <span class="p-input-icon-left">
             <i class="pi pi-id-card"/>
               <InputText id="championId"
-                         type="text"
+                         type="number"
                          inputmode="numeric"
-                         placeholder="Телеграм"
+                         placeholder="Champion Id"
                          style="padding: 1rem; padding-left: 3rem; width: 100%"
-                         :value="partnerFieldsData.championId"
-                         @input="onChampionIdChange($event)"
+                         v-model="partnerFieldsData.championId"
               />
+              <span v-if="v$.championId?.$errors[0]?.$message" class="text-red-400">
+                {{ v$.championId?.$errors[0]?.$message }}
+              </span>
             </span>
         </div>
 
@@ -260,6 +245,9 @@ watchEffect(() => {
                          style="padding: 1rem; padding-left: 3rem; width: 100%"
                          v-model="partnerFieldsData.championLogin"
               />
+              <span v-if="v$.championLogin?.$errors[0]?.$message" class="text-red-400">
+                {{ v$.championLogin?.$errors[0]?.$message }}
+              </span>
             </span>
         </div>
       </div>
@@ -270,12 +258,14 @@ watchEffect(() => {
           <span class="p-input-icon-left">
             <i class="pi pi-wallet"/>
               <InputText id="bonusBalance"
-                         type="text"
+                         type="number"
                          placeholder="Бонусный баланс"
                          style="padding: 1rem; padding-left: 3rem; width: 100%"
-                         :value="partnerFieldsData.bonusBalance"
-                         @input="onBonusBalanceChange($event)"
+                         v-model="partnerFieldsData.bonusBalance"
               />
+            <span v-if="v$.bonusBalance?.$errors[0]?.$message" class="text-red-400">
+                {{ v$.bonusBalance?.$errors[0]?.$message }}
+              </span>
             </span>
         </div>
 
@@ -344,5 +334,10 @@ watchEffect(() => {
   .inputBlocksPaddingTop {
     padding-top: 0;
   }
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
 </style>
