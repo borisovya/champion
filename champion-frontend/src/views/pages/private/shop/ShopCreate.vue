@@ -64,17 +64,26 @@ const openFileUpload = () => {
 };
 
 const onSubmit = async () => {
+  loading.value = true;
 
-  const isValid = await v$.value.$validate();
-
-  console.log(productFieldsData);
-
-  if (!isValid) {
-    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Проверьте введенные данные.', life: 3000});
-    return;
+  try {
+    const isValid = await v$.value.$validate();
+    console.log(v$.value);
+    if (!isValid) {
+      toast.add({severity: 'error', summary: 'Ошибка', detail: 'Проверьте введенные данные.', life: 3000});
+      loading.value = false;
+      return;
+    }
+    toast.add({severity: 'success', summary: 'Confirmed', detail: 'Товар успешно добавлен.', life: 3000});
+    setTimeout(() => {
+      loading.value = false;
+      router.push('/admin/shop');
+    }, 1000);
   }
-
-  toast.add({severity: 'success', summary: 'Confirmed', detail: 'Товар успешно изменен.', life: 3000});
+  catch {
+    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
+    loading.value = false;
+  }
 };
 
 </script>

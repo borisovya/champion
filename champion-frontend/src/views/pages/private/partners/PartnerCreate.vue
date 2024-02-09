@@ -15,7 +15,7 @@ const loading = ref(false);
 const rules = computed(() => {
   return {
     email: {required, email},
-    championId: {required, numeric, minValue: minValue(1)},
+    championId: { numeric, minValue: minValue(1)},
     telegram: {required},
     championLogin: {required},
     bonusBalance: {required, numeric, minValue: minValue(1)},

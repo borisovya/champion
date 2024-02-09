@@ -23,7 +23,7 @@ const isSaveDisabled = ref(true);
 const rules = computed(() => {
   return {
     email: {required, email},
-    championId: {required, numeric, minValue: minValue(1)},
+    championId: {numeric, minValue: minValue(1)},
     telegram: {required},
     championLogin: {required},
     bonusBalance: {required, numeric, minValue: minValue(1)},
@@ -83,9 +83,6 @@ const getIsSaveDisabled = (): boolean => {
     return true;
   }
   if (!partnerFieldsData.telegram) {
-    return true;
-  }
-  if (!partnerFieldsData.championId) {
     return true;
   }
   if (!partnerFieldsData.championLogin) {

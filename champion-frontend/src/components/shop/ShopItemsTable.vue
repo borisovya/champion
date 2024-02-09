@@ -6,10 +6,13 @@ import InputText from 'primevue/inputtext';
 import Tag from 'primevue/tag';
 import Dropdown from 'primevue/dropdown';
 import Button from 'primevue/button';
-
+const toast = useToast();
 import Paginator from 'primevue/paginator';
 import {useRouter} from 'vue-router';
 import {Product} from '@/types/Products';
+import router from '@/router';
+import Toast from 'primevue/toast';
+import {useToast} from 'primevue/usetoast';
 
 const {products, isLoading} = defineProps({
   products: {
@@ -23,7 +26,7 @@ const {products, isLoading} = defineProps({
 });
 
 const route = useRouter();
-
+const loading = ref(false);
 const dropdownValues = ref([
   {name: 'Id товара', code: 'id'},
   {name: 'Название', code: 'name'},
@@ -36,15 +39,37 @@ const filters = ref({
   rows: 5
 });
 
+const deactivateHandler = () => {
+  loading.value = true;
+  try {
+    toast.add({severity: 'success', summary: 'Confirmed', detail: 'Товар успешно деактивирован.', life: 3000});
+  }
+  catch {
+    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
+  } finally {
+    loading.value = false;
+  }
+}
+
+const activateHandler = () => {
+  loading.value = true;
+  try {
+    toast.add({severity: 'success', summary: 'Confirmed', detail: 'Товар успешно активирован.', life: 3000});
+  }
+  catch {
+    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
+  } finally {
+    loading.value = false;
+  }
+}
+
 </script>
 
 <template>
   <div class=" flex flex-column">
+    <Toast/>
     <h3>Витрина</h3>
-
     <div v-if="!isLoading" class="flex flex-column justify-content-between">
-
-
       <DataTable :value="products" tableStyle="min-width: 50rem">
         <template #header>
           <div class="flex flex-wrap align-items-center justify-content-between gap-2">
@@ -106,7 +131,7 @@ const filters = ref({
                     size="large"
                     icon="pi pi-times"
                     severity="danger"
-                    @click="">
+                    @click="deactivateHandler">
 
             </Button>
             <Button v-else
@@ -115,7 +140,7 @@ const filters = ref({
                     size="large"
                     icon="pi pi-check"
                     severity="success"
-                    @click="">
+                    @click="activateHandler">
 
             </Button>
             <Button text rounded size="large" icon="pi pi-eye" severity="secondary"
