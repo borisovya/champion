@@ -9,14 +9,21 @@ import {useConfirm} from 'primevue/useconfirm';
 import {useToast} from 'primevue/usetoast';
 import ConfirmDialog from 'primevue/confirmdialog';
 import useVuelidate from '@vuelidate/core';
-import {minValue, numeric, required} from '@vuelidate/validators';
+import {required, minValue, numeric} from '@/i18n/i18n-validators';
 import {Product} from '@/types/Products';
+import Image from 'primevue/image';
+import Dropdown from 'primevue/dropdown';
+import RadioButton from 'primevue/radiobutton';
+import Tag from 'primevue/tag';
+import Textarea from 'primevue/textarea';
+
 
 const confirm = useConfirm();
 const toast = useToast();
 const product = ref<Product | null>(null);
 const loading = ref(false);
 const isSaveDisabled = ref(true);
+const chooseFileComponent = ref(null);
 
 const rules = computed(() => {
   return {
@@ -37,6 +44,7 @@ const productFieldsData = reactive({
   imgUrl: '',
   showConfirm: false
 });
+const categories = ref<{ name: String, code: Number }[] | null>(null);
 
 onMounted(() => {
   loading.value = true;
@@ -50,8 +58,7 @@ onMounted(() => {
       categoryId: 1,
       imgUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRB6p_1WriDjdY2v6Y5RXYkVlmtqAMAVIOBTw&usqp=CAU'
     },
-
-    productFieldsData.id = product.value.id,
+        productFieldsData.id = product.value.id,
         productFieldsData.name = product.value.name,
         productFieldsData.description = product.value.description,
         productFieldsData.price = product.value.price,
@@ -59,6 +66,12 @@ onMounted(() => {
         productFieldsData.categoryId = product.value.categoryId,
         productFieldsData.imgUrl = product.value.imgUrl;
 
+    categories.value = [
+      {name: 'Электроника', code: 1},
+      {name: 'Одежда', code: 2},
+      {name: 'Транспорт', code: 3},
+      {name: 'Аксесуары', code: 4},
+    ];
     loading.value = false;
   }, 100);
 });
@@ -104,6 +117,17 @@ const getIsSaveDisabled = (): boolean => {
 
 const v$ = useVuelidate(rules, toRefs(productFieldsData));
 
+const onUpload = (e) => {
+  const photo = e.target.files[0];
+  productFieldsData.imgUrl = URL.createObjectURL(photo);
+
+  toast.add({severity: 'info', summary: 'Success', detail: 'Фото загружено', life: 2000});
+};
+
+const openFileUpload = () => {
+  chooseFileComponent.value.click();
+};
+
 const onSubmit = async () => {
 
   const isValid = await v$.value.$validate();
@@ -126,7 +150,6 @@ watchEffect(() => {
 
 <template>
   <Toast/>
-
   <ConfirmDialog group="headless">
     <template #container="{ message, acceptCallback, rejectCallback }">
       <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
@@ -136,28 +159,48 @@ watchEffect(() => {
         <span class="font-bold text-2xl block mb-2 mt-4">{{ (message as any).message }}</span>
         <p class="mb-0">{{ (message as any).header }}</p>
         <div class="flex align-items-center gap-2 mt-4">
-          <Button :label="product.active ? 'Деактивировать' : 'Активировать'"  @click="acceptCallback"></Button>
+          <Button :label="product.active ? 'Деактивировать' : 'Активировать'" @click="acceptCallback"></Button>
           <Button label="Отменить" outlined @click="rejectCallback"></Button>
         </div>
       </div>
     </template>
   </ConfirmDialog>
 
-  <div class="card" style="min-height: 80vh">
-    <ProgressBar v-if="!product" mode="indeterminate" style="height: 6px"></ProgressBar>
+  <div class="card" style="height: calc(100vh - 9rem); overflow: auto">
+    <ProgressBar v-if="!product || !categories" mode="indeterminate" style="height: 6px"></ProgressBar>
 
     <form v-else class="p-grid p-fluid p-justify-center" @submit.prevent.stop="onSubmit">
       <h3 class="ml-3">Детали товара {{ productFieldsData.name }}:</h3>
 
-      <div class="lg:flex border-round inputBlocksPaddingBottom">
+      <div class="lg:flex border-round inputBlocksPaddingTop">
+        <div class="p-2 flex flex-column align-items-start justify-content-center lg:w-12">
+          <label for="imgUrl">Изображение</label>
+          <Image
+              :src="productFieldsData.imgUrl"
+              alt="Image"
+              width="200"
+              class="cursor-pointer"
+              @click="openFileUpload"
+          />
+          <input type="file" @change="onUpload" name="imgUrl" ref="chooseFileComponent" style="display: none"/>
+          <span v-if="v$.imgUrl?.$errors[0]?.$message" class="text-red-400">
+                {{ v$.imgUrl?.$errors[0]?.$message }}
+          </span>
+        </div>
+
+        <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center ">
+
+        </div>
+      </div>
+
+      <div class="flex border-round align-items-start inputBlocksPaddingBottom">
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
           <label for="name">Название</label>
           <span class="p-input-icon-left">
-            <i class="pi pi-at"/>
               <InputText id="name"
                          type="text"
                          placeholder="Название товара"
-                         style="padding: 1rem; padding-left: 3rem; width: 100%"
+                         style="padding: 1rem; width: 100%"
                          v-model="productFieldsData.name"
               />
             </span>
@@ -167,15 +210,14 @@ watchEffect(() => {
         </div>
 
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
-          <label for="description">Описание</label>
+          <label for="categoryId">Категория</label>
           <span class="p-input-icon-left">
-            <i class="pi pi-send"/>
-              <InputText id="description"
-                         type="text"
-                         placeholder="Телеграм"
-                         style="padding: 1rem; padding-left: 3rem; width: 100%"
-                         v-model="productFieldsData.description"
-              />
+            <Dropdown v-model="productFieldsData.categoryId"
+                      :options="categories"
+                      optionLabel="name"
+                      optionValue="code"
+                      style="padding: 6px; width: 100%"
+            />
             </span>
         </div>
       </div>
@@ -184,65 +226,52 @@ watchEffect(() => {
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
           <label for="price">Цена</label>
           <span class="p-input-icon-left">
-            <i class="pi pi-id-card"/>
               <InputText id="price"
                          type="number"
                          inputmode="numeric"
                          placeholder="Цена"
-                         style="padding: 1rem; padding-left: 3rem; width: 100%"
+                         style="padding: 1rem; width: 100%"
                          v-model="productFieldsData.price"
               />
             </span>
           <span v-if="v$.price?.$errors[0]?.$message" class="text-red-400">
                 {{ v$.price?.$errors[0]?.$message }}
-              </span>
+          </span>
         </div>
 
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
-          <label for="categoryId">Категория</label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-user"/>
-              <InputText id="categoryId"
-                         type="text"
-                         placeholder="Телеграм"
-                         style="padding: 1rem; padding-left: 3rem; width: 100%"
-                         v-model="productFieldsData.categoryId"
-              />
-            </span>
-          <span v-if="v$.categoryId?.$errors[0]?.$message" class="text-red-400">
-                {{ v$.categoryId?.$errors[0]?.$message }}
-              </span>
+          <div class="lg:w-12 p-2 flex align-items-center justify-content-start ">
+            <label for="status" class="ml-1 mr-2">Статус:</label>
+            <div class="flex flex-wrap gap-3">
+              <div class="flex align-items-center">
+                <RadioButton v-model="productFieldsData.active" inputId="active" name="active" :checked="productFieldsData.active" :value="true"/>
+                <label for="active" class="ml-2">
+                  <Tag severity="success" value="Активен"/>
+                </label>
+              </div>
+              <div class="flex align-items-center">
+                <RadioButton v-model="productFieldsData.active" inputId="inActive" name="active" :checked="!productFieldsData.active" :value="false" />
+                <label for="inActive" class="ml-2">
+                  <Tag severity="danger" value="Не активен"/>
+                </label>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="lg:flex border-round inputBlocksPaddingTop">
-        <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center ">
-          <label for="status">Статус</label>
+        <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
+          <label for="description">Описание товара</label>
           <span class="p-input-icon-left">
-            <i class="pi pi-user"/>
-              <InputText id="status"
-                         type="text"
-                         placeholder="Статус"
-                         style="padding: 1rem; padding-left: 3rem; width: 100%"
-                         v-model="productFieldsData.active"
+              <Textarea id="description"
+                        rows="6"
+                        type="text"
+                        placeholder="Описание товара"
+                        style="padding: 1rem; width: 100%"
+                        v-model="productFieldsData.description"
               />
-            </span>
-        </div>
-
-        <div class="p-2 flex flex-column align-items-start justify-content-center lg:w-12">
-          <label for="imgUrl">Изображение</label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-user"/>
-              <InputText id="imgUrl"
-                         type="text"
-                         placeholder="Изображение"
-                         style="padding: 1rem; padding-left: 3rem; width: 100%"
-                         v-model="productFieldsData.imgUrl"
-              />
-            </span>
-          <span v-if="v$.imgUrl?.$errors[0]?.$message" class="text-red-400">
-                {{ v$.imgUrl?.$errors[0]?.$message }}
-              </span>
+          </span>
         </div>
       </div>
 
@@ -276,7 +305,6 @@ watchEffect(() => {
                     :disabled="isSaveDisabled"
                     icon="pi pi-save"
                     severity="success"
-
                     text
             />
           </div>
@@ -307,6 +335,7 @@ watchEffect(() => {
     padding-top: 0;
   }
 }
+
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
   -webkit-appearance: none;

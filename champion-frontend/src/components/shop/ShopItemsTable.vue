@@ -3,7 +3,7 @@ import {ref} from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import InputText from 'primevue/inputtext';
-import type {Partner} from '@/types/Partner';
+import Tag from 'primevue/tag';
 import Dropdown from 'primevue/dropdown';
 import Button from 'primevue/button';
 
@@ -93,17 +93,31 @@ const filters = ref({
         <Column field="categoryId" header="Категория"></Column>
         <Column field="active" header="Статус">
           <template #body="slotProps">
-            <div v-if="slotProps.data.active" class="text-green-500">Активен</div>
-            <div v-else class="text-red-500">Не активен</div>
+            <Tag v-if="slotProps.data.active" severity="success" value="Активен"></Tag>
+            <Tag v-else class="text-red-500" severity="danger" value="Не активен"></Tag>
           </template>
         </Column>
         <Column header="" style="min-width: 3rem">
           <template v-slot:header></template>
           <template v-slot:body="{data}">
-            <Button v-if="data.active" text rounded size="large" icon="pi pi-times" severity="danger"
-                    @click=""></Button>
-            <Button v-else text rounded size="large" icon="pi pi-check" severity="success"
-                    @click=""></Button>
+            <Button v-if="data.active"
+                    text
+                    rounded
+                    size="large"
+                    icon="pi pi-times"
+                    severity="danger"
+                    @click="">
+
+            </Button>
+            <Button v-else
+                    text
+                    rounded
+                    size="large"
+                    icon="pi pi-check"
+                    severity="success"
+                    @click="">
+
+            </Button>
             <Button text rounded size="large" icon="pi pi-eye" severity="secondary"
                     @click="route.push(`/admin/shop/show/${data.id}`)"></Button>
           </template>

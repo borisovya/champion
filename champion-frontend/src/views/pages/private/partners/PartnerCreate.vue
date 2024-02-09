@@ -35,7 +35,6 @@ const v$ = useVuelidate(rules, toRefs(partnerFieldsData));
 const onSubmit = async () => {
   loading.value = true;
 
-
   try {
     const isValid = await v$.value.$validate();
     console.log(v$.value);
