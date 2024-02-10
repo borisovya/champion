@@ -12,7 +12,7 @@ import {useConfirm} from 'primevue/useconfirm';
 import {useToast} from 'primevue/usetoast';
 import ConfirmDialog from 'primevue/confirmdialog';
 import useVuelidate from '@vuelidate/core';
-import {email, minValue, numeric, required} from '@vuelidate/validators';
+import {required, email, minValue, numeric} from '@/i18n/i18n-validators';
 
 const confirm = useConfirm();
 const toast = useToast();
@@ -208,9 +208,9 @@ watchEffect(() => {
                          v-model="partnerFieldsData.telegram"
               />
             </span>
-          <span v-if="v$.telegram?.$errors[0]?.$message" class="text-red-400">
+          <div v-if="v$.telegram?.$errors[0]?.$message" class="text-red-400">
                 {{ v$.telegram?.$errors[0]?.$message }}
-              </span>
+              </div>
         </div>
       </div>
 
@@ -226,9 +226,9 @@ watchEffect(() => {
                          style="padding: 1rem; padding-left: 3rem; width: 100%"
                          v-model="partnerFieldsData.championId"
               />
-              <span v-if="v$.championId?.$errors[0]?.$message" class="text-red-400">
+              <div v-if="v$.championId?.$errors[0]?.$message" class="text-red-400">
                 {{ v$.championId?.$errors[0]?.$message }}
-              </span>
+              </div>
             </span>
         </div>
 
@@ -242,9 +242,9 @@ watchEffect(() => {
                          style="padding: 1rem; padding-left: 3rem; width: 100%"
                          v-model="partnerFieldsData.championLogin"
               />
-              <span v-if="v$.championLogin?.$errors[0]?.$message" class="text-red-400">
+              <div v-if="v$.championLogin?.$errors[0]?.$message" class="text-red-400">
                 {{ v$.championLogin?.$errors[0]?.$message }}
-              </span>
+              </div>
             </span>
         </div>
       </div>
@@ -260,9 +260,9 @@ watchEffect(() => {
                          style="padding: 1rem; padding-left: 3rem; width: 100%"
                          v-model="partnerFieldsData.bonusBalance"
               />
-            <span v-if="v$.bonusBalance?.$errors[0]?.$message" class="text-red-400">
+            <div v-if="v$.bonusBalance?.$errors[0]?.$message" class="text-red-400">
                 {{ v$.bonusBalance?.$errors[0]?.$message }}
-              </span>
+              </div>
             </span>
         </div>
 

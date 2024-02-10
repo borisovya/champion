@@ -10,7 +10,6 @@ const toast = useToast();
 import Paginator from 'primevue/paginator';
 import {useRouter} from 'vue-router';
 import {Product} from '@/types/Products';
-import router from '@/router';
 import Toast from 'primevue/toast';
 import {useToast} from 'primevue/usetoast';
 
