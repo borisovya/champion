@@ -1,0 +1,13 @@
+{% extends '@!NelmioApiDoc/SwaggerUi/index.html.twig' %}
+
+{% block header %}
+    <style>
+        header #logo img, header::before {
+            background-color: #222c31;
+        }
+
+    </style>
+    <a id="logo" href="https://champion.partners">
+        <img style="height: 45px !important;" src="{{ asset('img/logo-white.svg') }}" alt="Champion logo">
+    </a>
+{% endblock %}

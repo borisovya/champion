@@ -36,7 +36,7 @@ services:
     volumes:
       - server_logs:/var/log/nginx
       - frontend_dist:/var/www/champion/dist
-      - ./champion-backend/:/var/www/champion
+      - ./champion-backend/:/var/www/champion:delegated
 #      - ./infra/server/cert/selfsigned.crt:/etc/ssl/certs/selfsigned.crt
 #      - ./infra/server/cert/selfsigned.key:/etc/ssl/private/selfsigned.key
       - ./infra/server/nginx/conf.d/:/etc/nginx/conf.d/
@@ -50,7 +50,8 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./champion-backend:/var/www/champion
+      - ./champion-backend:/var/www/champion:delegated
+      - ./infra/php/php.ini:/usr/local/etc/php/php.ini:ro
     build:
       context: ./champion-backend
     networks:
