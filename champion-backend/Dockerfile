@@ -1,4 +1,4 @@
-FROM champion_backend_base
+FROM champion-backend-base
 
 MAINTAINER https://champion.partners
 

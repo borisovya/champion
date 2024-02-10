@@ -9,7 +9,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PinPongController extends AbstractController
 {
-    #[Route('/pin/pong', name: 'app_pin_pong', methods: 'get')]
+    #[Route('/ping/pong', name: 'ping_pong', methods: 'get')]
     public function index(PinPongRepository $pinPongRepository): JsonResponse
     {
         return $this->json([

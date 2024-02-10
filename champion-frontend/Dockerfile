@@ -1,25 +1,24 @@
-FROM champion_frontend_base as dev
+FROM champion-frontend-base as dev
 
 WORKDIR /var/www/champion
 
 COPY . .
 
-CMD [ "sh", "-c", "yarn install" ]
-COPY ./dev-entrypoint.sh /usr/local/bin/
+RUN yarn
 
-ENTRYPOINT ["bash", "dev-entrypoint.sh"]
-
-CMD [ "sh", "-c", "yarn install && yarn build" ]
+CMD [ "sh", "-c", "yarn dev" ]
 
 EXPOSE 8080
 
 
-FROM champion_frontend_base as production
+FROM champion-frontend-base as production
 
 WORKDIR /var/www/champion
 
 COPY . .
 
-CMD [ "sh", "-c", "yarn install && yarn build" ]
+RUN yarn
+
+CMD [ "sh", "-c", "yarn start" ]
 
 EXPOSE 8080

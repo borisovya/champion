@@ -1,4 +1,4 @@
-./idea
-./Dockerfile
-./node_modules
-./.vscode
+.idea
+Dockerfile
+node_modules
+.vscode
