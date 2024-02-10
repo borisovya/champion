@@ -15,7 +15,7 @@ const loading = ref(false);
 const rules = computed(() => {
   return {
     email: {required, email},
-    championId: {required, numeric, minValue: minValue(10)},
+    championId: { numeric, minValue: minValue(1)},
     telegram: {required},
     championLogin: {required},
     bonusBalance: {required, numeric, minValue: minValue(1)},
@@ -35,9 +35,9 @@ const v$ = useVuelidate(rules, toRefs(partnerFieldsData));
 const onSubmit = async () => {
   loading.value = true;
 
-
   try {
     const isValid = await v$.value.$validate();
+    console.log(v$.value);
     if (!isValid) {
       toast.add({severity: 'error', summary: 'Ошибка', detail: 'Проверьте введенные данные.', life: 3000});
       loading.value = false;
@@ -78,9 +78,9 @@ const onSubmit = async () => {
                          v-model="partnerFieldsData.email"
               />
             </span>
-          <span v-if="v$.email?.$errors[0]?.$message" class="text-red-400">
+          <div v-if="v$.email?.$errors[0]?.$message" class="text-red-400">
             {{ v$.email?.$errors[0]?.$message }}
-          </span>
+          </div>
         </div>
 
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
@@ -94,9 +94,9 @@ const onSubmit = async () => {
                          v-model="partnerFieldsData.telegram"
               />
             </span>
-          <span v-if="v$.telegram?.$errors[0]?.$message" class="text-red-400">
+          <div v-if="v$.telegram?.$errors[0]?.$message" class="text-red-400">
                 {{ v$.telegram?.$errors[0]?.$message }}
-              </span>
+              </div>
         </div>
       </div>
 
@@ -112,9 +112,9 @@ const onSubmit = async () => {
                          v-model="partnerFieldsData.championId"
               />
             </span>
-          <span v-if="v$.championId?.$errors[0]?.$message" class="text-red-400">
+          <div v-if="v$.championId?.$errors[0]?.$message" class="text-red-400">
             {{ v$.championId?.$errors[0]?.$message }}
-          </span>
+          </div>
         </div>
 
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
@@ -128,9 +128,9 @@ const onSubmit = async () => {
                          v-model="partnerFieldsData.championLogin"
               />
             </span>
-          <span v-if="v$.championLogin?.$errors[0]?.$message" class="text-red-400">
+          <div v-if="v$.championLogin?.$errors[0]?.$message" class="text-red-400">
                 {{ v$.championLogin?.$errors[0]?.$message }}
-              </span>
+              </div>
         </div>
       </div>
 
@@ -146,9 +146,9 @@ const onSubmit = async () => {
                          v-model="partnerFieldsData.bonusBalance"
               />
           </span>
-          <span v-if="v$.bonusBalance?.$errors[0]?.$message" class="text-red-400">
+          <div v-if="v$.bonusBalance?.$errors[0]?.$message" class="text-red-400">
             {{ v$.bonusBalance?.$errors[0]?.$message }}
-          </span>
+          </div>
         </div>
 
         <div class="p-2 flex flex-column align-items-start justify-content-center lg:w-12">

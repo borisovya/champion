@@ -12,7 +12,7 @@ const loginData = reactive({
   email: '',
   password: '',
   telegram: '',
-  champId: '',
+  champLogin: '',
 })
 
 const showSuccess = () => {
@@ -61,8 +61,8 @@ const submit = () => {
             <label for="telegram1" class="block text-900 text-xl font-medium mb-2">Телеграм</label>
             <InputText id="telegram1" type="text" placeholder="Телеграм" class="w-full md:w-30rem mb-5" style="padding: 1rem" v-model="loginData.telegram" />
 
-            <label for="champId" class="block text-900 text-xl font-medium mb-2">Champion Id</label>
-            <InputText id="champId" type="text" placeholder="Champion Id" class="w-full md:w-30rem mb-5" style="padding: 1rem" v-model="loginData.champId" />
+            <label for="champId" class="block text-900 text-xl font-medium mb-2">Champion Login</label>
+            <InputText id="champId" type="text" placeholder="Champion Login" class="w-full md:w-30rem mb-5" style="padding: 1rem" v-model="loginData.champLogin" />
 
             <label for="password1" class="block text-900 font-medium text-xl mb-2">Пароль</label>
             <Password id="password1" v-model="loginData.password" placeholder="Пароль" :toggleMask="true" class="w-full mb-3" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>

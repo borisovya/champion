@@ -23,7 +23,7 @@ const onTopBarMenuButton = () => {
 };
 const onProfileClick = () => {
     topbarMenuActive.value = false;
-    router.push('/admin/profile');
+    router.push('/');
 };
 
 const topbarMenuClasses = computed(() => {
@@ -58,7 +58,7 @@ const isOutsideClicked = (event) => {
 };
 
 const onExitClickHandler = () => {
-  router.push('/');
+  router.push('/login');
 };
 
 </script>
@@ -83,7 +83,7 @@ const onExitClickHandler = () => {
                 <span>Выйти из админ панели</span>
             </Button>
             <Button @click="onProfileClick" class="p-link layout-topbar-button">
-                <i class="pi pi-user"></i>
+                <i class="pi pi-home"></i>
                 <span>Профиль</span>
             </Button>
         </div>

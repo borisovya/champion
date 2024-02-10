@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import PartnersTable from '@/components/PartnersTable.vue';
+import PartnersTable from '@/components/partners/PartnersTable.vue';
 import {onMounted, ref} from 'vue';
 import type {Partner} from '@/types/Partner';
+import ProgressBar from 'primevue/progressbar';
 
 const partners = ref<Partner[]>([]);
 const loading = ref(false);
@@ -16,6 +17,7 @@ onMounted(() => {
         email: 'eeeee.mail.ru',
         telegram: '@ivan',
         championId: 1,
+        championLogin: '123fff',
         bonusBalance: 1000
       },
       {
@@ -24,6 +26,7 @@ onMounted(() => {
         email: 'eeeee2.mail.ru',
         telegram: '@ivan2',
         championId: 2,
+        championLogin: '123fff',
         bonusBalance: 2000
       },
       {
@@ -32,14 +35,29 @@ onMounted(() => {
         email: 'eeeee3.mail.ru',
         telegram: '@ivan3',
         championId: 3,
+        championLogin: '123fff',
         bonusBalance: 3000
       },
+      {
+        id: 4,
+        name: 'Iv4',
+        email: 'eeeee344.mail.ru',
+        telegram: '@iv4',
+        championId: 4,
+        championLogin: '12444',
+        bonusBalance: 1000
+      },
     ];
-    loading.value = false
-  }, 2000);
+    loading.value = false;
+  }, 500);
 });
 </script>
 
 <template>
-  <PartnersTable :partnersData="partners" :isLoading="loading"/>
+  <div class="card " style="height: calc(100vh - 9rem); overflow: auto">
+    <PartnersTable v-if="!loading" :partnersData="partners" :isLoading="loading"/>
+
+    <ProgressBar v-else mode="indeterminate" style="height: 6px"></ProgressBar>
+  </div>
+
 </template>
