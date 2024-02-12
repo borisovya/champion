@@ -12,12 +12,21 @@ const withI18nMessage = createI18nMessage({ t: i18n.global.t.bind(i18n) })
 // wrap each validator.
 export const required = withI18nMessage(validators.required)
 // validators that expect a parameter should have `{ withArguments: true }` passed as a second parameter, to annotate they should be wrapped
-export const minLength = withI18nMessage(validators.minLength, { withArguments: true })
-// or you can provide the param at definition, statically
+export const minLength = withI18nMessage(validators.minLength, { withArguments: true, messageParams: (params)=> {
+    return {
+      minLength: params.min
+    }
+  } })
+
 export const minValue = withI18nMessage(validators.minValue, { withArguments: true, messageParams: (params)=> {
   return {
     minValue: params.min
   }
-  } }, )
+  } })
+export const sameAs = withI18nMessage(validators.sameAs, { withArguments: true, messageParams: (params)=> {
+    return {
+      field: params.otherName
+    }
+  } })
 export const email = withI18nMessage(validators.email)
 export const numeric = withI18nMessage(validators.numeric)
