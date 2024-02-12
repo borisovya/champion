@@ -2,9 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import AppLayout from '@/layout/AppLayout.vue';
 import Shop from '@/views/pages/private/shop/ShopMain.vue';
 import Partners from '@/views/pages/private/partners/PartnersMain.vue';
-import News from '@/views/pages/private/news/NewsMain.vue';
 import PublicShop from '@/views/pages/public/PublicShop.vue';
-import AdminProfile from '@/views/pages/private/AdminProfile.vue';
 import Notification from '@/views/pages/private/notifications/NotificationsMain.vue';
 import PartnersShow from '@/views/pages/private/partners/PartnersShow.vue';
 import NotFound from '@/views/pages/public/NotFound.vue';
