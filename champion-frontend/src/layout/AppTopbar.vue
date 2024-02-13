@@ -1,93 +1,100 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
-import { useLayout } from '@/layout/composables/layout.ts';
-import { useRouter } from 'vue-router';
-import Button from 'primevue/button';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { useLayout } from '@/layout/composables/layout.ts'
+import { useRouter } from 'vue-router'
+import Button from 'primevue/button'
 
-const { onMenuToggle } = useLayout();
+const { onMenuToggle } = useLayout()
 
-const outsideClickListener = ref(null);
-const topbarMenuActive = ref(false);
-const router = useRouter();
+const outsideClickListener = ref(null)
+const topbarMenuActive = ref(false)
+const router = useRouter()
 
 onMounted(() => {
-    bindOutsideClickListener();
-});
+  bindOutsideClickListener()
+})
 
 onBeforeUnmount(() => {
-    unbindOutsideClickListener();
-});
+  unbindOutsideClickListener()
+})
 
 const onTopBarMenuButton = () => {
-    topbarMenuActive.value = !topbarMenuActive.value;
-};
+  topbarMenuActive.value = !topbarMenuActive.value
+}
 const onProfileClick = () => {
-    topbarMenuActive.value = false;
-    router.push('/');
-};
+  topbarMenuActive.value = false
+  router.push('/')
+}
 
 const topbarMenuClasses = computed(() => {
-    return {
-        'layout-topbar-menu-mobile-active': topbarMenuActive.value
-    };
-});
+  return {
+    'layout-topbar-menu-mobile-active': topbarMenuActive.value
+  }
+})
 
 const bindOutsideClickListener = () => {
-    if (!outsideClickListener.value) {
-        outsideClickListener.value = (event) => {
-            if (isOutsideClicked(event)) {
-                topbarMenuActive.value = false;
-            }
-        };
-        document.addEventListener('click', outsideClickListener.value);
+  if (!outsideClickListener.value) {
+    outsideClickListener.value = (event) => {
+      if (isOutsideClicked(event)) {
+        topbarMenuActive.value = false
+      }
     }
-};
+    document.addEventListener('click', outsideClickListener.value)
+  }
+}
 const unbindOutsideClickListener = () => {
-    if (outsideClickListener.value) {
-        document.removeEventListener('click', outsideClickListener);
-        outsideClickListener.value = null;
-    }
-};
+  if (outsideClickListener.value) {
+    document.removeEventListener('click', outsideClickListener)
+    outsideClickListener.value = null
+  }
+}
 const isOutsideClicked = (event) => {
-    if (!topbarMenuActive.value) return;
+  if (!topbarMenuActive.value) return
 
-    const sidebarEl = document.querySelector('.layout-topbar-menu');
-    const topbarEl = document.querySelector('.layout-topbar-menu-button');
+  const sidebarEl = document.querySelector('.layout-topbar-menu')
+  const topbarEl = document.querySelector('.layout-topbar-menu-button')
 
-    return !(sidebarEl.isSameNode(event.target) || sidebarEl.contains(event.target) || topbarEl.isSameNode(event.target) || topbarEl.contains(event.target));
-};
+  return !(
+    sidebarEl.isSameNode(event.target) ||
+    sidebarEl.contains(event.target) ||
+    topbarEl.isSameNode(event.target) ||
+    topbarEl.contains(event.target)
+  )
+}
 
 const onExitClickHandler = () => {
-  router.push('/login');
-};
-
+  router.push('/login')
+}
 </script>
 
 <template>
-    <div class="layout-topbar">
-        <router-link to="/" class="layout-topbar-logo">
-            <img src="/layout/images/ChampionPartners_full_logo.svg" alt="logo" style="height: 80px;"  />
-        </router-link>
+  <div class="layout-topbar">
+    <router-link to="/" class="layout-topbar-logo">
+      <img src="/layout/images/ChampionPartners_full_logo.svg" alt="logo" style="height: 80px" />
+    </router-link>
 
-        <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
-            <i class="pi pi-bars"></i>
-        </button>
+    <button class="p-link layout-menu-button layout-topbar-button" @click="onMenuToggle()">
+      <i class="pi pi-bars"></i>
+    </button>
 
-        <button class="p-link layout-topbar-menu-button layout-topbar-button" @click="onTopBarMenuButton()">
-            <i class="pi pi-ellipsis-v"></i>
-        </button>
+    <button
+      class="p-link layout-topbar-menu-button layout-topbar-button"
+      @click="onTopBarMenuButton()"
+    >
+      <i class="pi pi-ellipsis-v"></i>
+    </button>
 
-        <div class="layout-topbar-menu" :class="topbarMenuClasses">
-          <Button @click="onExitClickHandler" class="p-link layout-topbar-button">
-                <i class="pi pi-sign-out"></i>
-                <span>Выйти из админ панели</span>
-            </Button>
-            <Button @click="onProfileClick" class="p-link layout-topbar-button">
-                <i class="pi pi-home"></i>
-                <span>Профиль</span>
-            </Button>
-        </div>
+    <div class="layout-topbar-menu" :class="topbarMenuClasses">
+      <Button @click="onExitClickHandler" class="p-link layout-topbar-button">
+        <i class="pi pi-sign-out"></i>
+        <span>Выйти из админ панели</span>
+      </Button>
+      <Button @click="onProfileClick" class="p-link layout-topbar-button">
+        <i class="pi pi-home"></i>
+        <span>Профиль</span>
+      </Button>
     </div>
+  </div>
 </template>
 
 <style lang="scss" scoped></style>

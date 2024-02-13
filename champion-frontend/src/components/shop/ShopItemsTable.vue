@@ -1,72 +1,80 @@
 <script setup lang="ts">
-import {ref} from 'vue';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import InputText from 'primevue/inputtext';
-import Tag from 'primevue/tag';
-import Dropdown from 'primevue/dropdown';
-import Button from 'primevue/button';
-const toast = useToast();
-import Paginator from 'primevue/paginator';
-import {useRouter} from 'vue-router';
-import {Product} from '@/types/Products';
-import Toast from 'primevue/toast';
-import {useToast} from 'primevue/usetoast';
+import { ref } from 'vue'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import InputText from 'primevue/inputtext'
+import Tag from 'primevue/tag'
+import Dropdown from 'primevue/dropdown'
+import Button from 'primevue/button'
 
-const {products, isLoading} = defineProps({
+const toast = useToast()
+import Paginator from 'primevue/paginator'
+import { useRouter } from 'vue-router'
+import { Product } from '@/types/Products'
+import Toast from 'primevue/toast'
+import { useToast } from 'primevue/usetoast'
+
+const { products, isLoading } = defineProps({
   products: {
     type: Array as () => Product[],
-    required: true,
+    required: true
   },
   isLoading: {
     type: Boolean,
-    required: true,
+    required: true
   }
-});
+})
 
-const route = useRouter();
-const loading = ref(false);
+const route = useRouter()
+const loading = ref(false)
 const dropdownValues = ref([
-  {name: 'Id товара', code: 'id'},
-  {name: 'Название', code: 'name'},
-  {name: 'Категория', code: 'categoryId'},
-]);
+  { name: 'Id товара', code: 'id' },
+  { name: 'Название', code: 'name' },
+  { name: 'Категория', code: 'categoryId' }
+])
 
 const filters = ref({
   searchValue: '',
   fieldForSearch: 'name',
   rows: 5
-});
+})
 
 const deactivateHandler = () => {
-  loading.value = true;
+  loading.value = true
   try {
-    toast.add({severity: 'success', summary: 'Confirmed', detail: 'Товар успешно деактивирован.', life: 3000});
-  }
-  catch {
-    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
+    toast.add({
+      severity: 'success',
+      summary: 'Confirmed',
+      detail: 'Товар успешно деактивирован.',
+      life: 3000
+    })
+  } catch {
+    toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
 
 const activateHandler = () => {
-  loading.value = true;
+  loading.value = true
   try {
-    toast.add({severity: 'success', summary: 'Confirmed', detail: 'Товар успешно активирован.', life: 3000});
-  }
-  catch {
-    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
+    toast.add({
+      severity: 'success',
+      summary: 'Confirmed',
+      detail: 'Товар успешно активирован.',
+      life: 3000
+    })
+  } catch {
+    toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
   } finally {
-    loading.value = false;
+    loading.value = false
   }
 }
-
 </script>
 
 <template>
-  <div class=" flex flex-column">
-    <Toast/>
+  <div class="flex flex-column">
+    <Toast />
     <h3>Витрина</h3>
     <div v-if="!isLoading" class="flex flex-column justify-content-between">
       <DataTable :value="products" tableStyle="min-width: 50rem">
@@ -78,36 +86,39 @@ const activateHandler = () => {
 
           <div class="flex grid justify-content-between justify-content-center pt-2">
             <div class="flex justify-content-start col-3 p-0">
-              <Button outlined
-                      icon="pi pi-box"
-                      label="Добавить товар"
-                      @click="route.push('/admin/shop/create')"
+              <Button
+                outlined
+                icon="pi pi-box"
+                label="Добавить товар"
+                @click="route.push('/admin/shop/create')"
               />
             </div>
             <div class="col-9 p-0">
               <div class="flex justify-content-end">
-                <Dropdown v-model="filters.fieldForSearch"
-                          :options="dropdownValues"
-                          optionLabel="name"
-                          optionValue="code"
-                          class="w-full w-12rem"
+                <Dropdown
+                  v-model="filters.fieldForSearch"
+                  :options="dropdownValues"
+                  optionLabel="name"
+                  optionValue="code"
+                  class="w-full w-12rem"
                 />
 
                 <span class="p-input-icon-left ml-4">
-                        <i class="pi pi-search"/>
-                        <InputText v-model="filters.searchValue"
-                                   placeholder="Введите значение"
-                        />
-                    </span>
+                  <i class="pi pi-search" />
+                  <InputText v-model="filters.searchValue" placeholder="Введите значение" />
+                </span>
               </div>
             </div>
           </div>
-
         </template>
         <Column field="imgUrl" header="Изображение">
           <template #body="slotProps">
             <div class="flex align-content-center justify-content-center">
-              <img :src="slotProps.data.imgUrl" :alt="slotProps.data.image" class=" h-5rem border-round overflow-hidden"/>
+              <img
+                :src="slotProps.data.imgUrl"
+                :alt="slotProps.data.image"
+                class="h-5rem border-round overflow-hidden"
+              />
             </div>
           </template>
         </Column>
@@ -123,34 +134,45 @@ const activateHandler = () => {
         </Column>
         <Column header="" style="min-width: 3rem">
           <template v-slot:header></template>
-          <template v-slot:body="{data}">
-            <Button v-if="data.active"
-                    text
-                    rounded
-                    size="large"
-                    icon="pi pi-times"
-                    severity="danger"
-                    @click="deactivateHandler">
-
+          <template v-slot:body="{ data }">
+            <Button
+              v-if="data.active"
+              text
+              rounded
+              size="large"
+              icon="pi pi-times"
+              severity="danger"
+              @click="deactivateHandler"
+            >
             </Button>
-            <Button v-else
-                    text
-                    rounded
-                    size="large"
-                    icon="pi pi-check"
-                    severity="success"
-                    @click="activateHandler">
-
+            <Button
+              v-else
+              text
+              rounded
+              size="large"
+              icon="pi pi-check"
+              severity="success"
+              @click="activateHandler"
+            >
             </Button>
-            <Button text rounded size="large" icon="pi pi-eye" severity="secondary"
-                    @click="route.push(`/admin/shop/show/${data.id}`)"></Button>
+            <Button
+              text
+              rounded
+              size="large"
+              icon="pi pi-eye"
+              severity="secondary"
+              @click="route.push(`/admin/shop/show/${data.id}`)"
+            ></Button>
           </template>
         </Column>
         <template #footer> Всего {{ products ? products.length : 0 }} товаров.</template>
       </DataTable>
 
-
-      <Paginator :rows="filters.rows" :totalRecords="products.length" :rowsPerPageOptions="[5, 10, 15]"/>
+      <Paginator
+        :rows="filters.rows"
+        :totalRecords="products.length"
+        :rowsPerPageOptions="[5, 10, 15]"
+      />
     </div>
   </div>
 </template>

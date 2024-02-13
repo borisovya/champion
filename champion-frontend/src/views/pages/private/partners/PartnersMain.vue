@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import PartnersTable from '@/components/partners/PartnersTable.vue';
-import {onMounted, ref} from 'vue';
-import type {Partner} from '@/types/Partner';
-import ProgressBar from 'primevue/progressbar';
+import PartnersTable from '@/components/partners/PartnersTable.vue'
+import { onMounted, ref } from 'vue'
+import type { Partner } from '@/types/Partner'
+import ProgressBar from 'primevue/progressbar'
 
-const partners = ref<Partner[]>([]);
-const loading = ref(false);
+const partners = ref<Partner[]>([])
+const loading = ref(false)
 
 onMounted(() => {
-  loading.value = true;
+  loading.value = true
   setTimeout(() => {
     partners.value = [
       {
@@ -46,18 +46,17 @@ onMounted(() => {
         championId: 4,
         championLogin: '12444',
         bonusBalance: 1000
-      },
-    ];
-    loading.value = false;
-  }, 500);
-});
+      }
+    ]
+    loading.value = false
+  }, 500)
+})
 </script>
 
 <template>
-  <div class="card " style="height: calc(100vh - 9rem); overflow: auto">
-    <PartnersTable v-if="!loading" :partnersData="partners" :isLoading="loading"/>
+  <div class="card" style="height: calc(100vh - 9rem); overflow: auto">
+    <PartnersTable v-if="!loading" :partnersData="partners" :isLoading="loading" />
 
     <ProgressBar v-else mode="indeterminate" style="height: 6px"></ProgressBar>
   </div>
-
 </template>

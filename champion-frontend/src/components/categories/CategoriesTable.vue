@@ -4,82 +4,96 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Tag from 'primevue/tag';
 import Button from 'primevue/button';
-import Paginator from 'primevue/paginator';
 import {useRouter} from 'vue-router';
 import Toast from 'primevue/toast';
 import {useToast} from 'primevue/usetoast';
 import type {Category} from '@/types/Category';
 
-const toast = useToast();
+const toast = useToast()
 
-const {categories, isLoading} = defineProps({
+const { categories, isLoading } = defineProps({
   categories: {
     type: Array as () => Category[],
-    required: true,
+    required: true
   },
   isLoading: {
     type: Boolean,
-    required: true,
+    required: true
   }
-});
+})
 
-const route = useRouter();
-const loading = ref(false);
+const route = useRouter()
+const loading = ref(false)
 
 const deactivateHandler = () => {
-  loading.value = true;
+  loading.value = true
   try {
-    toast.add({severity: 'success', summary: 'Confirmed', detail: 'Категория успешно деактивирована.', life: 3000});
+    toast.add({
+      severity: 'success',
+      summary: 'Confirmed',
+      detail: 'Категория успешно деактивирована.',
+      life: 3000
+    })
+  } catch {
+    toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
+  } finally {
+    loading.value = false
   }
-  catch {
-    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
-  }
-  finally {
-    loading.value = false;
-  }
-};
+}
 
 const activateHandler = () => {
-  loading.value = true;
+  loading.value = true
   try {
-    toast.add({severity: 'success', summary: 'Confirmed', detail: 'Категория успешно активирована.', life: 3000});
+    toast.add({
+      severity: 'success',
+      summary: 'Confirmed',
+      detail: 'Категория успешно активирована.',
+      life: 3000
+    })
+  } catch {
+    toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
+  } finally {
+    loading.value = false
   }
-  catch {
-    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
-  }
-  finally {
-    loading.value = false;
-  }
-};
+}
 
 const deleteHandler = () => {
-  loading.value = true;
+  loading.value = true
   try {
-    toast.add({severity: 'success', summary: 'Confirmed', detail: 'Категория успешно удалена.', life: 3000});
+    toast.add({
+      severity: 'success',
+      summary: 'Confirmed',
+      detail: 'Категория успешно удалена.',
+      life: 3000
+    })
+  } catch {
+    toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
+  } finally {
+    loading.value = false
   }
-  catch {
-    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
-  }
-  finally {
-    loading.value = false;
-  }
-};
-
+}
 </script>
 
 <template>
-  <div class=" flex flex-column">
-    <Toast/>
+  <div class="flex flex-column">
+    <Toast />
     <h3>Категории товаров</h3>
     <div v-if="!isLoading" class="flex flex-column justify-content-between">
-      <DataTable :value="categories" tableStyle="min-width: 50rem" paginator :rows="5" :rowsPerPageOptions="[5, 10, 20]">
+      <DataTable
+        :value="categories"
+        tableStyle="min-width: 50rem"
+        paginator
+        :rows="5"
+        :rowsPerPageOptions="[5, 10, 20]"
+      >
         <template #header>
           <div class="flex grid justify-content-between justify-content-center pt-2">
             <div class="flex justify-content-start p-0">
-              <Button outlined
-                      icon="pi pi-plus"
-                      label="Добавить категорию"
-                      @click="route.push('/admin/shop/category/create')"
+              <Button
+                outlined
+                icon="pi pi-plus"
+                label="Добавить категорию"
+                @click="route.push('/admin/shop/category/create')"
               />
             </div>
           </div>
@@ -93,35 +107,38 @@ const deleteHandler = () => {
         </Column>
         <Column header="" style="width: 110px">
           <template v-slot:header></template>
-          <template v-slot:body="{data}">
-            <Button v-if="data.active"
-                    title="Деактивировать"
-                    text
-                    rounded
-                    size="large"
-                    icon="pi pi-times"
-                    severity="danger"
-                    @click="deactivateHandler">
-
+          <template v-slot:body="{ data }">
+            <Button
+              v-if="data.active"
+              title="Деактивировать"
+              text
+              rounded
+              size="large"
+              icon="pi pi-times"
+              severity="danger"
+              @click="deactivateHandler"
+            >
             </Button>
-            <Button v-else
-                    text
-                    rounded
-                    title="Активировать"
-                    size="large"
-                    icon="pi pi-check"
-                    severity="success"
-                    @click="activateHandler">
-
+            <Button
+              v-else
+              text
+              rounded
+              title="Активировать"
+              size="large"
+              icon="pi pi-check"
+              severity="success"
+              @click="activateHandler"
+            >
             </Button>
-            <Button text
-                    rounded
-                    size="large"
-                    icon="pi pi-trash"
-                    severity="danger"
-                    title="Удалить"
-                    @click="deleteHandler">
-
+            <Button
+              text
+              rounded
+              size="large"
+              icon="pi pi-trash"
+              severity="danger"
+              title="Удалить"
+              @click="deleteHandler"
+            >
             </Button>
           </template>
         </Column>

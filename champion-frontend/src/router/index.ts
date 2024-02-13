@@ -1,36 +1,36 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import AppLayout from '@/layout/AppLayout.vue';
-import Shop from '@/views/pages/private/shop/ShopMain.vue';
-import Partners from '@/views/pages/private/partners/PartnersMain.vue';
-import PublicShop from '@/views/pages/public/PublicShop.vue';
-import Notification from '@/views/pages/private/notifications/NotificationsMain.vue';
-import PartnersShow from '@/views/pages/private/partners/PartnersShow.vue';
-import NotFound from '@/views/pages/public/NotFound.vue';
-import PartnerCreate from '@/views/pages/private/partners/PartnerCreate.vue';
-import ShopCategories from '@/views/pages/private/shopCategories/ShopCategoriesMain.vue';
-import ShopShow from '@/views/pages/private/shop/ShopShow.vue';
-import ShopCreate from '@/views/pages/private/shop/ShopCreate.vue';
-import ShopCategoryCreate from '@/views/pages/private/shopCategories/ShopCategoryCreate.vue';
-import NewsMain from '@/views/pages/private/news/NewsMain.vue';
-import NewsCreate from '@/views/pages/private/news/NewsCreate.vue';
-import NewsShow from '@/views/pages/private/news/NewsShow.vue';
+import AppLayout from '@/layout/AppLayout.vue'
+import Shop from '@/views/pages/private/shop/ShopMain.vue'
+import Partners from '@/views/pages/private/partners/PartnersMain.vue'
+import PublicShop from '@/views/pages/public/PublicShop.vue'
+import Notification from '@/views/pages/private/notifications/NotificationsMain.vue'
+import PartnersShow from '@/views/pages/private/partners/PartnersShow.vue'
+import NotFound from '@/views/pages/public/NotFound.vue'
+import PartnerCreate from '@/views/pages/private/partners/PartnerCreate.vue'
+import ShopCategories from '@/views/pages/private/shopCategories/ShopCategoriesMain.vue'
+import ShopShow from '@/views/pages/private/shop/ShopShow.vue'
+import ShopCreate from '@/views/pages/private/shop/ShopCreate.vue'
+import ShopCategoryCreate from '@/views/pages/private/shopCategories/ShopCategoryCreate.vue'
+import NewsMain from '@/views/pages/private/news/NewsMain.vue'
+import NewsCreate from '@/views/pages/private/news/NewsCreate.vue'
+import NewsShow from '@/views/pages/private/news/NewsShow.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
-      children:[
+      children: [
         {
           path: '/',
           component: PublicShop
-        },
+        }
       ]
     },
     {
       path: '/admin',
       component: AppLayout,
-      children:[
+      children: [
         {
           path: '/admin',
           component: Partners
@@ -78,7 +78,7 @@ const router = createRouter({
         {
           path: '/admin/notifications',
           component: Notification
-        },
+        }
       ]
     },
     {
@@ -98,8 +98,8 @@ const router = createRouter({
     },
     {
       path: '/:path(.*)',
-      component: NotFound,
-    },
+      component: NotFound
+    }
   ]
 })
 

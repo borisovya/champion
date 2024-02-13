@@ -3,12 +3,14 @@ require('@rushstack/eslint-patch/modern-module-resolution')
 
 module.exports = {
   root: true,
-  env: { browser: true, es2020: true },
+  env: {
+    browser: true,
+    node: true
+  },
   extends: [
     'plugin:vue/vue3-essential',
     'eslint:recommended',
-    '@vue/eslint-config-typescript',
-    '@vue/eslint-config-prettier/skip-formatting'
+    '@vue/typescript/recommended',
   ],
   parserOptions: {
     ecmaVersion: 'latest'
@@ -16,4 +18,9 @@ module.exports = {
 
   ignorePatterns: ['dist', '.eslintrc.cjs'],
   parser: '@typescript-eslint/parser',
+
+  plugins: [
+    "vue",
+    "@typescript-eslint"
+  ],
 }

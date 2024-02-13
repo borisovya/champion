@@ -26,9 +26,8 @@ const rules = computed(() => {
     championId: {numeric, minValue: minValue(1)},
     telegram: {required},
     championLogin: {required},
-    bonusBalance: {required, numeric, minValue: minValue(1)},
+    bonusBalance: {required, numeric, minValue: minValue(1)}
   };
-
 });
 const partnerFieldsData = reactive({
   id: null,
@@ -56,15 +55,15 @@ onMounted(() => {
       bonusBalance: 1000
     };
 
-    partnerFieldsData.id = partner.value.id,
-        partnerFieldsData.name = partner.value.name,
-        partnerFieldsData.email = partner.value.email,
-        partnerFieldsData.telegram = partner.value.telegram,
-        partnerFieldsData.championId = partner.value.championId,
-        partnerFieldsData.championLogin = partner.value.championLogin,
-        partnerFieldsData.bonusBalance = partner.value.bonusBalance;
+    (partnerFieldsData.id = partner.value.id),
+        (partnerFieldsData.name = partner.value.name),
+        (partnerFieldsData.email = partner.value.email),
+        (partnerFieldsData.telegram = partner.value.telegram),
+        (partnerFieldsData.championId = partner.value.championId),
+        (partnerFieldsData.championLogin = partner.value.championLogin),
+        (partnerFieldsData.bonusBalance = partner.value.bonusBalance),
 
-    loading.value = false;
+        loading.value = false;
   }, 100);
 });
 const requireConfirmation = () => {
@@ -74,11 +73,10 @@ const requireConfirmation = () => {
     message: 'Пожалуйста, подтвердите действие.',
     accept: () => {
       toast.add({severity: 'success', summary: 'Пароль успешно сброшен', life: 3000});
-    },
+    }
   });
 };
 const getIsSaveDisabled = (): boolean => {
-
   if (!partnerFieldsData.email) {
     return true;
   }
@@ -92,15 +90,18 @@ const getIsSaveDisabled = (): boolean => {
     return true;
   }
 
-  if (JSON.stringify(partner.value) === JSON.stringify({
-    id: partnerFieldsData.id,
-    name: partnerFieldsData.name,
-    email: partnerFieldsData.email,
-    telegram: partnerFieldsData.telegram,
-    championId: partnerFieldsData.championId,
-    championLogin: partnerFieldsData.championLogin,
-    bonusBalance: partnerFieldsData.bonusBalance,
-  })) {
+  if (
+      JSON.stringify(partner.value) ===
+      JSON.stringify({
+        id: partnerFieldsData.id,
+        name: partnerFieldsData.name,
+        email: partnerFieldsData.email,
+        telegram: partnerFieldsData.telegram,
+        championId: partnerFieldsData.championId,
+        championLogin: partnerFieldsData.championLogin,
+        bonusBalance: partnerFieldsData.bonusBalance
+      })
+  ) {
     return true;
   }
 
@@ -113,55 +114,84 @@ const messageCancelClickHandler = () => {
 const messageSendClickHandler = () => {
   partnerFieldsData.showMessageModal = false;
   partnerFieldsData.messageForPartner = '';
-  toast.add({severity: 'success', summary: 'Confirmed', detail: 'Сообщение отправлено', life: 3000});
+  toast.add({
+    severity: 'success',
+    summary: 'Confirmed',
+    detail: 'Сообщение отправлено',
+    life: 3000
+  });
 };
 
 const v$ = useVuelidate(rules, toRefs(partnerFieldsData));
 
 const onSubmit = async () => {
-
   const isValid = await v$.value.$validate();
 
   console.log(partnerFieldsData);
 
   if (!isValid) {
-    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Проверьте введенные данные.', life: 3000});
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Проверьте введенные данные.',
+      life: 3000
+    });
     return;
   }
 
-  toast.add({severity: 'success', summary: 'Confirmed', detail: 'Данные пользователя успешно изменены.', life: 3000});
+  toast.add({
+    severity: 'success',
+    summary: 'Confirmed',
+    detail: 'Данные пользователя успешно изменены.',
+    life: 3000
+  });
 };
 
 watchEffect(() => {
   isSaveDisabled.value = getIsSaveDisabled();
 });
-
 </script>
 
 <template>
   <Toast/>
-  <Dialog v-model:visible="partnerFieldsData.showMessageModal" modal
-          :header="'Отправка сообщения ' + partnerFieldsData.telegram" :style="{ width: '45rem' }">
+  <Dialog
+      v-model:visible="partnerFieldsData.showMessageModal"
+      modal
+      :header="'Отправка сообщения ' + partnerFieldsData.telegram"
+      :style="{ width: '45rem' }"
+  >
     <span class="p-text-secondary block mb-3">Текст сообщения:</span>
     <div class="flex align-items-center gap-3 mb-3">
-      <Textarea id="message"
-                rows="7"
-                v-model="partnerFieldsData.messageForPartner"
-                class="flex-auto"
-                autocomplete="off"
+      <Textarea
+          id="message"
+          rows="7"
+          v-model="partnerFieldsData.messageForPartner"
+          class="flex-auto"
+          autocomplete="off"
       />
     </div>
     <div class="flex justify-content-end gap-2">
-      <Button type="button" label="Отменить" severity="secondary" @click="messageCancelClickHandler"></Button>
-      <Button type="button" label="Отправить" :disabled="!partnerFieldsData.messageForPartner"
-              @click="messageSendClickHandler"></Button>
+      <Button
+          type="button"
+          label="Отменить"
+          severity="secondary"
+          @click="messageCancelClickHandler"
+      ></Button>
+      <Button
+          type="button"
+          label="Отправить"
+          :disabled="!partnerFieldsData.messageForPartner"
+          @click="messageSendClickHandler"
+      ></Button>
     </div>
   </Dialog>
 
   <ConfirmDialog group="headless">
     <template #container="{ message, acceptCallback, rejectCallback }">
       <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
-        <div class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem -mt-8">
+        <div
+            class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem -mt-8"
+        >
           <i class="pi pi-question text-5xl"></i>
         </div>
         <span class="font-bold text-2xl block mb-2 mt-4">{{ (message as any).message }}</span>
@@ -185,13 +215,14 @@ watchEffect(() => {
           <label for="email">Email</label>
           <span class="p-input-icon-left">
             <i class="pi pi-at"/>
-              <InputText id="email"
-                         type="text"
-                         placeholder="Email"
-                         style="padding: 1rem; padding-left: 3rem; width: 100%"
-                         v-model="partnerFieldsData.email"
-              />
-            </span>
+            <InputText
+                id="email"
+                type="text"
+                placeholder="Email"
+                style="padding: 1rem; padding-left: 3rem; width: 100%"
+                v-model="partnerFieldsData.email"
+            />
+          </span>
           <span v-if="v$.email?.$errors[0]?.$message" class="text-red-400">
             {{ v$.email?.$errors[0]?.$message }}
           </span>
@@ -201,16 +232,17 @@ watchEffect(() => {
           <label for="telegram">Телеграм</label>
           <span class="p-input-icon-left">
             <i class="pi pi-send"/>
-              <InputText id="telegram"
-                         type="text"
-                         placeholder="Телеграм"
-                         style="padding: 1rem; padding-left: 3rem; width: 100%"
-                         v-model="partnerFieldsData.telegram"
-              />
-            </span>
+            <InputText
+                id="telegram"
+                type="text"
+                placeholder="Телеграм"
+                style="padding: 1rem; padding-left: 3rem; width: 100%"
+                v-model="partnerFieldsData.telegram"
+            />
+          </span>
           <div v-if="v$.telegram?.$errors[0]?.$message" class="text-red-400">
-                {{ v$.telegram?.$errors[0]?.$message }}
-              </div>
+            {{ v$.telegram?.$errors[0]?.$message }}
+          </div>
         </div>
       </div>
 
@@ -219,95 +251,93 @@ watchEffect(() => {
           <label for="championId">Champion Id</label>
           <span class="p-input-icon-left">
             <i class="pi pi-id-card"/>
-              <InputText id="championId"
-                         type="number"
-                         inputmode="numeric"
-                         placeholder="Champion Id"
-                         style="padding: 1rem; padding-left: 3rem; width: 100%"
-                         v-model="partnerFieldsData.championId"
-              />
-              <div v-if="v$.championId?.$errors[0]?.$message" class="text-red-400">
-                {{ v$.championId?.$errors[0]?.$message }}
-              </div>
-            </span>
+            <InputText
+                id="championId"
+                type="number"
+                inputmode="numeric"
+                placeholder="Champion Id"
+                style="padding: 1rem; padding-left: 3rem; width: 100%"
+                v-model="partnerFieldsData.championId"
+            />
+            <div v-if="v$.championId?.$errors[0]?.$message" class="text-red-400">
+              {{ v$.championId?.$errors[0]?.$message }}
+            </div>
+          </span>
         </div>
 
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
           <label for="championLogin">Champion Login</label>
           <span class="p-input-icon-left">
             <i class="pi pi-user"/>
-              <InputText id="championLogin"
-                         type="text"
-                         placeholder="Телеграм"
-                         style="padding: 1rem; padding-left: 3rem; width: 100%"
-                         v-model="partnerFieldsData.championLogin"
-              />
-              <div v-if="v$.championLogin?.$errors[0]?.$message" class="text-red-400">
-                {{ v$.championLogin?.$errors[0]?.$message }}
-              </div>
-            </span>
+            <InputText
+                id="championLogin"
+                type="text"
+                placeholder="Телеграм"
+                style="padding: 1rem; padding-left: 3rem; width: 100%"
+                v-model="partnerFieldsData.championLogin"
+            />
+            <div v-if="v$.championLogin?.$errors[0]?.$message" class="text-red-400">
+              {{ v$.championLogin?.$errors[0]?.$message }}
+            </div>
+          </span>
         </div>
       </div>
 
       <div class="lg:flex border-round inputBlocksPaddingTop">
-        <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center ">
+        <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
           <label for="bonusBalance">Бонусный баланс</label>
           <span class="p-input-icon-left">
             <i class="pi pi-wallet"/>
-              <InputText id="bonusBalance"
-                         type="number"
-                         placeholder="Бонусный баланс"
-                         style="padding: 1rem; padding-left: 3rem; width: 100%"
-                         v-model="partnerFieldsData.bonusBalance"
-              />
+            <InputText
+                id="bonusBalance"
+                type="number"
+                placeholder="Бонусный баланс"
+                style="padding: 1rem; padding-left: 3rem; width: 100%"
+                v-model="partnerFieldsData.bonusBalance"
+            />
             <div v-if="v$.bonusBalance?.$errors[0]?.$message" class="text-red-400">
-                {{ v$.bonusBalance?.$errors[0]?.$message }}
-              </div>
-            </span>
+              {{ v$.bonusBalance?.$errors[0]?.$message }}
+            </div>
+          </span>
         </div>
 
-        <div class="p-2 flex flex-column align-items-start justify-content-center lg:w-12">
-
-        </div>
+        <div class="p-2 flex flex-column align-items-start justify-content-center lg:w-12"></div>
       </div>
 
       <div class="lg:flex border-round inputBlocksPaddingTop">
         <div class="w-12 p-2 flex flex-wrap align-items-start justify-content-start">
           <div class="flex mr-2">
-            <Button label="Отправить сообщение"
-                    icon="pi pi-envelope"
-                    text
-                    @click="partnerFieldsData.showMessageModal = true"
+            <Button
+                label="Отправить сообщение"
+                icon="pi pi-envelope"
+                text
+                @click="partnerFieldsData.showMessageModal = true"
             />
           </div>
           <div class="flex mr-2">
-            <Button label="Сбросить пароль"
-                    icon="pi pi-key"
-                    text
-                    @click="requireConfirmation()"
-            />
+            <Button label="Сбросить пароль" icon="pi pi-key" text @click="requireConfirmation()"/>
           </div>
           <div class="flex mr-2">
-            <Button label="Отменить"
-                    severity="danger"
-                    icon="pi pi-directions-alt"
-                    text
-                    @click="router.back()"
+            <Button
+                label="Отменить"
+                severity="danger"
+                icon="pi pi-directions-alt"
+                text
+                @click="router.back()"
             />
           </div>
           <div class="flex">
-            <Button label="Сохранить"
-                    type="submit"
-                    :disabled="isSaveDisabled"
-                    icon="pi pi-save"
-                    severity="success"
-
-                    text
+            <Button
+                label="Сохранить"
+                type="submit"
+                :disabled="isSaveDisabled"
+                icon="pi pi-save"
+                severity="success"
+                text
             />
           </div>
         </div>
       </div>
-
     </form>
   </div>
 </template>
@@ -332,8 +362,9 @@ watchEffect(() => {
     padding-top: 0;
   }
 }
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }

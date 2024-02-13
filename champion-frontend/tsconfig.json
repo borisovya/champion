@@ -14,7 +14,6 @@
     }
   ],
   "compilerOptions": {
-    "module": "ESNext", //бурало две ошибки в vite.config
     "baseUrl": ".",
     "paths": {
       "types": ["vite/client"],

@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import {onMounted, ref} from 'vue';
-import ProgressBar from 'primevue/progressbar';
-import ShopItemsTable from '@/components/shop/ShopItemsTable.vue';
-import type {Product} from '@/types/Products';
+import { onMounted, ref } from 'vue'
+import ProgressBar from 'primevue/progressbar'
+import ShopItemsTable from '@/components/shop/ShopItemsTable.vue'
+import type { Product } from '@/types/Products'
 
-const products = ref<Product[]>([]);
-const loading = ref(false);
+const products = ref<Product[]>([])
+const loading = ref(false)
 
 onMounted(() => {
-  loading.value = true;
+  loading.value = true
   setTimeout(() => {
     products.value = [
       {
@@ -18,7 +18,8 @@ onMounted(() => {
         price: 500,
         active: true,
         categoryId: 1,
-        imgUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRB6p_1WriDjdY2v6Y5RXYkVlmtqAMAVIOBTw&usqp=CAU'
+        imgUrl:
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRB6p_1WriDjdY2v6Y5RXYkVlmtqAMAVIOBTw&usqp=CAU'
       },
       {
         id: 2,
@@ -27,7 +28,8 @@ onMounted(() => {
         price: 2500,
         active: true,
         categoryId: 2,
-        imgUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGbT5FI9ZoXAAVDVluVs1hbO5oCMUyMU1w2g&usqp=CAU'
+        imgUrl:
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGbT5FI9ZoXAAVDVluVs1hbO5oCMUyMU1w2g&usqp=CAU'
       },
       {
         id: 3,
@@ -36,7 +38,8 @@ onMounted(() => {
         price: 300,
         active: true,
         categoryId: 1,
-        imgUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7SoYsXmu_-uMQnJ7PPr6v9ND3jrq3oYri-g&usqp=CAU'
+        imgUrl:
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7SoYsXmu_-uMQnJ7PPr6v9ND3jrq3oYri-g&usqp=CAU'
       },
       {
         id: 4,
@@ -45,7 +48,8 @@ onMounted(() => {
         price: 15500,
         active: true,
         categoryId: 3,
-        imgUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkUso7lKSjoBcBh9-vKqQQQxW7nfzBF08Bug&usqp=CAU'
+        imgUrl:
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkUso7lKSjoBcBh9-vKqQQQxW7nfzBF08Bug&usqp=CAU'
       },
       {
         id: 5,
@@ -54,17 +58,18 @@ onMounted(() => {
         price: 9500,
         active: false,
         categoryId: 4,
-        imgUrl: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwXHQ8nJw9on_IdjF5c59hjx4ZdHVqP9sw0w&usqp=CAU'
-      },
-    ];
-    loading.value = false;
-  }, 500);
-});
+        imgUrl:
+          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwXHQ8nJw9on_IdjF5c59hjx4ZdHVqP9sw0w&usqp=CAU'
+      }
+    ]
+    loading.value = false
+  }, 500)
+})
 </script>
 
 <template>
-  <div class="card " style="height: calc(100vh - 9rem); overflow: auto">
-    <ShopItemsTable v-if="!loading" :products="products" :isLoading="loading"/>
+  <div class="card" style="height: calc(100vh - 9rem); overflow: auto">
+    <ShopItemsTable v-if="!loading" :products="products" :isLoading="loading" />
 
     <ProgressBar v-else mode="indeterminate" style="height: 6px"></ProgressBar>
   </div>
