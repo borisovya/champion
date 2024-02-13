@@ -1,5 +1,5 @@
 controllers:
-    prefix: "api"
+    prefix: "api/v1/"
     resource:
         path: ../src/Controller/
         namespace: App\Controller
