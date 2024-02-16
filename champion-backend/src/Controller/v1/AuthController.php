@@ -21,7 +21,12 @@ class AuthController extends BaseController
     /**
      * @throws UserAlreadyExistsException
      */
+
     #[Route(path: '/auth/sign-up', methods: ['POST'])]
+    #[OA\RequestBody(attachables: [new Model(type: SignUpRequest::class)])]
+
+    #[OA\Tag(name: 'Authentication')]
+
     #[OA\Response(
         response: 200,
         description: 'Signs up a user',
@@ -31,7 +36,7 @@ class AuthController extends BaseController
     )]
     #[OA\Response(response: 409, description: 'User already exists', attachables: [new Model(type: ErrorResponse::class)])]
     #[OA\Response(response: 400, description: 'Validation failed', attachables: [new Model(type: ErrorResponse::class)])]
-    #[OA\RequestBody(attachables: [new Model(type: SignUpRequest::class)])]
+
     public function signUp(
         #[RequestBody] SignUpRequest $signUpRequest,
         UserService $authService,
