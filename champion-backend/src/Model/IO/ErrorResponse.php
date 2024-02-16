@@ -9,9 +9,9 @@ use App\Model\ErrorValidationDetails;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Attributes as OA;
 
-class ErrorResponse
+readonly class ErrorResponse
 {
-    public function __construct(private readonly string $message, private readonly mixed $details = null)
+    public function __construct(private string $message, private mixed $details = null)
     {
     }
 
