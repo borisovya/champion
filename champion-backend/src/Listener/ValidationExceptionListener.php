@@ -14,11 +14,14 @@ use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ValidationExceptionListener
+readonly class ValidationExceptionListener
 {
-    public function __construct(private readonly SerializerInterface $serializer)
-    {
+    public function __construct(
+        private SerializerInterface $serializer,
+        private TranslatorInterface $translator,
+    ) {
     }
 
     public function __invoke(ExceptionEvent $event): void
@@ -30,7 +33,10 @@ class ValidationExceptionListener
         }
 
         $data = $this->serializer->serialize(
-            new ErrorResponse($throwable->getMessage(), $this->formatViolations($throwable->getViolations())),
+            new ErrorResponse(
+                $this->translator->trans($throwable->getMessage()),
+                $this->formatViolations($throwable->getViolations()),
+            ),
             JsonEncoder::FORMAT,
         );
 

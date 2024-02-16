@@ -15,14 +15,16 @@ use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
-class ApiExceptionListener
+readonly class ApiExceptionListener
 {
     public function __construct(
-        private readonly ExceptionMappingResolver $resolver,
-        private readonly LoggerInterface $logger,
-        private readonly SerializerInterface $serializer,
-        private readonly bool $isDebug
+        private ExceptionMappingResolver $resolver,
+        private LoggerInterface $logger,
+        private SerializerInterface $serializer,
+        private TranslatorInterface $translator,
+        private bool $isDebug,
     ) {
     }
 
@@ -52,7 +54,10 @@ class ApiExceptionListener
             : $throwable->getMessage();
 
         $details = $this->isDebug ? new ErrorDebugDetails($throwable->getTraceAsString()) : null;
-        $data = $this->serializer->serialize(new ErrorResponse($message, $details), JsonEncoder::FORMAT);
+        $data = $this->serializer->serialize(
+            new ErrorResponse($this->translator->trans($message), $details),
+            JsonEncoder::FORMAT
+        );
 
         $event->setResponse(new JsonResponse($data, $mapping->getCode(), [], true));
     }

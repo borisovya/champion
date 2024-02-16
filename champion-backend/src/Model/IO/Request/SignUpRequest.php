@@ -4,19 +4,30 @@ declare(strict_types=1);
 
 namespace App\Model\IO\Request;
 
-use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\EqualTo;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class SignUpRequest
 {
-    #[Assert\NotBlank, Assert\Email]
+    #[NotBlank]
+    #[Email]
     private string $email;
-    #[Assert\NotBlank, Assert\Length(min: 6)]
-    private string $password;
-    #[Assert\NotBlank, Assert\EqualTo(propertyPath: 'password', message: 'Confirm password should be equal to password field')]
+
+    #[NotBlank]
+    #[Length(min: 6)]
+    private ?string $password = null;
+
+    #[NotBlank]
+    #[EqualTo(propertyPath: 'password', message: 'confirm.password')]
     private string $confirmPassword;
-    #[Assert\NotBlank]
+
+    #[NotBlank]
     private string $telegramLogin;
-    private ?string $championPartnersLogin;
+
+    #[NotBlank]
+    private string $championPartnersLogin;
 
     public function getConfirmPassword(): string
     {
@@ -42,12 +53,12 @@ class SignUpRequest
         return $this;
     }
 
-    public function getPassword(): string
+    public function getPassword(): ?string
     {
         return $this->password;
     }
 
-    public function setPassword(string $password): SignUpRequest
+    public function setPassword(?string $password): SignUpRequest
     {
         $this->password = $password;
 
@@ -66,12 +77,12 @@ class SignUpRequest
         return $this;
     }
 
-    public function getChampionPartnersLogin(): ?string
+    public function getChampionPartnersLogin(): string
     {
         return $this->championPartnersLogin;
     }
 
-    public function setChampionPartnersLogin(?string $championPartnersLogin): SignUpRequest
+    public function setChampionPartnersLogin(string $championPartnersLogin): SignUpRequest
     {
         $this->championPartnersLogin = $championPartnersLogin;
 

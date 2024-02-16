@@ -1,30 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Service;
 
 use App\Entity\User;
 use App\Exception\UserAlreadyExistsException;
 use App\Model\IO\Request\SignUpRequest;
 use App\Repository\UserRepository;
-use Lexik\Bundle\JWTAuthenticationBundle\Security\Http\Authentication\AuthenticationSuccessHandler;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class AuthService extends BaseService
+readonly class UserService
 {
     public function __construct(
-        private readonly UserPasswordHasherInterface $userPasswordHasher,
-        private readonly UserRepository $userRepository,
-        private readonly AuthenticationSuccessHandler $successHandler,
+        private UserPasswordHasherInterface $userPasswordHasher,
+        private UserRepository $userRepository
     ) {
     }
 
     /**
      * @throws UserAlreadyExistsException
      */
-    public function signUp(SignUpRequest $signUpRequest): Response
+    public function signUp(SignUpRequest $signUpRequest): User
     {
-        if (!$this->userRepository->existsByEmail($signUpRequest->getEmail())) {
+        if ($this->userRepository->existsByEmail($signUpRequest->getEmail())) {
             throw new UserAlreadyExistsException();
         }
 
@@ -34,10 +33,9 @@ class AuthService extends BaseService
             ->setChampionPartnersLogin($signUpRequest->getChampionPartnersLogin());
 
         $passwordHash = $this->userPasswordHasher->hashPassword($user, $signUpRequest->getPassword());
-
         $user->setPassword($passwordHash);
-        $this->save($user);
+        $this->userRepository->save($user);
 
-        return $this->successHandler->handleAuthenticationSuccess($user);
+        return $user;
     }
 }

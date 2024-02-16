@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Model;
 
-class ExceptionMapping
+readonly class ExceptionMapping
 {
     public function __construct(
-        private readonly int $code,
-        private readonly bool $hidden,
-        private readonly bool $loggable
+        private int $code,
+        private bool $hidden,
+        private bool $loggable
     ) {
     }
 
