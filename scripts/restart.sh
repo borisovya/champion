@@ -8,4 +8,8 @@ command docker compose up --force-recreate -d || { message error 'The applicatio
 
 cd ../champion-backend || exit 1
 
+command composer install --prefer-dist --no-interaction
+
+docker compose exec backend php bin/console --no-interaction doctrine:migrations:migrate
+
 command php bin/console cache:clear

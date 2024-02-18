@@ -25,3 +25,5 @@ command docker compose build || { message error 'Docker services build was faile
 
 message info 'Step 3: Run services.'
 command docker compose up -d || { message error 'Docker services run was failed' ; exit  1 ; }
+
+docker compose exec backend php bin/console --no-interaction doctrine:migrations:migrate
