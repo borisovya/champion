@@ -21,14 +21,14 @@ readonly class UserService
     /**
      * @throws UserAlreadyExistsException
      */
-    public function signUp(SignUpRequest $signUpRequest): User
+    public function create(SignUpRequest $signUpRequest): User
     {
-        if ($this->userRepository->existsByEmail($signUpRequest->getEmail())) {
+        if ($this->userRepository->exists($signUpRequest->getUsername())) {
             throw new UserAlreadyExistsException();
         }
 
         $user = (new User())
-            ->setEmail($signUpRequest->getEmail())
+            ->setUsername($signUpRequest->getUsername())
             ->setTelegramLogin($signUpRequest->getTelegramLogin())
             ->setChampionPartnersLogin($signUpRequest->getChampionPartnersLogin());
 

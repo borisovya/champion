@@ -13,7 +13,7 @@ class SignUpRequest
 {
     #[NotBlank]
     #[Email]
-    private string $email;
+    private string $username;
 
     #[NotBlank]
     #[Length(min: 6)]
@@ -41,14 +41,14 @@ class SignUpRequest
         return $this;
     }
 
-    public function getEmail(): string
+    public function getUsername(): string
     {
-        return $this->email;
+        return $this->username;
     }
 
-    public function setEmail(string $email): SignUpRequest
+    public function setUsername(string $username): SignUpRequest
     {
-        $this->email = $email;
+        $this->username = $username;
 
         return $this;
     }

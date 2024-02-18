@@ -16,4 +16,10 @@ app.swagger:
     defaults: { _controller: nelmio_api_doc.controller.swagger }
 
 api_login_check:
-    path: /api/v1/auth/login
+    path: /api/v1/auth/sign-in
+
+api_refresh_token:
+    path: /api/v1/auth/refresh
+
+api_logout:
+    path: /api/v1/auth/sign-out

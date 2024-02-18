@@ -4,14 +4,83 @@ nelmio_api_doc:
             title: Champion shop API
             description: API for Champion shop
             version: 1.0.0
+        paths:
+            /api/v1/auth/refresh:
+                get:
+                    tags:
+                        - Authentication
+                    responses:
+                        '200':
+                            description: Refresh new JWT Token
+                            content:
+                                application/json:
+                                    schema:
+                                        $ref: '#/components/schemas/Token'
+            /api/v1/auth/sign-out:
+                post:
+                    tags:
+                        - Authentication
+                    responses:
+                        '200':
+                            description: Refresh new JWT Token
+                            content:
+                                application/json:
+                                    schema:
+                                        $ref: '#/components/schemas/Token'
+            /api/v1/auth/sign-in:
+                post:
+                    tags:
+                        - Authentication
+                    requestBody:
+                        description: Create new JWT Token
+                        content:
+                            application/json:
+                                schema:
+                                    $ref: '#/components/schemas/Credentials'
+                    responses:
+                        '200':
+                            description: The supplied refresh_token has been invalidated
+                            content:
+                                application/json:
+                                    schema:
+                                        $ref: '#/components/schemas/Message'
+                        '400':
+                            description: Refresh token not found
+                            content:
+                                application/json:
+                                    schema:
+                                        $ref: '#/components/schemas/Message'
+
         components:
+            schemas:
+                Token:
+                    type: object
+                    properties:
+                        token:
+                            type: string
+                            readOnly: true
+                Credentials:
+                    type: object
+                    properties:
+                        username:
+                            type: string
+                        password:
+                            type: string
+
+                Message:
+                    type: object
+                    properties:
+                        code:
+                            type: number
+                        message:
+                            type: string
             securitySchemes:
                 Bearer:
                     type: http
                     scheme: bearer
                     bearerFormat: JWT
         security:
-            - Bearer: []
+            -   Bearer: [ ]
     areas:
         path_patterns:
             - ^/api/v1

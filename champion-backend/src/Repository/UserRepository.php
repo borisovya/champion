@@ -14,14 +14,14 @@ use App\Entity\User;
  */
 class UserRepository extends DatabaseRepository
 {
-    public function existsByEmail(string $email): bool
+    public function exists(string $username): bool
     {
-        return null !== $this->findOneBy(['email' => $email]);
+        return null !== $this->findOneBy(['username' => $username]);
     }
 
     public function save(User $user): User
     {
-        $this->saveEntity($user);
+        $this->saveEntityWithCommit($user);
 
         return $user;
     }
