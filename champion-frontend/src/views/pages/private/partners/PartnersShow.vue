@@ -53,7 +53,7 @@ onMounted(() => {
       championId: 1,
       championLogin: '123fff',
       bonusBalance: 1000
-    }
+    };
 
     (partnerFieldsData.id = partner.value.id),
       (partnerFieldsData.name = partner.value.name),
