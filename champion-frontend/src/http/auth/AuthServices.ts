@@ -1,24 +1,24 @@
-import axios from '../axios.ts'
+import axios from '@/http/axios.ts'
 import type { Registration } from '@/types/requests/auth/Auth'
 
-export const login = async (login: string, password: string): Promise<boolean> => {
+export const signIn = async (username: string, password: string): Promise<boolean> => {
   try {
-    return await axios.post('web-api/v1/login', { login, password })
+    return await axios.post('api/v1/auth/sign-in', { username, password })
   } catch (e) {
     return false
   }
 }
-export const register = async (request: Registration): Promise<boolean> => {
+export const signUp = async (request: Registration): Promise<boolean> => {
   try {
-    return await axios.post('web-api/v1/register', { ...request })
+    return await axios.post('api/v1/auth/sign-up', { ...request })
   } catch (e) {
     return false
   }
 }
 
-export const logout = async (): Promise<boolean> => {
+export const signOut = async (): Promise<boolean> => {
   try {
-    await axios.post('web-api/v1/logout')
+    await axios.post('api/v1/logout')
     return true
   } catch (e) {
     return false

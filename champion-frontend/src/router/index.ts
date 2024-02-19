@@ -23,13 +23,19 @@ const router = createRouter({
       children: [
         {
           path: '/',
-          component: PublicShop
+          component: PublicShop,
+          meta: {
+            requiresAuth: true
+          }
         }
       ]
     },
     {
       path: '/admin',
       component: AppLayout,
+      meta: {
+        requiresAuth: true
+      },
       children: [
         {
           path: '/admin',
@@ -101,6 +107,43 @@ const router = createRouter({
       component: NotFound
     }
   ]
+})
+
+router.beforeEach(async (to, from) => {
+  const user = true
+  if (to.meta.requiresAuth && !user) {
+    // await user.getUser();
+    try {
+      if (to.meta.requiresAuth) {
+        return {
+          path: '/login',
+          // save the location we were at to come back later
+          query: { redirect: to.fullPath }
+        }
+      }
+    } catch {
+      return {
+        path: '/login',
+        // save the location we were at to come back later
+        query: { redirect: to.fullPath }
+      }
+    }
+  }
+
+  if (
+    Object.prototype.hasOwnProperty.call(to, 'meta') &&
+    to.meta.table !== undefined &&
+    to.meta.action !== undefined
+  ) {
+    if (
+      user.auth.user &&
+      !user.isUserHasPermission(to.meta.table, to.meta.action, undefined, to.meta.onlyAll)
+    ) {
+      return {
+        path: '/access_deny'
+      }
+    }
+  }
 })
 
 export default router

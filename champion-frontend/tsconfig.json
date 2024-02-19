@@ -17,7 +17,7 @@
     "baseUrl": ".",
     "paths": {
       "types": ["vite/client"],
-      "@/*": ["src/*"],
+      "@/*": ["src/*"]
     }
   }
 }

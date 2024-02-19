@@ -7,16 +7,17 @@ import { useToast } from 'primevue/usetoast'
 import Toast from 'primevue/toast'
 import useVuelidate from '@vuelidate/core'
 import { required, email, minLength, sameAs } from '@/i18n/i18n-validators'
+import { signUp } from '@/http/auth/AuthServices.ts'
 
 const toast = useToast()
 const loading = ref(false)
 const rules = computed(() => {
   return {
-    email: { required, email },
-    telegram: { required, minLength: minLength(2) },
-    championLogin: { required },
+    username: { required, email },
+    telegramLogin: { required, minLength: minLength(2) },
+    championPartnersLogin: { required },
     password: { required, minLength: minLength(5) },
-    repeatedPassword: {
+    confirmPassword: {
       required,
       minLength: minLength(5),
       sameAs: sameAs(`${registrationData.password}`, 'Пароль')
@@ -24,12 +25,14 @@ const rules = computed(() => {
   }
 })
 const registrationData = reactive({
-  email: '',
+  username: '',
   password: '',
-  repeatedPassword: '',
-  telegram: '',
-  championLogin: ''
+  confirmPassword: '',
+  telegramLogin: '',
+  championPartnersLogin: ''
 })
+
+const v$ = useVuelidate(rules, toRefs(registrationData))
 
 const showSuccess = () => {
   toast.add({
@@ -44,7 +47,7 @@ const showError = () => {
   toast.add({
     severity: 'error',
     summary: 'Ой! Что-то сломалось.',
-    detail: 'Но это не точно...',
+    detail: 'Попробуйте еще раз.',
     life: 2000
   })
 }
@@ -63,13 +66,18 @@ const submit = async () => {
       })
       loading.value = false
       return
-    } else showSuccess()
+    } else {
+      const registrationResponse = await signUp(registrationData)
+      if (registrationResponse) {
+        showSuccess()
+      } else {
+        showError()
+      }
+    }
   } catch (e) {
     showError()
   }
 }
-
-const v$ = useVuelidate(rules, toRefs(registrationData))
 </script>
 
 <template>
@@ -104,10 +112,10 @@ const v$ = useVuelidate(rules, toRefs(registrationData))
                 placeholder="Email"
                 class="w-full md:w-30rem"
                 style="padding: 1rem"
-                v-model="registrationData.email"
+                v-model="registrationData.username"
               />
-              <div v-if="v$.email?.$errors[0]?.$message" class="text-red-400">
-                {{ v$.email?.$errors[0]?.$message }}
+              <div v-if="v$.username?.$errors[0]?.$message" class="text-red-400">
+                {{ v$.username?.$errors[0]?.$message }}
               </div>
             </div>
             <div class="mb-2">
@@ -120,26 +128,26 @@ const v$ = useVuelidate(rules, toRefs(registrationData))
                 placeholder="Телеграм"
                 class="w-full md:w-30rem"
                 style="padding: 1rem"
-                v-model="registrationData.telegram"
+                v-model="registrationData.telegramLogin"
               />
-              <div v-if="v$.telegram?.$errors[0]?.$message" class="text-red-400">
-                {{ v$.telegram?.$errors[0]?.$message }}
+              <div v-if="v$.telegramLogin?.$errors[0]?.$message" class="text-red-400">
+                {{ v$.telegramLogin?.$errors[0]?.$message }}
               </div>
             </div>
             <div class="mb-2">
               <label for="champId" class="block text-900 text-xl font-medium mb-2"
-                >Champion Login</label
+                >Champion Partners Login</label
               >
               <InputText
                 id="champId"
                 type="text"
-                placeholder="Champion Login"
+                placeholder="Champion Partners Login"
                 class="w-full md:w-30rem"
                 style="padding: 1rem"
-                v-model="registrationData.championLogin"
+                v-model="registrationData.championPartnersLogin"
               />
-              <div v-if="v$.championLogin?.$errors[0]?.$message" class="text-red-400">
-                {{ v$.championLogin?.$errors[0]?.$message }}
+              <div v-if="v$.championPartnersLogin?.$errors[0]?.$message" class="text-red-400">
+                {{ v$.championPartnersLogin?.$errors[0]?.$message }}
               </div>
             </div>
             <div class="mb-2">
@@ -163,15 +171,15 @@ const v$ = useVuelidate(rules, toRefs(registrationData))
               >
               <Password
                 id="password2"
-                v-model="registrationData.repeatedPassword"
+                v-model="registrationData.confirmPassword"
                 placeholder="Повтор пароля"
                 :toggleMask="true"
                 class="w-full"
                 inputClass="w-full"
                 :inputStyle="{ padding: '1rem' }"
               ></Password>
-              <div v-if="v$.repeatedPassword?.$errors[0]?.$message" class="text-red-400">
-                {{ v$.repeatedPassword?.$errors[0]?.$message }}
+              <div v-if="v$.confirmPassword?.$errors[0]?.$message" class="text-red-400">
+                {{ v$.confirmPassword?.$errors[0]?.$message }}
               </div>
             </div>
             <Button

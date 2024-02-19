@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import {computed, reactive, ref, toRefs} from 'vue';
-import ProgressBar from 'primevue/progressbar';
-import Button from 'primevue/button';
-import Toast from 'primevue/toast';
-import {useToast} from 'primevue/usetoast';
-import useVuelidate from '@vuelidate/core';
-import {required} from '@/i18n/i18n-validators';
-import Textarea from 'primevue/textarea';
+import { computed, reactive, ref, toRefs } from 'vue'
+import ProgressBar from 'primevue/progressbar'
+import Button from 'primevue/button'
+import Toast from 'primevue/toast'
+import { useToast } from 'primevue/usetoast'
+import useVuelidate from '@vuelidate/core'
+import { required } from '@/i18n/i18n-validators'
+import Textarea from 'primevue/textarea'
 
 const toast = useToast()
 const loading = ref(false)

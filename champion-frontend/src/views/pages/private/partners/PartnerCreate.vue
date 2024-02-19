@@ -2,32 +2,39 @@
 import { computed, reactive, ref, toRefs } from 'vue'
 import ProgressBar from 'primevue/progressbar'
 import InputText from 'primevue/inputtext'
+import Password from 'primevue/password'
 import Button from 'primevue/button'
 import router from '@/router'
 import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
 import useVuelidate from '@vuelidate/core'
-import { required, email, minValue, numeric } from '@/i18n/i18n-validators'
+import { required, email, numeric, minLength, sameAs } from '@/i18n/i18n-validators'
+import { signUp } from '@/http/auth/AuthServices'
 
 const toast = useToast()
 
 const loading = ref(false)
 const rules = computed(() => {
   return {
-    email: { required, email },
-    championId: { numeric, minValue: minValue(1) },
-    telegram: { required },
-    championLogin: { required },
-    bonusBalance: { required, numeric, minValue: minValue(1) }
+    username: { required, email },
+    telegramLogin: { required },
+    championPartnersLogin: { required },
+    bonusBalance: { required, numeric },
+    password: { required, minLength: minLength(5) },
+    confirmPassword: {
+      required,
+      minLength: minLength(5),
+      sameAs: sameAs(`${partnerFieldsData.password}`, 'Пароль')
+    }
   }
 })
 const partnerFieldsData = reactive({
-  name: '',
-  email: '',
-  telegram: '',
-  championId: null,
-  championLogin: '',
-  bonusBalance: null
+  username: '',
+  telegramLogin: '',
+  championPartnersLogin: '',
+  bonusBalance: null,
+  password: '',
+  confirmPassword: ''
 })
 
 const v$ = useVuelidate(rules, toRefs(partnerFieldsData))
@@ -47,17 +54,29 @@ const onSubmit = async () => {
       })
       loading.value = false
       return
+    } else {
+      const createPartnerRes = await signUp()
+      if (createPartnerRes) {
+        toast.add({
+          severity: 'success',
+          summary: 'Confirmed',
+          detail: 'Партнер успешно добавлен.',
+          life: 2000
+        })
+        setTimeout(() => {
+          loading.value = false
+          router.push('/admin')
+        }, 2000)
+      } else {
+        loading.value = false
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: 'Попробуйте еще раз.',
+          life: 3000
+        })
+      }
     }
-    toast.add({
-      severity: 'success',
-      summary: 'Confirmed',
-      detail: 'Партнер успешно добавлен.',
-      life: 2000
-    })
-    setTimeout(() => {
-      loading.value = false
-      router.push('/admin')
-    }, 2000)
   } catch {
     toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
     loading.value = false
@@ -84,11 +103,11 @@ const onSubmit = async () => {
               type="text"
               placeholder="Email"
               style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.email"
+              v-model="partnerFieldsData.username"
             />
           </span>
-          <div v-if="v$.email?.$errors[0]?.$message" class="text-red-400">
-            {{ v$.email?.$errors[0]?.$message }}
+          <div v-if="v$.username?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.username?.$errors[0]?.$message }}
           </div>
         </div>
 
@@ -101,33 +120,50 @@ const onSubmit = async () => {
               type="text"
               placeholder="Телеграм"
               style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.telegram"
+              v-model="partnerFieldsData.telegramLogin"
             />
           </span>
-          <div v-if="v$.telegram?.$errors[0]?.$message" class="text-red-400">
-            {{ v$.telegram?.$errors[0]?.$message }}
+          <div v-if="v$.telegramLogin?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.telegramLogin?.$errors[0]?.$message }}
           </div>
         </div>
       </div>
 
       <div class="lg:flex border-round inputBlocksPaddingTop">
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
-          <label for="championId">Champion Id</label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-id-card" />
-            <InputText
-              id="championId"
-              type="number"
-              placeholder="Champion Id"
-              style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.championId"
-            />
-          </span>
-          <div v-if="v$.championId?.$errors[0]?.$message" class="text-red-400">
-            {{ v$.championId?.$errors[0]?.$message }}
+          <label for="password1">Пароль</label>
+          <Password
+            id="password1"
+            v-model="partnerFieldsData.password"
+            placeholder="Пароль"
+            :toggleMask="true"
+            class="w-full"
+            inputClass="w-full"
+            :inputStyle="{ padding: '1rem' }"
+          ></Password>
+          <div v-if="v$.password?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.password?.$errors[0]?.$message }}
           </div>
         </div>
 
+        <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
+          <label for="password2">Повтор пароля</label>
+          <Password
+            id="password2"
+            v-model="partnerFieldsData.confirmPassword"
+            placeholder="Повтор пароля"
+            :toggleMask="true"
+            class="w-full"
+            inputClass="w-full"
+            :inputStyle="{ padding: '1rem' }"
+          ></Password>
+          <div v-if="v$.confirmPassword?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.confirmPassword?.$errors[0]?.$message }}
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:flex border-round inputBlocksPaddingTop">
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
           <label for="championLogin">Champion Login</label>
           <span class="p-input-icon-left">
@@ -137,16 +173,14 @@ const onSubmit = async () => {
               type="text"
               placeholder="Champion Login"
               style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.championLogin"
+              v-model="partnerFieldsData.championPartnersLogin"
             />
           </span>
-          <div v-if="v$.championLogin?.$errors[0]?.$message" class="text-red-400">
-            {{ v$.championLogin?.$errors[0]?.$message }}
+          <div v-if="v$.championPartnersLogin?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.championPartnersLogin?.$errors[0]?.$message }}
           </div>
         </div>
-      </div>
 
-      <div class="lg:flex border-round inputBlocksPaddingTop">
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
           <label for="bonusBalance">Бонусный баланс</label>
           <span class="p-input-icon-left">
@@ -163,8 +197,6 @@ const onSubmit = async () => {
             {{ v$.bonusBalance?.$errors[0]?.$message }}
           </div>
         </div>
-
-        <div class="p-2 flex flex-column align-items-start justify-content-center lg:w-12"></div>
       </div>
 
       <div class="lg:flex border-round inputBlocksPaddingTop">

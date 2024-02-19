@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import {ref} from 'vue';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import Tag from 'primevue/tag';
-import Button from 'primevue/button';
-import {useRouter} from 'vue-router';
-import Toast from 'primevue/toast';
-import {useToast} from 'primevue/usetoast';
-import type {Category} from '@/types/Category';
+import { ref } from 'vue'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import Tag from 'primevue/tag'
+import Button from 'primevue/button'
+import { useRouter } from 'vue-router'
+import Toast from 'primevue/toast'
+import { useToast } from 'primevue/usetoast'
+import type { Category } from '@/types/Category'
 
 const toast = useToast()
 

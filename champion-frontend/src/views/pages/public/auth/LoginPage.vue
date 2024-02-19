@@ -1,18 +1,28 @@
 <script setup>
-import { reactive } from 'vue'
+import { computed, reactive, ref, toRefs } from 'vue'
 import Password from 'primevue/password'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import { useToast } from 'primevue/usetoast'
 import Toast from 'primevue/toast'
+import { signIn } from '@/http/auth/AuthServices.ts'
+import useVuelidate from '@vuelidate/core'
+import { email, minLength, required } from '@/i18n/i18n-validators.ts'
 
 const toast = useToast()
-
+const loading = ref(false)
+const rules = computed(() => {
+  return {
+    username: { required, email },
+    password: { required, minLength: minLength(5) }
+  }
+})
 const loginData = reactive({
-  email: '',
+  username: '',
   password: ''
 })
 
+const v$ = useVuelidate(rules, toRefs(loginData))
 const showSuccess = () => {
   toast.add({
     severity: 'success',
@@ -25,16 +35,33 @@ const showError = () => {
   toast.add({
     severity: 'error',
     summary: 'Ой! Что-то сломалось.',
-    detail: 'Но это не точно...',
+    detail: 'Попробуйте еще раз.',
     life: 2000
   })
 }
 
-const submit = () => {
+const submit = async () => {
   try {
-    showSuccess()
-    loginData.email = ''
-    loginData.password = ''
+    const isValid = await v$.value.$validate()
+    console.log(loginData)
+
+    if (!isValid) {
+      toast.add({
+        severity: 'error',
+        summary: 'Ошибка',
+        detail: 'Проверьте введенные данные.',
+        life: 3000
+      })
+      loading.value = false
+      return
+    } else {
+      const registrationResponse = await signIn(loginData)
+      if (registrationResponse) {
+        showSuccess()
+      } else {
+        showError()
+      }
+    }
   } catch (e) {
     showError()
   }
@@ -71,8 +98,11 @@ const submit = () => {
               placeholder="Email"
               class="w-full md:w-30rem mb-5"
               style="padding: 1rem"
-              v-model="loginData.email"
+              v-model="loginData.username"
             />
+            <div v-if="v$.username?.$errors[0]?.$message" class="text-red-400">
+              {{ v$.username?.$errors[0]?.$message }}
+            </div>
 
             <label for="password1" class="block text-900 font-medium text-xl mb-2">Пароль</label>
             <Password
@@ -86,6 +116,9 @@ const submit = () => {
               :inputStyle="{ padding: '1rem' }"
             >
             </Password>
+            <div v-if="v$.password?.$errors[0]?.$message" class="text-red-400">
+              {{ v$.password?.$errors[0]?.$message }}
+            </div>
 
             <div class="flex align-items-center justify-content-between mb-5 gap-5">
               <a

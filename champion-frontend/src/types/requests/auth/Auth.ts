@@ -1,7 +1,7 @@
 export interface Registration {
-  email: string
+  username: string
   password: string
-  repeatedPassword: string
-  telegram: string
-  championLogin: string
+  confirmPassword: string
+  telegramLogin: string
+  championPartnersLogin: string
 }
