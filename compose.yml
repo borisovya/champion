@@ -37,7 +37,7 @@ services:
     volumes:
       - server_logs:/var/log/nginx
       - frontend_dist:/var/www/champion/dist
-      - ./champion-backend/:/var/www/champion:delegated
+      - ./champion-backend/:/var/www/champion
 #      - ./infra/server/cert/selfsigned.crt:/etc/ssl/certs/selfsigned.crt
 #      - ./infra/server/cert/selfsigned.key:/etc/ssl/private/selfsigned.key
       - ./infra/server/nginx/conf.d/:/etc/nginx/conf.d/
@@ -51,10 +51,12 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./champion-backend:/var/www/champion:delegated
+      - ./champion-backend:/var/www/champion
       - ./infra/php/php.ini:/usr/local/etc/php/php.ini:ro
     build:
       context: ./champion-backend
+    ports:
+      - "9999:9000"
     networks:
       champion_network:
         ipv4_address: 172.28.1.2
@@ -66,6 +68,10 @@ services:
       context: ./champion-frontend
     volumes:
       - ./champion-frontend/src:/var/www/champion/src
+      - ./champion-frontend/public:/var/www/champion/public
+      - ./champion-frontend/vite.config.ts:/var/www/champion/vite.config.ts
+      - ./champion-frontend/.env:/var/www/champion/.env
+      - ./champion-frontend/package.json:/var/www/champion/package.json
     ports:
       - "8080:8080"
     networks:

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\IO\Request;
 
+use OpenApi\Attributes as OA;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\Length;
@@ -13,20 +14,25 @@ class SignUpRequest
 {
     #[NotBlank]
     #[Email]
+    #[OA\Property(example: 'test@ya.ru')]
     private string $username;
 
     #[NotBlank]
     #[Length(min: 6)]
+    #[OA\Property(example: '123123')]
     private ?string $password = null;
 
     #[NotBlank]
     #[EqualTo(propertyPath: 'password', message: 'confirm.password')]
+    #[OA\Property(example: '123123')]
     private string $confirmPassword;
 
     #[NotBlank]
+    #[OA\Property(example: 'test')]
     private string $telegramLogin;
 
     #[NotBlank]
+    #[OA\Property(example: 'test')]
     private string $championPartnersLogin;
 
     public function getConfirmPassword(): string

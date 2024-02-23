@@ -1,2 +1,4 @@
 Validation failed: Ошибка валидации запроса
 The user is already exists: Пользователь уже зарегистрирован
+User not found: Пользователь не найден
+

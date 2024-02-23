@@ -6,6 +6,7 @@
 parameters:
     exceptions:
         App\Exception\UserAlreadyExistsException: {code: 409, hidden: false}
+        App\Exception\UserNotFoundException: {code: 404, hidden: false}
 
 services:
     # default configuration for services in *this* file
@@ -34,6 +35,10 @@ services:
     App\Listener\ValidationExceptionListener:
         tags:
             - { name: kernel.event_listener, event: kernel.exception, priority: 15 }
+
+    App\Listener\TokenCreatedListener:
+        tags:
+            - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created }
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
