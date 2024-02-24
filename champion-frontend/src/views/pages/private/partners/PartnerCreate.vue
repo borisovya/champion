@@ -60,7 +60,7 @@ const onSubmit = async () => {
         password: '',
         confirmPassword: '',
         telegramLogin: '',
-        championPartnersLogin: '',
+        championPartnersLogin: ''
       })
       if (createPartnerRes) {
         toast.add({

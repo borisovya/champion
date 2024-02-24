@@ -1,8 +1,8 @@
-import axios from '../axios.ts';
-import {GeneralResponse} from '../../types/GeneralResponse.ts';
-import {TransactionsHistory} from '../../types/responses/clientAccounts/TransactionsHistoryResponse.ts';
-import type {PartnerUpdate} from '@/types/requests/partners/Partner';
-import type {Partner} from '@/types/Partner';
+import axios from '../axios.ts'
+import { GeneralResponse } from '../../types/GeneralResponse.ts'
+import { TransactionsHistory } from '../../types/responses/clientAccounts/TransactionsHistoryResponse.ts'
+import type { PartnerUpdate } from '@/types/requests/partners/Partner'
+import type { Partner } from '@/types/Partner'
 
 export const getPartnerList = async (): Promise<any | null> => {
   try {

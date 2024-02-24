@@ -3,8 +3,8 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useLayout } from '@/layout/composables/layout.ts'
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
-import {useUserStore} from '@/store/useStore.ts';
-import {deleteFromCookie} from '@/helpers/CookieHelper.ts';
+import { useUserStore } from '@/store/useStore.ts'
+import { deleteFromCookie } from '@/helpers/CookieHelper.ts'
 
 const { onMenuToggle } = useLayout()
 const userStore = useUserStore()
@@ -93,7 +93,7 @@ const onExitClickHandler = () => {
     <div class="layout-topbar-menu" :class="topbarMenuClasses">
       <div class="flex align-items-center ml-3 mb-3 lg:ml-0 lg:mb-0">
         <i class="pi pi-user mr-2"></i>
-        <span>{{user.username}}</span>
+        <span>{{ user.username }}</span>
       </div>
 
       <Button @click="onProfileClick" class="p-link layout-topbar-button">

@@ -1,10 +1,9 @@
-import { defineStore } from "pinia";
-import type {User} from '@/types/User';
-
+import { defineStore } from 'pinia'
+import type { User } from '@/types/User'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    user: null,
+    user: null
   }),
   actions: {
     setUser(user: User) {
@@ -14,7 +13,7 @@ export const useUserStore = defineStore('user', {
       return this.user
     },
     removeUser() {
-      return this.user = null;
+      return (this.user = null)
     }
-  },
-});
+  }
+})

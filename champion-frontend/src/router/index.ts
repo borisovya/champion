@@ -14,7 +14,7 @@ import ShopCategoryCreate from '@/views/pages/private/shopCategories/ShopCategor
 import NewsMain from '@/views/pages/private/news/NewsMain.vue'
 import NewsCreate from '@/views/pages/private/news/NewsCreate.vue'
 import NewsShow from '@/views/pages/private/news/NewsShow.vue'
-import {getFromCookie} from '@/helpers/CookieHelper';
+import { getFromCookie } from '@/helpers/CookieHelper'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -95,9 +95,9 @@ const router = createRouter({
       beforeEnter: (to, from, next) => {
         const user = getFromCookie('token')
         if (user) {
-          next('/');
+          next('/')
         } else {
-          next();
+          next()
         }
       }
     },
@@ -108,9 +108,9 @@ const router = createRouter({
       beforeEnter: (to, from, next) => {
         const user = getFromCookie('token')
         if (user) {
-          next('/');
+          next('/')
         } else {
-          next();
+          next()
         }
       }
     },

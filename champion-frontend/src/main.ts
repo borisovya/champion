@@ -7,8 +7,8 @@ import ConfirmationService from 'primevue/confirmationservice'
 import App from './App.vue'
 import router from './router'
 import { i18n } from '@/i18n/i18n-messages'
-import {useUserStore} from '@/store/useStore';
-import {getFromCookie} from '@/helpers/CookieHelper';
+import { useUserStore } from '@/store/useStore'
+import { getFromCookie } from '@/helpers/CookieHelper'
 
 const app = createApp(App)
 

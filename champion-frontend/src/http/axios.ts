@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {getFromCookie} from '@/helpers/CookieHelper';
+import { getFromCookie } from '@/helpers/CookieHelper'
 
 axios.defaults.withCredentials = true
 
@@ -12,8 +12,8 @@ axios.interceptors.request.use(
   (config) => {
     const token = getFromCookie('token')
 
-    if(token) {
-      config.headers['Authorization'] =`Bearer ${token}`
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`
     }
 
     return config

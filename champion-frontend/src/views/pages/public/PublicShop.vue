@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import Button from 'primevue/button'
 import { useRouter } from 'vue-router'
-import {useUserStore} from '@/store/useStore';
-import {deleteFromCookie} from '@/helpers/CookieHelper';
+import { useUserStore } from '@/store/useStore'
+import { deleteFromCookie } from '@/helpers/CookieHelper'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -22,15 +22,11 @@ const loggOff = () => {
 <template>
   <h1>Скоро тут будет магаз, а пока кликай по кнопке</h1>
 
-  <div v-if="user">
-    User data: {{ user.username }}
-  </div>
+  <div v-if="user">User data: {{ user.username }}</div>
 
   <div v-if="user" class="mt-2 mb-2">
     <Button @click="loggOff" severity="danger"> LOG OFF</Button>
   </div>
-
-
 
   <Button
     label="Перейти в админ панель"
