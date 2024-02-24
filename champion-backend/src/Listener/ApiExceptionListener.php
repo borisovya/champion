@@ -54,8 +54,13 @@ readonly class ApiExceptionListener
             : $throwable->getMessage();
 
         $details = $this->isDebug ? new ErrorDebugDetails($throwable->getTraceAsString()) : null;
+
+        if (str_ends_with($message, '.')) {
+            $message = rtrim($message, '.');
+        }
+
         $data = $this->serializer->serialize(
-            new ErrorResponse($this->translator->trans($message), $details),
+            new ErrorResponse($this->translator->trans($message) . '.', $details),
             JsonEncoder::FORMAT
         );
 
