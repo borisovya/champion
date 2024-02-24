@@ -22,6 +22,7 @@ cd .. || exit 1
 message info 'Install backend into container.'
 docker compose exec backend composer install --prefer-dist --no-interaction
 docker compose exec backend php bin/console --no-interaction doctrine:migrations:migrate
+docker compose exec backend php bin/console doctrine:fixtures:load --no-interaction --append
 
 message info 'Install frontend into container.'
 docker compose exec frontend yarn

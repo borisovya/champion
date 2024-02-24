@@ -27,9 +27,9 @@ class AuthController extends BaseController
     /**
      * @throws UserAlreadyExistsException
      */
-    #[Route(path: '/v1/auth/sign-up', methods: ['POST'])]
-    #[OA\RequestBody(attachables: [new Model(type: SignUpRequest::class)])]
+    #[Route(path: '/v1/auth/sign-up', name: 'v1_sign_up', methods: ['POST'])]
     #[OA\Tag(name: 'Authentication')]
+    #[OA\RequestBody(attachables: [new Model(type: SignUpRequest::class)])]
     #[OA\Response(
         response: 200,
         description: 'Signs up a user',
@@ -52,17 +52,17 @@ class AuthController extends BaseController
         UserService $userService,
         AuthenticationSuccessHandler $successHandler,
     ): Response {
-        $user = $userService->create($signUpRequest);
-
-        return $successHandler->handleAuthenticationSuccess($user);
+        return $successHandler->handleAuthenticationSuccess(
+            $userService->create($signUpRequest)
+        );
     }
 
     /**
      * @throws UserNotFoundException
      */
-    #[Route(path: '/v1/auth/sign-in', name: 'api_login_check', methods: ['POST'])]
-    #[OA\RequestBody(attachables: [new Model(type: SignInRequest::class)])]
+    #[Route(path: '/v1/auth/sign-in', name: 'v1_sign_in', methods: ['POST'])]
     #[OA\Tag(name: 'Authentication')]
+    #[OA\RequestBody(attachables: [new Model(type: SignInRequest::class)])]
     #[OA\Response(
         response: 200,
         description: 'Signs in a user',

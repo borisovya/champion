@@ -11,14 +11,14 @@ nelmio_api_doc:
                         - Authentication
                     responses:
                         '200':
-                            description: User signs out
+                            description: Refresh access token
             /api/v1/auth/sign-out:
                 post:
                     tags:
                         - Authentication
                     responses:
                         '200':
-                            description: Refresh new JWT Token
+                            description: Sings out a user
                             content:
                                 application/json:
                                     schema:

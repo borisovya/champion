@@ -28,10 +28,10 @@ readonly class UserService
             throw new UserAlreadyExistsException();
         }
 
+        $roles = $signUpRequest->getRoles();
+
         $user = (new User())
-            ->setRoles([
-                Role::USER->value,
-            ])
+            ->setRoles(!empty($roles) ? $roles : [Role::USER->value])
             ->setUsername($signUpRequest->getUsername())
             ->setTelegramLogin($signUpRequest->getTelegramLogin())
             ->setChampionPartnersLogin($signUpRequest->getChampionPartnersLogin());

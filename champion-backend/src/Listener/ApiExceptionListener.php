@@ -60,7 +60,7 @@ readonly class ApiExceptionListener
         }
 
         $data = $this->serializer->serialize(
-            new ErrorResponse($this->translator->trans($message) . '.', $details),
+            new ErrorResponse($this->translator->trans($message).'.', $details),
             JsonEncoder::FORMAT
         );
 
