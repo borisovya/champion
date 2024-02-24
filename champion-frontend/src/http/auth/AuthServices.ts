@@ -1,24 +1,41 @@
 import axios from '@/http/axios.ts'
 import type {Registration} from '@/types/requests/auth/Auth'
+import {isAxiosError} from 'axios';
 
-export const signIn = async (credentials: { username: string, password: string }): Promise<string> => {
+export const signIn = async (credentials: { username: string, password: string }): Promise<string | {message: string}> => {
   try {
-    const res = await axios.post('v1/auth/sign-in', credentials)
+    const res = await axios.post<{token: string} | {message: string}>('v1/auth/sign-in', credentials)
 
-    if(res.status === 200) {
-      return res.token
+    if(!res) {
+      return {message: 'Недействительные аутентификационные данные.'}
     }
-    else return res.message
+    if(res.status === 200) {
+      return res.data.token
+    }
+    else return res.data.message
 
   } catch (e) {
-    return false
+    if(isAxiosError(e)){
+      return {message: e.response.data.message}
+    }
+    return {message: 'Произошла ошибка сервера.'}
   }
 }
-export const signUp = async (request: Registration): Promise<boolean> => {
+export const signUp = async (request: Registration): Promise<string | {message: string}> => {
   try {
-    return await axios.post('v1/auth/sign-up', {...request})
+    const res = await axios.post<{token: string} | {message: string}>('v1/auth/sign-up', {...request})
+
+    if(res.status === 200) {
+      return res.data.token
+    }
+    else return res.data.message
+
   } catch (e) {
-    return false
+
+    if(isAxiosError(e)){
+      return {message: e.response.data.message}
+    }
+    return {message: 'Произошла ошибка сервера.'}
   }
 }
 

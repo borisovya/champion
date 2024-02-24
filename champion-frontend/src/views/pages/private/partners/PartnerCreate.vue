@@ -55,7 +55,13 @@ const onSubmit = async () => {
       loading.value = false
       return
     } else {
-      const createPartnerRes = await signUp()
+      const createPartnerRes = await signUp({
+        username: '',
+        password: '',
+        confirmPassword: '',
+        telegramLogin: '',
+        championPartnersLogin: '',
+      })
       if (createPartnerRes) {
         toast.add({
           severity: 'success',

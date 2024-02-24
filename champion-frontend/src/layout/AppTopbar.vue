@@ -3,12 +3,16 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useLayout } from '@/layout/composables/layout.ts'
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
+import {useUserStore} from '@/store/useStore.ts';
+import {deleteFromCookie} from '@/helpers/CookieHelper.ts';
 
 const { onMenuToggle } = useLayout()
+const userStore = useUserStore()
 
 const outsideClickListener = ref(null)
 const topbarMenuActive = ref(false)
 const router = useRouter()
+const user = userStore.getUser()
 
 onMounted(() => {
   bindOutsideClickListener()
@@ -63,7 +67,9 @@ const isOutsideClicked = (event) => {
 }
 
 const onExitClickHandler = () => {
-  router.push('/login')
+  userStore.removeUser()
+  deleteFromCookie('token')
+  router.push('/')
 }
 </script>
 
@@ -85,13 +91,19 @@ const onExitClickHandler = () => {
     </button>
 
     <div class="layout-topbar-menu" :class="topbarMenuClasses">
-      <Button @click="onExitClickHandler" class="p-link layout-topbar-button">
-        <i class="pi pi-sign-out"></i>
-        <span>Выйти из админ панели</span>
-      </Button>
+      <div class="flex align-items-center ml-3 mb-3 lg:ml-0 lg:mb-0">
+        <i class="pi pi-user mr-2"></i>
+        <span>{{user.username}}</span>
+      </div>
+
       <Button @click="onProfileClick" class="p-link layout-topbar-button">
         <i class="pi pi-home"></i>
-        <span>Профиль</span>
+        <span>Вернуться в магазин</span>
+      </Button>
+
+      <Button @click="onExitClickHandler" class="p-link layout-topbar-button">
+        <i class="pi pi-sign-out"></i>
+        <span>Выйти</span>
       </Button>
     </div>
   </div>

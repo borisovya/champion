@@ -14,6 +14,7 @@ import ShopCategoryCreate from '@/views/pages/private/shopCategories/ShopCategor
 import NewsMain from '@/views/pages/private/news/NewsMain.vue'
 import NewsCreate from '@/views/pages/private/news/NewsCreate.vue'
 import NewsShow from '@/views/pages/private/news/NewsShow.vue'
+import {getFromCookie} from '@/helpers/CookieHelper';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -90,12 +91,28 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: () => import('@/views/pages/public/auth/LoginPage.vue')
+      component: () => import('@/views/pages/public/auth/LoginPage.vue'),
+      beforeEnter: (to, from, next) => {
+        const user = getFromCookie('token')
+        if (user) {
+          next('/');
+        } else {
+          next();
+        }
+      }
     },
     {
       path: '/register',
       name: 'register',
-      component: () => import('@/views/pages/public/auth/RegisterPage.vue')
+      component: () => import('@/views/pages/public/auth/RegisterPage.vue'),
+      beforeEnter: (to, from, next) => {
+        const user = getFromCookie('token')
+        if (user) {
+          next('/');
+        } else {
+          next();
+        }
+      }
     },
     {
       path: '/password-reset',
@@ -110,7 +127,7 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from) => {
-  const user = true
+  const user = getFromCookie('token')
   if (to.meta.requiresAuth && !user) {
     // await user.getUser();
     try {
@@ -126,21 +143,6 @@ router.beforeEach(async (to, from) => {
         path: '/login',
         // save the location we were at to come back later
         query: { redirect: to.fullPath }
-      }
-    }
-  }
-
-  if (
-    Object.prototype.hasOwnProperty.call(to, 'meta') &&
-    to.meta.table !== undefined &&
-    to.meta.action !== undefined
-  ) {
-    if (
-      user.auth.user &&
-      !user.isUserHasPermission(to.meta.table, to.meta.action, undefined, to.meta.onlyAll)
-    ) {
-      return {
-        path: '/access_deny'
       }
     }
   }

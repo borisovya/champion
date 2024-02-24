@@ -1,9 +1,8 @@
 import axios from 'axios'
-const baseURL = import.meta.env.VITE_BASE_URL;
+import {getFromCookie} from '@/helpers/CookieHelper';
 
 axios.defaults.withCredentials = true
 
-//axios.defaults.baseURL = `${baseURL}`
 axios.defaults.baseURL = `/api`
 
 axios.defaults.headers.common['Content-Type'] = 'application/json'
@@ -11,7 +10,7 @@ axios.defaults.headers.common['Accept'] = 'application/json'
 
 axios.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token')
+    const token = getFromCookie('token')
 
     if(token) {
       config.headers['Authorization'] =`Bearer ${token}`
