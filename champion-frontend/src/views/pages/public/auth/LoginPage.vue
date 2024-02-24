@@ -55,8 +55,10 @@ const submit = async () => {
       loading.value = false
       return
     } else {
-      const registrationResponse = await signIn(loginData)
-      if (registrationResponse) {
+      const loginResponse = await signIn(loginData)
+
+      if (loginResponse) {
+        localStorage.setItem('token', loginResponse)
         showSuccess()
       } else {
         showError()

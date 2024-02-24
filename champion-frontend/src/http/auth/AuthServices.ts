@@ -1,9 +1,15 @@
 import axios from '@/http/axios.ts'
 import type {Registration} from '@/types/requests/auth/Auth'
 
-export const signIn = async (credentials: { username: string, password: string }): Promise<boolean> => {
+export const signIn = async (credentials: { username: string, password: string }): Promise<string> => {
   try {
-    return await axios.post('api/v1/auth/sign-in', credentials)
+    const res = await axios.post('v1/auth/sign-in', credentials)
+
+    if(res.status === 200) {
+      return res.token
+    }
+    else return res.message
+
   } catch (e) {
     return false
   }

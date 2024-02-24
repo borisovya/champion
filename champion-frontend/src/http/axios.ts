@@ -1,33 +1,28 @@
 import axios from 'axios'
+const baseURL = import.meta.env.VITE_BASE_URL;
 
 axios.defaults.withCredentials = true
 
-axios.defaults.baseURL = '/api'
+//axios.defaults.baseURL = `${baseURL}`
+axios.defaults.baseURL = `/api`
 
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.headers.common['Accept'] = 'application/json'
 
-// axios.interceptors.request.use(
-//   (config) => {
-//     function getCookie(cookieName: string): string | undefined {
-//       const cookiePairs = document.cookie.split(';')
-//       for (const pair of cookiePairs) {
-//         const [key, value] = pair.split('=')
-//         if (key.trim() === cookieName) {
-//           return value.split('%')[0].trim()
-//         }
-//       }
-//       return undefined
-//     }
-//
-//     config.headers['X-XSRF-TOKEN'] = getCookie('XSRF-TOKEN')
-//
-//     return config
-//   },
-//   (error) => {
-//     return Promise.reject(error)
-//   }
-// )
+axios.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token')
+
+    if(token) {
+      config.headers['Authorization'] =`Bearer ${token}`
+    }
+
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
 
 axios.interceptors.response.use(
   (response) => {
