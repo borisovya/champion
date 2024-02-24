@@ -40,7 +40,7 @@ class SignUpRequest
      * @var array<Role>
      */
     #[OA\Property(enum: ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'], example: 'ROLE_USER')]
-    private array $roles = [];
+    private array $roles = [Role::USER->value];
 
     public function getConfirmPassword(): string
     {
