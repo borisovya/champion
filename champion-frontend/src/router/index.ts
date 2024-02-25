@@ -15,7 +15,7 @@ import NewsMain from '@/views/pages/private/news/NewsMain.vue'
 import NewsCreate from '@/views/pages/private/news/NewsCreate.vue'
 import NewsShow from '@/views/pages/private/news/NewsShow.vue'
 import { getFromCookie } from '@/helpers/CookieHelper'
-import {useUserStore} from '@/store/useStore';
+import { useUserStore } from '@/store/useStore'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,7 +27,7 @@ const router = createRouter({
           path: '/',
           component: PublicShop,
           meta: {
-            requiresAuth: true,
+            requiresAuth: true
           }
         }
       ]
@@ -152,14 +152,14 @@ router.beforeEach(async (to, from) => {
 
   if (to.meta.requiresAuth && to.meta.role === 'admin' && user) {
     try {
-      if(user?.roles.every(role => role === 'ROLE_USER')) {
+      if (user?.roles.every((role) => role === 'ROLE_USER')) {
         return {
-          path: '/',
+          path: '/'
         }
       }
     } catch {
       return {
-        path: '/login',
+        path: '/login'
       }
     }
   }

@@ -2,10 +2,10 @@
 import Button from 'primevue/button'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/store/useStore'
-import {deleteFromCookie, getFromCookie} from '@/helpers/CookieHelper';
-import {signOut} from '@/http/auth/AuthServices';
-import Toast from 'primevue/toast';
-import {useToast} from 'primevue/usetoast';
+import { deleteFromCookie, getFromCookie } from '@/helpers/CookieHelper'
+import { signOut } from '@/http/auth/AuthServices'
+import Toast from 'primevue/toast'
+import { useToast } from 'primevue/usetoast'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -17,8 +17,8 @@ const onButtonClickHandler = () => {
 }
 const loggOff = async () => {
   try {
-    const res = await signOut({token: getFromCookie('token')})
-    if(res) {
+    const res = await signOut({ token: getFromCookie('token') })
+    if (res) {
       userStore.removeUser()
       deleteFromCookie('token')
       router.push('/login')
@@ -30,8 +30,7 @@ const loggOff = async () => {
         life: 2000
       })
     }
-  }
-  catch {
+  } catch {
     toast.add({
       severity: 'error',
       summary: 'Ошибка',
@@ -57,7 +56,7 @@ const loggOff = async () => {
     @click="onButtonClickHandler"
     class="w-auto p-3 text-xl border-round-3xl"
     style="background: linear-gradient(270deg, #ef008f 0.26%, #a815ed 99.72%); border: none"
-    v-if="user.roles.every(role => role !== 'ROLE_USER')"
+    v-if="user.roles.every((role) => role !== 'ROLE_USER')"
   >
   </Button>
 </template>

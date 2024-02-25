@@ -50,10 +50,10 @@ export const pingPong = async (data?: any): Promise<boolean> => {
   }
 }
 
-export const signOut = async (request: {token: string}): Promise<boolean> => {
+export const signOut = async (request: { token: string }): Promise<boolean> => {
   try {
     const res = await axios.post('v1/auth/sign-out', request)
-    return res.status === 200;
+    return res.status === 200
   } catch (e) {
     return false
   }

@@ -4,11 +4,10 @@ import { useLayout } from '@/layout/composables/layout.ts'
 import { useRouter } from 'vue-router'
 import Button from 'primevue/button'
 import { useUserStore } from '@/store/useStore.ts'
-import {deleteFromCookie, getFromCookie} from '@/helpers/CookieHelper.ts';
-import {signOut} from '@/http/auth/AuthServices.ts';
-import Toast from 'primevue/toast';
-import {useToast} from 'primevue/usetoast';
-
+import { deleteFromCookie, getFromCookie } from '@/helpers/CookieHelper.ts'
+import { signOut } from '@/http/auth/AuthServices.ts'
+import Toast from 'primevue/toast'
+import { useToast } from 'primevue/usetoast'
 
 const { onMenuToggle } = useLayout()
 const userStore = useUserStore()
@@ -71,10 +70,10 @@ const isOutsideClicked = (event) => {
   )
 }
 
-const onExitClickHandler = async() => {
+const onExitClickHandler = async () => {
   try {
-    const res = await signOut({token: getFromCookie('token')})
-    if(res) {
+    const res = await signOut({ token: getFromCookie('token') })
+    if (res) {
       userStore.removeUser()
       deleteFromCookie('token')
       router.push('/')
@@ -86,8 +85,7 @@ const onExitClickHandler = async() => {
         life: 2000
       })
     }
-  }
-  catch {
+  } catch {
     toast.add({
       severity: 'error',
       summary: 'Ошибка',
