@@ -15,6 +15,7 @@ import NewsMain from '@/views/pages/private/news/NewsMain.vue'
 import NewsCreate from '@/views/pages/private/news/NewsCreate.vue'
 import NewsShow from '@/views/pages/private/news/NewsShow.vue'
 import { getFromCookie } from '@/helpers/CookieHelper'
+import {useUserStore} from '@/store/useStore';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -26,7 +27,7 @@ const router = createRouter({
           path: '/',
           component: PublicShop,
           meta: {
-            requiresAuth: true
+            requiresAuth: true,
           }
         }
       ]
@@ -35,7 +36,8 @@ const router = createRouter({
       path: '/admin',
       component: AppLayout,
       meta: {
-        requiresAuth: true
+        requiresAuth: true,
+        role: 'admin'
       },
       children: [
         {
@@ -127,9 +129,10 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from) => {
-  const user = getFromCookie('token')
+  const userStore = useUserStore()
+  const user = userStore.getUser()
+
   if (to.meta.requiresAuth && !user) {
-    // await user.getUser();
     try {
       if (to.meta.requiresAuth) {
         return {
@@ -143,6 +146,20 @@ router.beforeEach(async (to, from) => {
         path: '/login',
         // save the location we were at to come back later
         query: { redirect: to.fullPath }
+      }
+    }
+  }
+
+  if (to.meta.requiresAuth && to.meta.role === 'admin' && user) {
+    try {
+      if(user?.roles.every(role => role === 'ROLE_USER')) {
+        return {
+          path: '/',
+        }
+      }
+    } catch {
+      return {
+        path: '/login',
       }
     }
   }

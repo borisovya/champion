@@ -50,21 +50,12 @@ export const pingPong = async (data?: any): Promise<boolean> => {
   }
 }
 
-export const signOut = async (): Promise<boolean> => {
+export const signOut = async (request: {token: string}): Promise<boolean> => {
   try {
-    await axios.post('v1/logout')
-    return true
+    const res = await axios.post('v1/auth/sign-out', request)
+    return res.status === 200;
   } catch (e) {
     return false
-  }
-}
-
-export const getUserData = async (): Promise<any> => {
-  try {
-    const res = await axios.get('web-api/v1/profile')
-    return res.data ? res.data : null
-  } catch (e) {
-    return null
   }
 }
 
