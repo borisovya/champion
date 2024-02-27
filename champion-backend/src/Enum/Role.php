@@ -11,4 +11,10 @@ enum Role: string
     case ADMIN = 'ROLE_ADMIN';
 
     case SUPER_ADMIN = 'ROLE_SUPER_ADMIN';
+
+    public const values = [
+        self::USER->value,
+        self::ADMIN->value,
+        self::SUPER_ADMIN->value,
+    ];
 }

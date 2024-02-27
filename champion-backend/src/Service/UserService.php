@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Entity\User;
-use App\Enum\Role;
 use App\Exception\UserAlreadyExistsException;
-use App\Model\IO\Request\SignUpRequest;
+use App\Model\SignUpRequest;
 use App\Repository\UserRepository;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 

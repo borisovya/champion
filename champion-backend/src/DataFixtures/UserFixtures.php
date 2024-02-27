@@ -6,7 +6,7 @@ namespace App\DataFixtures;
 
 use App\Enum\Role;
 use App\Exception\UserAlreadyExistsException;
-use App\Model\IO\Request\SignUpRequest;
+use App\Model\SignUpRequest;
 use App\Repository\UserRepository;
 use App\Service\UserService;
 use Doctrine\Bundle\FixturesBundle\Fixture;

@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\User;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
@@ -12,8 +15,15 @@ use App\Entity\User;
  * @method User[]    findAll()
  * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class UserRepository extends DatabaseRepository
+class UserRepository extends ServiceEntityRepository
 {
+    public function __construct(
+        protected ManagerRegistry $registry,
+        protected EntityManagerInterface $entityManager,
+    ) {
+        parent::__construct($registry, User::class);
+    }
+
     public function exists(string $username): bool
     {
         return null !== $this->findOneBy(['username' => $username]);
@@ -21,33 +31,9 @@ class UserRepository extends DatabaseRepository
 
     public function save(User $user): User
     {
-        $this->saveEntityWithCommit($user);
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
 
         return $user;
     }
-
-    //    /**
-    //     * @return User[] Returns an array of User objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('u.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?User
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

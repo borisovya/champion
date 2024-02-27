@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Model\IO\Request;
+namespace App\Model;
 
 use OpenApi\Attributes as OA;
 use Symfony\Component\Validator\Constraints\NotBlank;

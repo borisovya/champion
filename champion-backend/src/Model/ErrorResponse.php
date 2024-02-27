@@ -2,10 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Model\IO;
+namespace App\Model;
 
-use App\Model\ErrorDebugDetails;
-use App\Model\ErrorValidationDetails;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Attributes as OA;
 

@@ -9,9 +9,9 @@ use App\Controller\BaseController;
 use App\Entity\User;
 use App\Exception\UserAlreadyExistsException;
 use App\Exception\UserNotFoundException;
-use App\Model\IO\ErrorResponse;
-use App\Model\IO\Request\SignInRequest;
-use App\Model\IO\Request\SignUpRequest;
+use App\Model\ErrorResponse;
+use App\Model\SignInRequest;
+use App\Model\SignUpRequest;
 use App\Service\UserService;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\Http\Authentication\AuthenticationSuccessHandler;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -38,14 +38,10 @@ class AuthController extends BaseController
         ])
     )]
     #[OA\Response(response: 409, description: 'User already exists', attachables: [
-        new Model(
-            type: ErrorResponse::class
-        ),
+        new Model(type: ErrorResponse::class),
     ])]
     #[OA\Response(response: 400, description: 'Validation failed', attachables: [
-        new Model(
-            type: ErrorResponse::class
-        ),
+        new Model(type: ErrorResponse::class),
     ])]
     public function signUp(
         #[RequestBody] SignUpRequest $signUpRequest,
@@ -71,14 +67,10 @@ class AuthController extends BaseController
         ])
     )]
     #[OA\Response(response: 404, description: 'User not found', attachables: [
-        new Model(
-            type: ErrorResponse::class
-        ),
+        new Model(type: ErrorResponse::class),
     ])]
     #[OA\Response(response: 400, description: 'Validation failed', attachables: [
-        new Model(
-            type: ErrorResponse::class
-        ),
+        new Model(type: ErrorResponse::class),
     ])]
     public function signIn(
         #[CurrentUser] ?User $user,

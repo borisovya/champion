@@ -30,7 +30,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'string', nullable: true)]
     private ?string $championPartnersLogin;
 
-    #[ORM\Column(type: 'simple_array')]
+    #[ORM\Column(type: 'json')]
     private array $roles;
 
     public function getId(): ?int

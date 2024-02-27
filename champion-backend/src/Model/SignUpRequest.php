@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
-namespace App\Model\IO\Request;
+namespace App\Model;
 
 use App\Enum\Role;
 use OpenApi\Attributes as OA;
+use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Validator\Constraints\Email;
 use Symfony\Component\Validator\Constraints\EqualTo;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Type;
 
 class SignUpRequest
 {
@@ -37,9 +39,14 @@ class SignUpRequest
     private string $championPartnersLogin;
 
     /**
-     * @var array<Role>
+     * @var array<string>
      */
-    #[OA\Property(enum: ['ROLE_USER', 'ROLE_ADMIN', 'ROLE_SUPER_ADMIN'], example: 'ROLE_USER')]
+    #[OA\Property(
+        enum: Role::values,
+        example: 'ROLE_USER',
+    )]
+    #[Choice(Role::values, multiple: true)]
+    #[Type('array')]
     private array $roles = [Role::USER->value];
 
     public function getConfirmPassword(): string

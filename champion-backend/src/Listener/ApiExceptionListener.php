@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Listener;
 
 use App\Model\ErrorDebugDetails;
+use App\Model\ErrorResponse;
 use App\Model\ExceptionMapping;
-use App\Model\IO\ErrorResponse;
 use App\Resolver\ExceptionMappingResolver;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;

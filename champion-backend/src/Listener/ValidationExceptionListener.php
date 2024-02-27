@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Listener;
 
 use App\Exception\ValidationException;
+use App\Model\ErrorResponse;
 use App\Model\ErrorValidationDetails;
-use App\Model\IO\ErrorResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
