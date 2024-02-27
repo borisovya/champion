@@ -28,7 +28,7 @@ class CategoryController extends AbstractController
         description: 'Get categories list',
         content: new OA\JsonContent(
             type: 'array',
-            items: new OA\Items(ref: new Model(type: Category::class, groups: ['full']))
+            items: new OA\Items(ref: new Model(type: Category::class))
         )
     )]
     public function index(CategoryRepository $categoryRepository): Response
