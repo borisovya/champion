@@ -8,6 +8,7 @@ import { useRouter } from 'vue-router'
 import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
 import type { Category } from '@/types/Category'
+import {deleteCategory} from '@/http/categories/CategoriesServices';
 
 const toast = useToast()
 
@@ -57,15 +58,18 @@ const activateHandler = () => {
   }
 }
 
-const deleteHandler = () => {
+const deleteHandler = async () => {
   loading.value = true
   try {
-    toast.add({
-      severity: 'success',
-      summary: 'Confirmed',
-      detail: 'Категория успешно удалена.',
-      life: 3000
-    })
+    const res = await deleteCategory(1)
+    if(res) {
+      toast.add({
+        severity: 'success',
+        summary: 'Confirmed',
+        detail: 'Категория успешно удалена.',
+        life: 3000
+      })
+    }
   } catch {
     toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
   } finally {
