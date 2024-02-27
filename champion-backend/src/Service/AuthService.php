@@ -10,7 +10,7 @@ use App\Model\SignUpRequest;
 use App\Repository\UserRepository;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-readonly class UserService
+readonly class AuthService
 {
     public function __construct(
         private UserPasswordHasherInterface $userPasswordHasher,
@@ -21,7 +21,7 @@ readonly class UserService
     /**
      * @throws UserAlreadyExistsException
      */
-    public function create(SignUpRequest $signUpRequest): User
+    public function register(SignUpRequest $signUpRequest): User
     {
         if ($this->userRepository->exists($signUpRequest->getUsername())) {
             throw new UserAlreadyExistsException();

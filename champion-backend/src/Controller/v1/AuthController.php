@@ -12,7 +12,7 @@ use App\Exception\UserNotFoundException;
 use App\Model\ErrorResponse;
 use App\Model\SignInRequest;
 use App\Model\SignUpRequest;
-use App\Service\UserService;
+use App\Service\AuthService;
 use Lexik\Bundle\JWTAuthenticationBundle\Security\Http\Authentication\AuthenticationSuccessHandler;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Attributes as OA;
@@ -45,11 +45,11 @@ class AuthController extends BaseController
     ])]
     public function signUp(
         #[RequestBody] SignUpRequest $signUpRequest,
-        UserService $userService,
+        AuthService $userService,
         AuthenticationSuccessHandler $successHandler,
     ): Response {
         return $successHandler->handleAuthenticationSuccess(
-            $userService->create($signUpRequest)
+            $userService->register($signUpRequest)
         );
     }
 

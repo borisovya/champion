@@ -6,11 +6,13 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Attributes as OA;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
+#[OA\Schema]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -25,9 +27,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private string $password;
 
     #[ORM\Column(type: 'string')]
+    #[OA\Property(
+        type: 'string',
+        example: 'test',
+    )]
     private string $telegramLogin;
 
     #[ORM\Column(type: 'string', nullable: true)]
+    #[OA\Property(
+        type: 'string',
+        example: 'test',
+    )]
     private ?string $championPartnersLogin;
 
     #[ORM\Column(type: 'json')]

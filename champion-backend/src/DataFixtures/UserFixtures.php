@@ -8,14 +8,14 @@ use App\Enum\Role;
 use App\Exception\UserAlreadyExistsException;
 use App\Model\SignUpRequest;
 use App\Repository\UserRepository;
-use App\Service\UserService;
+use App\Service\AuthService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 
 class UserFixtures extends Fixture
 {
     public function __construct(
-        private readonly UserService $userService,
+        private readonly AuthService $userService,
         private readonly UserRepository $userRepository,
     ) {
     }
@@ -31,7 +31,7 @@ class UserFixtures extends Fixture
             return;
         }
 
-        $this->userService->create(
+        $this->userService->register(
             (new SignUpRequest())
                 ->setUsername($username)
                 ->setTelegramLogin('@admin')
