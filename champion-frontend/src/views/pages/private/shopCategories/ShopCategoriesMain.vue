@@ -3,12 +3,20 @@ import { onMounted, ref } from 'vue'
 import ProgressBar from 'primevue/progressbar'
 import type { Category } from '@/types/Category'
 import CategoriesTable from '@/components/categories/CategoriesTable.vue'
+import {getCategories} from '@/http/categories/CategoriesServices';
 
 const categories = ref<Category[]>([])
 const loading = ref(false)
 
-onMounted(() => {
+onMounted(async () => {
   loading.value = true
+  try {
+    const categories = await getCategories()
+    console.log(categories);
+  } catch (e) {
+    console.log(e);
+  }
+
   setTimeout(() => {
     categories.value = [
       {

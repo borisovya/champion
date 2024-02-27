@@ -1,66 +1,74 @@
 <script setup lang="ts">
-import { computed, reactive, ref, toRefs } from 'vue'
-import ProgressBar from 'primevue/progressbar'
-import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
-import router from '@/router'
-import Toast from 'primevue/toast'
-import { useToast } from 'primevue/usetoast'
-import useVuelidate from '@vuelidate/core'
-import { required } from '@/i18n/i18n-validators'
-import RadioButton from 'primevue/radiobutton'
-import Tag from 'primevue/tag'
+import {computed, reactive, ref, toRefs} from 'vue';
+import ProgressBar from 'primevue/progressbar';
+import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
+import router from '@/router';
+import Toast from 'primevue/toast';
+import {useToast} from 'primevue/usetoast';
+import useVuelidate from '@vuelidate/core';
+import {required} from '@/i18n/i18n-validators';
+import RadioButton from 'primevue/radiobutton';
+import Tag from 'primevue/tag';
+import {addCategories} from '@/http/categories/CategoriesServices';
 
-const toast = useToast()
-const loading = ref(false)
+const toast = useToast();
+const loading = ref(false);
 
 const rules = computed(() => {
   return {
-    name: { required }
-  }
-})
+    name: {required}
+  };
+});
 const shopCategoryFieldsData = reactive({
   name: '',
   active: true
-})
+});
 
-const v$ = useVuelidate(rules, toRefs(shopCategoryFieldsData))
+const v$ = useVuelidate(rules, toRefs(shopCategoryFieldsData));
 
 const onSubmit = async () => {
-  loading.value = true
+  loading.value = true;
 
   try {
-    const isValid = await v$.value.$validate()
-    console.log(shopCategoryFieldsData)
+    const isValid = await v$.value.$validate();
+    console.log(shopCategoryFieldsData);
     if (!isValid) {
       toast.add({
         severity: 'error',
         summary: 'Ошибка',
         detail: 'Проверьте введенные данные.',
         life: 3000
-      })
-      loading.value = false
-      return
+      });
+      loading.value = false;
+      return;
     }
-    toast.add({
-      severity: 'success',
-      summary: 'Confirmed',
-      detail: 'Категория успешно добавлена.',
-      life: 3000
-    })
-    setTimeout(() => {
-      loading.value = false
-      router.push('/admin/shop/categories')
-    }, 1000)
-  } catch {
-    toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
-    loading.value = false
+
+    const res = await addCategories(shopCategoryFieldsData);
+    console.log(res);
+    if (res) {
+      toast.add({
+        severity: 'success',
+        summary: 'Confirmed',
+        detail: 'Категория успешно добавлена.',
+        life: 3000
+      });
+      setTimeout(() => {
+        loading.value = false;
+        router.push('/admin/shop/categories');
+      }, 1000);
+    }
+  }
+  catch (e) {
+    console.log(e);
+    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
+    loading.value = false;
   }
 }
 </script>
 
 <template>
-  <Toast />
+  <Toast/>
   <div class="card" style="height: calc(100vh - 9rem); overflow: auto">
     <ProgressBar v-if="loading" mode="indeterminate" style="height: 6px"></ProgressBar>
 
@@ -72,11 +80,11 @@ const onSubmit = async () => {
           <label for="name">Название категории</label>
           <span class="p-input-icon-left">
             <InputText
-              id="name"
-              type="text"
-              placeholder="Название категории"
-              style="padding: 1rem; width: 100%"
-              v-model="shopCategoryFieldsData.name"
+                id="name"
+                type="text"
+                placeholder="Название категории"
+                style="padding: 1rem; width: 100%"
+                v-model="shopCategoryFieldsData.name"
             />
           </span>
           <span v-if="v$.name?.$errors[0]?.$message" class="text-red-400">
@@ -93,26 +101,26 @@ const onSubmit = async () => {
           <div class="flex flex-wrap gap-3">
             <div class="flex align-items-center">
               <RadioButton
-                v-model="shopCategoryFieldsData.active"
-                inputId="active"
-                name="active"
-                :checked="shopCategoryFieldsData.active"
-                :value="true"
+                  v-model="shopCategoryFieldsData.active"
+                  inputId="active"
+                  name="active"
+                  :checked="shopCategoryFieldsData.active"
+                  :value="true"
               />
               <label for="active" class="ml-2">
-                <Tag severity="success" value="Активен" />
+                <Tag severity="success" value="Активен"/>
               </label>
             </div>
             <div class="flex align-items-center">
               <RadioButton
-                v-model="shopCategoryFieldsData.active"
-                inputId="inActive"
-                name="active"
-                :checked="!shopCategoryFieldsData.active"
-                :value="false"
+                  v-model="shopCategoryFieldsData.active"
+                  inputId="inActive"
+                  name="active"
+                  :checked="!shopCategoryFieldsData.active"
+                  :value="false"
               />
               <label for="inActive" class="ml-2">
-                <Tag severity="danger" value="Не активен" />
+                <Tag severity="danger" value="Не активен"/>
               </label>
             </div>
           </div>
@@ -123,15 +131,15 @@ const onSubmit = async () => {
         <div class="w-12 p-2 flex flex-wrap align-items-start justify-content-start">
           <div class="flex mr-2">
             <Button
-              label="Отменить"
-              severity="danger"
-              icon="pi pi-directions-alt"
-              text
-              @click="router.back()"
+                label="Отменить"
+                severity="danger"
+                icon="pi pi-directions-alt"
+                text
+                @click="router.back()"
             />
           </div>
           <div class="flex">
-            <Button label="Сохранить" type="submit" icon="pi pi-save" severity="success" text />
+            <Button label="Сохранить" type="submit" icon="pi pi-save" severity="success" text/>
           </div>
         </div>
       </div>
