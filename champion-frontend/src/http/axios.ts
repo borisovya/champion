@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { getFromCookie } from '@/helpers/CookieHelper'
+import { deleteFromCookie, getFromCookie } from '@/helpers/CookieHelper'
 
 axios.defaults.withCredentials = true
 
@@ -28,8 +28,9 @@ axios.interceptors.response.use(
     return response
   },
   (error) => {
-    if (error.response?.status === 401 || error.response?.status === 419) {
-      return false
+    if (error.response?.status === 401) {
+      deleteFromCookie('token')
+      deleteFromCookie('refresh_token')
     }
 
     return Promise.reject(error)

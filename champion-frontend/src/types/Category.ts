@@ -1,5 +1,5 @@
 export interface Category {
   id: number
   name: string
-  active: boolean
+  status: 1 | 0
 }

@@ -52,7 +52,7 @@ onMounted(() => {
       name: 'Товар 1',
       description: 'Описание товара 1 Описание товара 1 Описание товара 1',
       price: 500,
-      active: true,
+      status: true,
       categoryId: 1,
       imgUrl:
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRB6p_1WriDjdY2v6Y5RXYkVlmtqAMAVIOBTw&usqp=CAU'

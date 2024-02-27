@@ -16,7 +16,7 @@ onMounted(() => {
         name: 'Товар 1',
         description: 'Описание товара 1 Описание товара 1 Описание товара 1',
         price: 500,
-        active: true,
+        status: true,
         categoryId: 1,
         imgUrl:
           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRB6p_1WriDjdY2v6Y5RXYkVlmtqAMAVIOBTw&usqp=CAU'
@@ -26,7 +26,7 @@ onMounted(() => {
         name: 'Товар 2',
         description: 'Описание товара 2 товара 2 Описание товара 2',
         price: 2500,
-        active: true,
+        status: true,
         categoryId: 2,
         imgUrl:
           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRGbT5FI9ZoXAAVDVluVs1hbO5oCMUyMU1w2g&usqp=CAU'
@@ -36,7 +36,7 @@ onMounted(() => {
         name: 'Товар 3',
         description: 'Описание товара 3 Описание товара 3 Описание товара 3',
         price: 300,
-        active: true,
+        status: true,
         categoryId: 1,
         imgUrl:
           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7SoYsXmu_-uMQnJ7PPr6v9ND3jrq3oYri-g&usqp=CAU'
@@ -46,7 +46,7 @@ onMounted(() => {
         name: 'Товар 4',
         description: 'Описание товара 4 Описание товара 4 Описание товара 4',
         price: 15500,
-        active: true,
+        status: true,
         categoryId: 3,
         imgUrl:
           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSkUso7lKSjoBcBh9-vKqQQQxW7nfzBF08Bug&usqp=CAU'
@@ -56,7 +56,7 @@ onMounted(() => {
         name: 'Товар 5',
         description: 'Описание товара 5 Описание товара 5 Описание товара 5',
         price: 9500,
-        active: false,
+        status: false,
         categoryId: 4,
         imgUrl:
           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwXHQ8nJw9on_IdjF5c59hjx4ZdHVqP9sw0w&usqp=CAU'
