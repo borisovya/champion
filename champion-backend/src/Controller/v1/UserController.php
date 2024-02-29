@@ -19,7 +19,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserController extends BaseController
 {
     /**
-     * Category list.
+     * User list.
      */
     #[Route('/v1/user', name: 'v1_user_list', methods: ['GET'])]
     #[OA\Tag(name: 'User')]
