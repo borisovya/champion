@@ -19,6 +19,26 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserController extends BaseController
 {
     /**
+     * Category list.
+     */
+    #[Route('/v1/user', name: 'v1_user_list', methods: ['GET'])]
+    #[OA\Tag(name: 'User')]
+    #[OA\Response(
+        response: 200,
+        description: 'Get user list',
+        content: new OA\JsonContent(
+            type: 'array',
+            items: new OA\Items(ref: new Model(type: User::class))
+        )
+    )]
+    public function index(UserRepository $userRepository)
+    {
+        return $this->json(
+            $userRepository->findAll()
+        );
+    }
+
+    /**
      * Show user.
      *
      * @throws UserNotFoundException
