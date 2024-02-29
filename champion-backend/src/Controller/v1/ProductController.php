@@ -69,6 +69,11 @@ class ProductController extends AbstractController
      */
     #[Route('/v1/product', name: 'v1_product_create', methods: ['POST'])]
     #[OA\Tag(name: 'Product')]
+    #[OA\Response(
+        response: 200,
+        description: 'Show product info',
+        content: new OA\JsonContent(ref: new Model(type: Product::class))
+    )]
     #[OA\Response(response: 404, description: 'Category not found', attachables: [
         new Model(type: ErrorResponse::class),
     ])]
