@@ -39,13 +39,37 @@ class ProductController extends AbstractController
     }
 
     /**
+     * Show product.
+     *
+     * @throws ProductNotFoundException
+     */
+    #[Route('/v1/product/{productId}', name: 'v1_product_show', methods: ['GET'])]
+    #[OA\Tag(name: 'Product')]
+    #[OA\Response(
+        response: 200,
+        description: 'Show product info',
+        content: new OA\JsonContent(ref: new Model(type: Product::class))
+    )]
+    #[OA\Response(response: 404, description: 'Product not found', attachables: [
+        new Model(type: ErrorResponse::class),
+    ])]
+    public function show(
+        int $productId,
+        ProductRepository $productRepository,
+    ): Response {
+        return $this->json(
+            $productRepository->findOrFail($productId)
+        );
+    }
+
+    /**
      * Create new product.
      *
      * @throws CategoryNotFoundException
      */
     #[Route('/v1/product', name: 'v1_product_create', methods: ['POST'])]
     #[OA\Tag(name: 'Product')]
-    #[OA\Response(response: 404, description: 'Product not found', attachables: [
+    #[OA\Response(response: 404, description: 'Category not found', attachables: [
         new Model(type: ErrorResponse::class),
     ])]
     #[OA\RequestBody(attachables: [new Model(type: CreateProductRequest::class)])]
