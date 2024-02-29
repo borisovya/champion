@@ -95,8 +95,8 @@ const deleteHandler = async (id: number) => {
             </div>
           </div>
         </template>
-        <Column field="name" header="Название"></Column>
-        <Column field="status" header="Статус" style="min-width: 100px">
+        <Column field="name" header="Название" style="max-width: 180px"></Column>
+        <Column field="status" header="Статус" style="min-width: 150px">
           <template #body="slotProps">
             <Tag v-if="slotProps.data.status === 1" severity="success" value="Активна"></Tag>
             <Tag v-else class="text-red-500" severity="danger" value="Не активна"></Tag>
