@@ -1,13 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Repository;
 
 use App\Entity\Category;
-use App\Enum\CategoryStatus;
 use App\Exception\CategoryNotFoundException;
 use App\Model\CreateCategoryRequest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -18,10 +18,8 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class CategoryRepository extends ServiceEntityRepository
 {
-    public function __construct(
-        protected ManagerRegistry $registry,
-        protected EntityManagerInterface $entityManager,
-    ) {
+    public function __construct(protected ManagerRegistry $registry)
+    {
         parent::__construct($registry, Category::class);
     }
 
@@ -43,28 +41,26 @@ class CategoryRepository extends ServiceEntityRepository
     {
         $category = (new Category())
             ->setName($categoryRequest->getName())
-            ->setStatus(
-                CategoryStatus::from($categoryRequest->getStatus())
-            );
+            ->setStatus($categoryRequest->getStatus());
 
-        $this->entityManager->persist($category);
-        $this->entityManager->flush();
+        $this->_em->persist($category);
+        $this->_em->flush();
 
         return $category;
     }
 
     public function remove(Category $category): void
     {
-        $this->entityManager->remove($category);
-        $this->entityManager->flush();
+        $this->_em->remove($category);
+        $this->_em->flush();
     }
 
     public function changeStatus(Category $category): Category
     {
-        $category->setStatus(CategoryStatus::inverse($category->getStatus()));
+        $category->setStatus(!$category->getStatus());
 
-        $this->entityManager->persist($category);
-        $this->entityManager->flush();
+        $this->_em->persist($category);
+        $this->_em->flush();
 
         return $category;
     }

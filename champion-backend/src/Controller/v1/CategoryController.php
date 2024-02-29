@@ -21,7 +21,7 @@ class CategoryController extends AbstractController
     /**
      * Category list.
      */
-    #[Route('/v1/category', name: 'v1_category_list', methods: ['GET'])]
+    #[Route('/v1/category', name: 'v1_category_index', methods: ['GET'])]
     #[OA\Tag(name: 'Category')]
     #[OA\Response(
         response: 200,
@@ -49,6 +49,7 @@ class CategoryController extends AbstractController
     #[OA\Response(response: 404, description: 'Category not found', attachables: [
         new Model(type: ErrorResponse::class),
     ])]
+    #[OA\RequestBody(attachables: [new Model(type: CreateCategoryRequest::class)])]
     public function create(
         #[RequestBody] CreateCategoryRequest $categoryRequest,
         CategoryRepository $categoryRepository,

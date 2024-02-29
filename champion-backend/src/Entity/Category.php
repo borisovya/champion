@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entity;
 
-use App\Enum\CategoryStatus;
 use App\Repository\CategoryRepository;
-use Doctrine\DBAL\Types\Types;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Attributes as OA;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
 #[OA\Schema]
@@ -24,18 +27,21 @@ class Category
 
     #[ORM\Column(length: 255)]
     #[OA\Property(
-        type: 'string',
-        example: 'test',
+        example: 'category name',
     )]
     private string $name;
 
-    #[ORM\Column(type: Types::SMALLINT, enumType: CategoryStatus::class)]
-    #[OA\Property(
-        type: 'int',
-        enum: CategoryStatus::values,
-        example: 1,
-    )]
-    private CategoryStatus $status;
+    #[ORM\Column]
+    private bool $status;
+
+    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Product::class, cascade: ['remove'], orphanRemoval: true)]
+    #[Ignore]
+    private Collection $products;
+
+    public function __construct()
+    {
+        $this->products = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -54,14 +60,44 @@ class Category
         return $this;
     }
 
-    public function getStatus(): CategoryStatus
+    public function getStatus(): bool
     {
         return $this->status;
     }
 
-    public function setStatus(CategoryStatus $status): static
+    public function setStatus(bool $status): static
     {
         $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Product>
+     */
+    public function getProducts(): Collection
+    {
+        return $this->products;
+    }
+
+    public function addProduct(Product $product): static
+    {
+        if (!$this->products->contains($product)) {
+            $this->products->add($product);
+            $product->setCategory($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProduct(Product $product): static
+    {
+        if ($this->products->removeElement($product)) {
+            // set the owning side to null (unless already changed)
+            if ($product->getCategory() === $this) {
+                $product->setCategory(null);
+            }
+        }
 
         return $this;
     }

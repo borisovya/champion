@@ -21,7 +21,7 @@ class UserController extends BaseController
     /**
      * User list.
      */
-    #[Route('/v1/user', name: 'v1_user_list', methods: ['GET'])]
+    #[Route('/v1/user', name: 'v1_user_index', methods: ['GET'])]
     #[OA\Tag(name: 'User')]
     #[OA\Response(
         response: 200,
