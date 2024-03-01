@@ -7,6 +7,7 @@ namespace App\Repository;
 use App\Entity\Post;
 use App\Exception\PostNotFoundException;
 use App\Model\CreatePostRequest;
+use App\Service\FileService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -20,8 +21,10 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PostRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private readonly FileService $fileService,
+    ) {
         parent::__construct($registry, Post::class);
     }
 
@@ -52,6 +55,20 @@ class PostRepository extends ServiceEntityRepository
             ->setDescription($createPostRequest->getDescription());
 
         $this->_em->persist($post);
+        $this->_em->flush();
+
+        return $post;
+    }
+
+    public function bindImage(Post $post, string $link): Post
+    {
+        $imagePath = $post->getImage();
+
+        if ($imagePath) {
+            $this->fileService->deleteFile($imagePath);
+        }
+
+        $post->setImage($link);
         $this->_em->flush();
 
         return $post;

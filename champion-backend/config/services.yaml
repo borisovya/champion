@@ -17,6 +17,7 @@ services:
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
         bind:
             bool $isDebug: '%kernel.debug%'
+            string $uploadDir: '%kernel.project_dir%/public'
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name
@@ -41,6 +42,9 @@ services:
     App\Listener\TokenCreatedListener:
         tags:
             - { name: kernel.event_listener, event: lexik_jwt_authentication.on_jwt_created }
+
+    App\Service\UploadService:
+        arguments: [ '@filesystem', '%uploadDir%' ]
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

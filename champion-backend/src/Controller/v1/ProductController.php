@@ -3,17 +3,23 @@
 namespace App\Controller\v1;
 
 use App\Attribute\RequestBody;
+use App\Attribute\RequestFile;
 use App\Entity\Product;
+use App\Enum\UploadType;
 use App\Exception\CategoryNotFoundException;
 use App\Exception\ProductNotFoundException;
 use App\Model\CreateProductRequest;
 use App\Model\ErrorResponse;
 use App\Repository\ProductRepository;
+use App\Service\FileService;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\Image;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 class ProductController extends AbstractController
 {
@@ -174,5 +180,73 @@ class ProductController extends AbstractController
                 $productRepository->findOrFail($productId)
             )
         );
+    }
+
+    /**
+     * Bind new image.
+     */
+    #[Route(
+        '/v1/product/bind-image/{productId}',
+        name: 'v1_product_bind_image',
+        methods: ['POST']
+    )]
+    #[OA\Tag(name: 'Product')]
+    #[OA\Response(
+        response: 200,
+        description: 'Product with new image',
+        content: new OA\JsonContent(ref: new Model(type: Product::class))
+    )]
+    #[OA\Response(
+        response: 400,
+        description: 'Validation failed',
+        attachables: [
+            new Model(type: ErrorResponse::class),
+        ]
+    )]
+    #[OA\Response(
+        response: 404,
+        description: 'Product not found',
+        attachables: [
+            new Model(type: ErrorResponse::class),
+        ]
+    )]
+    #[OA\RequestBody(
+        content: new OA\MediaType(
+            mediaType: 'multipart/form-data',
+            schema: new OA\Schema(
+                properties: [
+                    new OA\Property(property: "file", type: "file", format: "binary"),
+                ]
+            )
+        )
+    )]
+    public function bindImage(
+        int $productId,
+        #[RequestFile(
+            field: 'file',
+            constraints: [
+                new NotNull(),
+                new Image(
+                    maxSize: '5M',
+                    mimeTypes: [
+                        'image/jpeg',
+                        'image/png',
+                        'image/jpg',
+                    ],
+                ),
+            ]
+        )] UploadedFile $file,
+        FileService $uploadService,
+        ProductRepository $productRepository,
+    ): Response {
+        $product = $productRepository->findOrFail($productId);
+
+        return $this->json($productRepository->bindImage(
+            $product,
+            $uploadService->saveFile(
+                strtolower(UploadType::PRODUCT->name),
+                $file,
+            ),
+        ));
     }
 }

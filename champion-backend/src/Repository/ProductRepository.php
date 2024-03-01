@@ -8,6 +8,7 @@ use App\Entity\Product;
 use App\Exception\CategoryNotFoundException;
 use App\Exception\ProductNotFoundException;
 use App\Model\CreateProductRequest;
+use App\Service\FileService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -23,7 +24,8 @@ class ProductRepository extends ServiceEntityRepository
 {
     public function __construct(
         ManagerRegistry $registry,
-        private CategoryRepository $categoryRepository,
+        private readonly CategoryRepository $categoryRepository,
+        private readonly FileService $fileService,
     ) {
         parent::__construct($registry, Product::class);
     }
@@ -72,7 +74,20 @@ class ProductRepository extends ServiceEntityRepository
     {
         $product->setStatus(!$product->getStatus());
 
-        $this->_em->persist($product);
+        $this->_em->flush();
+
+        return $product;
+    }
+
+    public function bindImage(Product $product, string $link): Product
+    {
+        $imagePath = $product->getImage();
+
+        if ($imagePath) {
+            $this->fileService->deleteFile($imagePath);
+        }
+
+        $product->setImage($link);
         $this->_em->flush();
 
         return $product;
