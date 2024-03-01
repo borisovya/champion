@@ -10,8 +10,22 @@ import { useToast } from 'primevue/usetoast'
 import useVuelidate from '@vuelidate/core'
 import { required, email, numeric, minLength, sameAs } from '@/i18n/i18n-validators'
 import { signUp } from '@/http/auth/AuthServices'
+import { useRouter } from 'vue-router'
+import { Roles } from '@/enum/Roles'
+import { Partner } from '@/types/Partner'
+import Dropdown from 'primevue/dropdown'
+import { useUserStore } from '@/store/useStore'
+import type {User} from '@/types/User';
 
 const toast = useToast()
+const userStore = useUserStore()
+const accountData = userStore.getUser()
+
+const roleOptions = ref([
+  { name: 'Главный администратор', code: [Roles.SUPER_ADMIN] },
+  { name: 'Администратор', code: [Roles.ADMIN] },
+  { name: 'Партнер', code: [Roles.USER] }
+])
 
 const loading = ref(false)
 const rules = computed(() => {
@@ -19,32 +33,42 @@ const rules = computed(() => {
     username: { required, email },
     telegramLogin: { required },
     championPartnersLogin: { required },
-    bonusBalance: { required, numeric },
+    balance: { required, numeric },
+    roles: { required },
     password: { required, minLength: minLength(5) },
     confirmPassword: {
       required,
       minLength: minLength(5),
-      sameAs: sameAs(`${partnerFieldsData.password}`, 'Пароль')
+      sameAs: sameAs(`${createAccountFieldsData.password}`, 'Пароль')
     }
   }
 })
-const partnerFieldsData = reactive({
+const createAccountFieldsData = reactive({
   username: '',
   telegramLogin: '',
   championPartnersLogin: '',
-  bonusBalance: null,
+  balance: null,
+  roles: [Roles.USER],
   password: '',
   confirmPassword: ''
 })
 
-const v$ = useVuelidate(rules, toRefs(partnerFieldsData))
+const v$ = useVuelidate(rules, toRefs(createAccountFieldsData))
 
 const onSubmit = async () => {
   loading.value = true
+  const createRequest = {
+    username: createAccountFieldsData.username,
+    password: createAccountFieldsData.password,
+    confirmPassword: createAccountFieldsData.confirmPassword,
+    telegramLogin: createAccountFieldsData.telegramLogin,
+    championPartnersLogin: createAccountFieldsData.championPartnersLogin,
+    roles: createAccountFieldsData.roles
+  }
 
   try {
     const isValid = await v$.value.$validate()
-    console.log(v$.value)
+
     if (!isValid) {
       toast.add({
         severity: 'error',
@@ -55,26 +79,18 @@ const onSubmit = async () => {
       loading.value = false
       return
     } else {
-      const createPartnerRes = await signUp({
-        username: '',
-        password: '',
-        confirmPassword: '',
-        telegramLogin: '',
-        championPartnersLogin: ''
-      })
+      const createPartnerRes = await signUp(createRequest)
+
       if (createPartnerRes) {
         toast.add({
           severity: 'success',
           summary: 'Confirmed',
-          detail: 'Партнер успешно добавлен.',
+          detail: 'Учетная запись успешно добавлена.',
           life: 2000
         })
-        setTimeout(() => {
-          loading.value = false
-          router.push('/admin')
-        }, 2000)
+
+        await router.push('/admin')
       } else {
-        loading.value = false
         toast.add({
           severity: 'error',
           summary: 'Ошибка',
@@ -85,6 +101,7 @@ const onSubmit = async () => {
     }
   } catch {
     toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
+  } finally {
     loading.value = false
   }
 }
@@ -109,7 +126,7 @@ const onSubmit = async () => {
               type="text"
               placeholder="Email"
               style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.username"
+              v-model="createAccountFieldsData.username"
             />
           </span>
           <div v-if="v$.username?.$errors[0]?.$message" class="text-red-400">
@@ -126,7 +143,7 @@ const onSubmit = async () => {
               type="text"
               placeholder="Телеграм"
               style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.telegramLogin"
+              v-model="createAccountFieldsData.telegramLogin"
             />
           </span>
           <div v-if="v$.telegramLogin?.$errors[0]?.$message" class="text-red-400">
@@ -140,7 +157,7 @@ const onSubmit = async () => {
           <label for="password1">Пароль</label>
           <Password
             id="password1"
-            v-model="partnerFieldsData.password"
+            v-model="createAccountFieldsData.password"
             placeholder="Пароль"
             :toggleMask="true"
             class="w-full"
@@ -156,7 +173,7 @@ const onSubmit = async () => {
           <label for="password2">Повтор пароля</label>
           <Password
             id="password2"
-            v-model="partnerFieldsData.confirmPassword"
+            v-model="createAccountFieldsData.confirmPassword"
             placeholder="Повтор пароля"
             :toggleMask="true"
             class="w-full"
@@ -171,7 +188,7 @@ const onSubmit = async () => {
 
       <div class="lg:flex border-round inputBlocksPaddingTop">
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
-          <label for="championLogin">Champion Login</label>
+          <label for="championLogin">Champion Partners Login</label>
           <span class="p-input-icon-left">
             <i class="pi pi-user" />
             <InputText
@@ -179,7 +196,7 @@ const onSubmit = async () => {
               type="text"
               placeholder="Champion Login"
               style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.championPartnersLogin"
+              v-model="createAccountFieldsData.championPartnersLogin"
             />
           </span>
           <div v-if="v$.championPartnersLogin?.$errors[0]?.$message" class="text-red-400">
@@ -188,21 +205,45 @@ const onSubmit = async () => {
         </div>
 
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
-          <label for="bonusBalance">Бонусный баланс</label>
+          <label for="balance">Бонусный баланс</label>
           <span class="p-input-icon-left">
             <i class="pi pi-wallet" />
             <InputText
-              id="bonusBalance"
+              id="balance"
               type="number"
               placeholder="Бонусный баланс"
               style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.bonusBalance"
+              v-model="createAccountFieldsData.balance"
             />
           </span>
-          <div v-if="v$.bonusBalance?.$errors[0]?.$message" class="text-red-400">
-            {{ v$.bonusBalance?.$errors[0]?.$message }}
+          <div v-if="v$.balance?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.balance?.$errors[0]?.$message }}
           </div>
         </div>
+      </div>
+
+      <div
+        v-if="(accountData as User)?.roles[0] === Roles.SUPER_ADMIN"
+        class="lg:flex border-round inputBlocksPaddingTop"
+      >
+        <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
+          <label for="role">Роль</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-user" />
+            <Dropdown
+              v-model="createAccountFieldsData.roles"
+              optionLabel="name"
+              :options="roleOptions"
+              optionValue="code"
+              style="padding: 6px; width: 100%"
+            />
+          </span>
+          <div v-if="v$.roles?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.roles?.$errors[0]?.$message }}
+          </div>
+        </div>
+
+        <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center"></div>
       </div>
 
       <div class="lg:flex border-round inputBlocksPaddingTop">

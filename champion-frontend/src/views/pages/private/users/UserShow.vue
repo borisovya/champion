@@ -18,6 +18,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { isString } from 'lodash'
 import Dropdown from 'primevue/dropdown'
 import { Roles } from '@/enum/Roles'
+import type {User} from '@/types/User';
+import {useUserStore} from '@/store/useStore';
 
 const confirm = useConfirm()
 const navigate = useRouter()
@@ -28,6 +30,8 @@ const id = route.params.id
 const partner = ref<Partner | string | null>(null)
 const loading = ref(false)
 const isSaveDisabled = ref(true)
+const userStore = useUserStore()
+const accountData = userStore.getUser()
 
 const roleOptions = ref([
   { name: 'Главный администратор', code: [Roles.SUPER_ADMIN] },
@@ -332,7 +336,7 @@ watchEffect(() => {
       </div>
 
       <div
-        v-if="(partner as Partner)?.roles[0] === Roles.SUPER_ADMIN"
+        v-if="(accountData as User).roles[0] === Roles.SUPER_ADMIN"
         class="lg:flex border-round inputBlocksPaddingTop"
       >
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">

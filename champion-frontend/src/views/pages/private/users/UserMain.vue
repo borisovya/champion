@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import PartnersTable from '@/components/partners/PartnersTable.vue'
+import PartnersTable from '@/components/users/UsersTable.vue'
 import { onMounted, ref } from 'vue'
 import type { Partner } from '@/types/Partner'
 import ProgressBar from 'primevue/progressbar'

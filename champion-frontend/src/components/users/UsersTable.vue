@@ -1,16 +1,13 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import InputText from 'primevue/inputtext'
-import type { Partner } from '@/types/Partner'
-import Dropdown from 'primevue/dropdown'
-import Button from 'primevue/button'
-
-import Paginator from 'primevue/paginator'
-import { useRouter } from 'vue-router'
-import { Category } from '@/types/Category'
-import { getRoleName } from '@/enum/Roles'
+import {ref} from 'vue';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import InputText from 'primevue/inputtext';
+import type {Partner} from '@/types/Partner';
+import Button from 'primevue/button';
+import { FilterMatchMode } from 'primevue/api';
+import {useRouter} from 'vue-router';
+import {getRoleName} from '@/enum/Roles';
 
 interface Props {
   partners: Partner[] | []
@@ -20,26 +17,38 @@ const route = useRouter()
 const props = defineProps<Props>()
 const partnersData = ref(props.partners)
 
-const filters = ref({
-  searchValue: '',
-  fieldForSearch: 'email',
-  rows: 10
-})
+const filters = ref();
+
+const initFilters = () => {
+  filters.value = {
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  };
+};
+
+initFilters();
 </script>
 
 <template>
   <div class="flex flex-column">
-    <h3>Партнеры</h3>
+    <h3>Учетные записи</h3>
 
     <div v-if="partnersData?.length > 0" class="flex flex-column justify-content-between">
-      <DataTable :value="partnersData" dataKey="id" :rows="filters.rows" class="full-height">
+      <DataTable :value="partnersData"
+                 v-model:filters="filters"
+                 dataKey="id"
+                 paginator
+                 :rows="5"
+                 :rowsPerPageOptions="[5, 10, 20]"
+                 class="full-height"
+                 :globalFilterFields="['username', 'telegramLogin', 'championPartnersLogin', 'balance']"
+      >
         <template #header>
           <div class="flex grid justify-content-between justify-content-center pt-2">
             <div class="flex justify-content-start col-3 p-0">
               <Button
                 outlined
                 icon="pi pi-user-plus"
-                label="Добавить партнера"
+                label="Добавить учетную запись"
                 @click="route.push('/admin/partner/create')"
               />
             </div>
@@ -47,7 +56,10 @@ const filters = ref({
               <div class="flex justify-content-end">
                 <span class="p-input-icon-left ml-4">
                   <i class="pi pi-search" />
-                  <InputText v-model="filters.searchValue" placeholder="Введите значение" />
+                  <InputText
+                      v-model="filters['global'].value"
+                      placeholder="Введите значение"
+                  />
                 </span>
               </div>
             </div>
@@ -81,12 +93,6 @@ const filters = ref({
           </template>
         </Column>
       </DataTable>
-
-      <Paginator
-        :rows="filters.rows"
-        :totalRecords="partnersData.length"
-        :rowsPerPageOptions="[10, 20, 30]"
-      />
     </div>
 
     <div v-else class="flex flex-column justify-content-between">
