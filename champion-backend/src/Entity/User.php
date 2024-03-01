@@ -64,7 +64,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->username;
     }
 
-    public function setUsername(string $username): User
+    public function setUsername(string $username): static
     {
         $this->username = $username;
 
@@ -76,7 +76,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->telegramLogin;
     }
 
-    public function setTelegramLogin(string $telegramLogin): User
+    public function setTelegramLogin(string $telegramLogin): static
     {
         $this->telegramLogin = $telegramLogin;
 
@@ -88,7 +88,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->championPartnersLogin;
     }
 
-    public function setChampionPartnersLogin(?string $championPartnersLogin): User
+    public function setChampionPartnersLogin(?string $championPartnersLogin): static
     {
         $this->championPartnersLogin = $championPartnersLogin;
 
@@ -100,7 +100,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): User
+    public function setPassword(string $password): static
     {
         $this->password = $password;
 
@@ -112,7 +112,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->roles;
     }
 
-    public function setRoles(array $roles): User
+    public function setRoles(array $roles): static
     {
         $this->roles = $roles;
 

@@ -13,7 +13,9 @@ use OpenApi\Attributes as OA;
 class Product
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\GeneratedValue(
+        strategy: 'IDENTITY'
+    )]
     #[ORM\Column]
     #[OA\Property(
         example: 1,
@@ -26,7 +28,10 @@ class Product
     )]
     private string $name;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[ORM\Column(
+        type: Types::TEXT,
+        nullable: true
+    )]
     #[OA\Property(
         example: 'product description',
     )]
@@ -44,8 +49,14 @@ class Product
     )]
     private bool $status;
 
-    #[ORM\ManyToOne(targetEntity: Category::class, fetch: 'EAGER', inversedBy: 'products')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\ManyToOne(
+        targetEntity: Category::class,
+        fetch: 'EAGER',
+        inversedBy: 'products'
+    )]
+    #[ORM\JoinColumn(
+        nullable: false
+    )]
     #[OA\Property(
         example: 1,
     )]
@@ -59,7 +70,7 @@ class Product
         return $this->id;
     }
 
-    public function setId(?int $id): Product
+    public function setId(?int $id): static
     {
         $this->id = $id;
 
@@ -71,7 +82,7 @@ class Product
         return $this->name;
     }
 
-    public function setName(string $name): Product
+    public function setName(string $name): static
     {
         $this->name = $name;
 
@@ -83,7 +94,7 @@ class Product
         return $this->description;
     }
 
-    public function setDescription(?string $description): Product
+    public function setDescription(?string $description): static
     {
         $this->description = $description;
 
@@ -95,7 +106,7 @@ class Product
         return $this->price;
     }
 
-    public function setPrice(int $price): Product
+    public function setPrice(int $price): static
     {
         $this->price = $price;
 
@@ -107,7 +118,7 @@ class Product
         return $this->status;
     }
 
-    public function setStatus(bool $status): Product
+    public function setStatus(bool $status): static
     {
         $this->status = $status;
 
@@ -119,7 +130,7 @@ class Product
         return $this->category;
     }
 
-    public function setCategory(?Category $category): Product
+    public function setCategory(?Category $category): static
     {
         $this->category = $category;
 
@@ -131,7 +142,7 @@ class Product
         return $this->image;
     }
 
-    public function setImage(?string $image): Product
+    public function setImage(?string $image): static
     {
         $this->image = $image;
 

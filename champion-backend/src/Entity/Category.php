@@ -16,7 +16,9 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 class Category
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    #[ORM\GeneratedValue(
+        strategy: 'IDENTITY'
+    )]
     #[ORM\Column]
     #[OA\Property(
         type: 'int',
@@ -34,7 +36,12 @@ class Category
     #[ORM\Column]
     private bool $status;
 
-    #[ORM\OneToMany(mappedBy: 'category', targetEntity: Product::class, cascade: ['remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(
+        mappedBy: 'category',
+        targetEntity: Product::class,
+        cascade: ['remove'],
+        orphanRemoval: true
+    )]
     #[Ignore]
     private Collection $products;
 

@@ -21,7 +21,11 @@ class UserController extends BaseController
     /**
      * User list.
      */
-    #[Route('/v1/user', name: 'v1_user_index', methods: ['GET'])]
+    #[Route(
+        path: '/v1/user',
+        name: 'v1_user_index',
+        methods: ['GET']
+    )]
     #[OA\Tag(name: 'User')]
     #[OA\Response(
         response: 200,
@@ -31,7 +35,7 @@ class UserController extends BaseController
             items: new OA\Items(ref: new Model(type: User::class))
         )
     )]
-    public function index(UserRepository $userRepository)
+    public function index(UserRepository $userRepository): Response
     {
         return $this->json(
             $userRepository->findAll()
@@ -43,7 +47,11 @@ class UserController extends BaseController
      *
      * @throws UserNotFoundException
      */
-    #[Route('/v1/user/{userId}', name: 'v1_user_show', methods: ['GET'])]
+    #[Route(
+        path: '/v1/user/{userId}',
+        name: 'v1_user_show',
+        methods: ['GET']
+    )]
     #[OA\Tag(name: 'User')]
     #[OA\Response(
         response: 200,
@@ -67,7 +75,11 @@ class UserController extends BaseController
      *
      * @throws UserNotFoundException
      */
-    #[Route('/v1/user/{userId}', name: 'v1_user_update', methods: ['PATCH'])]
+    #[Route(
+        path: '/v1/user/{userId}',
+        name: 'v1_user_update',
+        methods: ['PATCH'],
+    )]
     #[OA\Tag(name: 'User')]
     #[OA\Response(
         response: 200,

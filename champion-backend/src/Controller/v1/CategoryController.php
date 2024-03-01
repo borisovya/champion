@@ -21,7 +21,11 @@ class CategoryController extends AbstractController
     /**
      * Category list.
      */
-    #[Route('/v1/category', name: 'v1_category_index', methods: ['GET'])]
+    #[Route(
+        path: '/v1/category',
+        name: 'v1_category_index',
+        methods: ['GET']
+    )]
     #[OA\Tag(name: 'Category')]
     #[OA\Response(
         response: 200,
@@ -39,44 +43,71 @@ class CategoryController extends AbstractController
     /**
      * Create new category.
      */
-    #[Route('/v1/category', name: 'v1_category_create', methods: ['POST'])]
+    #[Route(
+        path: '/v1/category',
+        name: 'v1_category_create',
+        methods: ['POST']
+    )]
     #[OA\Tag(name: 'Category')]
     #[OA\Response(
         response: 201,
         description: 'Category created',
         content: new OA\JsonContent(ref: new Model(type: Category::class))
     )]
-    #[OA\Response(response: 404, description: 'Category not found', attachables: [
-        new Model(type: ErrorResponse::class),
-    ])]
+    #[OA\Response(
+        response: 400,
+        description: 'Validation failed',
+        attachables: [
+            new Model(type: ErrorResponse::class),
+        ],
+    )]
+    #[OA\Response(
+        response: 404,
+        description: 'Category not found',
+        attachables: [
+            new Model(type: ErrorResponse::class),
+        ],
+    )]
     #[OA\RequestBody(attachables: [new Model(type: CreateCategoryRequest::class)])]
     public function create(
         #[RequestBody] CreateCategoryRequest $categoryRequest,
         CategoryRepository $categoryRepository,
     ): Response {
-        return $this->json($categoryRepository->store($categoryRequest), Response::HTTP_CREATED);
+        return $this->json(
+            $categoryRepository->store($categoryRequest),
+            Response::HTTP_CREATED
+        );
     }
 
     /**
-     * Delete current category.
+     * Delete category.
      *
      * @throws CategoryNotFoundException
      */
-    #[Route('/v1/category/{categoryId}', name: 'v1_category_delete', methods: ['DELETE'])]
-    #[OA\Tag(name: 'Category')]
+    #[Route(
+        path: '/v1/category/{categoryId}',
+        name: 'v1_category_delete',
+        methods: ['DELETE']
+    )]
+    #[OA\Tag(
+        name: 'Category',
+    )]
     #[OA\Response(
         response: 204,
-        description: 'Category removed'
+        description: 'Category removed',
     )]
-    #[OA\Response(response: 404, description: 'Category not found', attachables: [
-        new Model(type: ErrorResponse::class),
-    ])]
+    #[OA\Response(
+        response: 404,
+        description: 'Category not found',
+        attachables: [
+            new Model(type: ErrorResponse::class),
+        ],
+    )]
     public function delete(
         int $categoryId,
         CategoryRepository $categoryRepository,
     ): Response {
-        $category = $categoryRepository->findOrFail($categoryId);
-        $categoryRepository->remove($category);
+        $categoryRepository->remove($categoryRepository->findOrFail($categoryId));
 
         return $this->json([], status: Response::HTTP_NO_CONTENT);
     }
@@ -86,22 +117,32 @@ class CategoryController extends AbstractController
      *
      * @throws CategoryNotFoundException
      */
-    #[Route('/v1/category/toggle-status/{categoryId}', name: 'v1_category_toggle_status', methods: ['PATCH'])]
+    #[Route(
+        path: '/v1/category/toggle-status/{categoryId}',
+        name: 'v1_category_toggle_status',
+        methods: ['PATCH'],
+    )]
     #[OA\Tag(name: 'Category')]
     #[OA\Response(
         response: 200,
         description: 'Category status changed',
-        content: new OA\JsonContent(ref: new Model(type: Category::class))
+        content: new OA\JsonContent(ref: new Model(type: Category::class)),
     )]
-    #[OA\Response(response: 404, description: 'Category not found', attachables: [
-        new Model(type: ErrorResponse::class),
-    ])]
+    #[OA\Response(
+        response: 404,
+        description: 'Category not found',
+        attachables: [
+            new Model(type: ErrorResponse::class),
+        ],
+    )]
     public function toggleStatus(
         int $categoryId,
         CategoryRepository $categoryRepository,
     ): Response {
-        return $this->json($categoryRepository->changeStatus(
-            $categoryRepository->findOrFail($categoryId)
-        ));
+        return $this->json(
+            $categoryRepository->changeStatus(
+                $categoryRepository->findOrFail($categoryId)
+            )
+        );
     }
 }

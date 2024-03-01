@@ -20,7 +20,11 @@ class ProductController extends AbstractController
     /**
      * Product list.
      */
-    #[Route('/v1/product', name: 'v1_product_index', methods: ['GET'])]
+    #[Route(
+        path: '/v1/product',
+        name: 'v1_product_index',
+        methods: ['GET']
+    )]
     #[OA\Tag(name: 'Product')]
     #[OA\Response(
         response: 200,
@@ -43,7 +47,11 @@ class ProductController extends AbstractController
      *
      * @throws ProductNotFoundException
      */
-    #[Route('/v1/product/{productId}', name: 'v1_product_show', methods: ['GET'])]
+    #[Route(
+        path: '/v1/product/{productId}',
+        name: 'v1_product_show',
+        methods: ['GET']
+    )]
     #[OA\Tag(name: 'Product')]
     #[OA\Response(
         response: 200,
@@ -67,46 +75,69 @@ class ProductController extends AbstractController
      *
      * @throws CategoryNotFoundException
      */
-    #[Route('/v1/product', name: 'v1_product_create', methods: ['POST'])]
+    #[Route(
+        path: '/v1/product',
+        name: 'v1_product_create',
+        methods: ['POST']
+    )]
     #[OA\Tag(name: 'Product')]
     #[OA\Response(
-        response: 200,
-        description: 'Show product info',
+        response: 201,
+        description: 'Create new product',
         content: new OA\JsonContent(ref: new Model(type: Product::class))
     )]
-    #[OA\Response(response: 404, description: 'Category not found', attachables: [
-        new Model(type: ErrorResponse::class),
-    ])]
+    #[OA\Response(
+        response: 400,
+        description: 'Validation failed',
+        attachables: [
+            new Model(type: ErrorResponse::class),
+        ]
+    )]
+    #[OA\Response(
+        response: 404,
+        description: 'Category not found',
+        attachables: [
+            new Model(type: ErrorResponse::class),
+        ]
+    )]
     #[OA\RequestBody(attachables: [new Model(type: CreateProductRequest::class)])]
     public function create(
         #[RequestBody] CreateProductRequest $createProductRequest,
         ProductRepository $productRepository,
     ): Response {
         return $this->json(
-            $productRepository->store($createProductRequest)
+            $productRepository->store($createProductRequest),
+            Response::HTTP_CREATED,
         );
     }
 
     /**
-     * Delete current product.
+     * Delete product.
      *
      * @throws ProductNotFoundException
      */
-    #[Route('/v1/product/{productId}', name: 'v1_product_delete', methods: ['DELETE'])]
+    #[Route(
+        '/v1/product/{productId}',
+        name: 'v1_product_delete',
+        methods: ['DELETE']
+    )]
     #[OA\Tag(name: 'Product')]
     #[OA\Response(
         response: 204,
         description: 'Product removed'
     )]
-    #[OA\Response(response: 404, description: 'Product not found', attachables: [
-        new Model(type: ErrorResponse::class),
-    ])]
+    #[OA\Response(
+        response: 404,
+        description: 'Product not found',
+        attachables: [
+            new Model(type: ErrorResponse::class),
+        ]
+    )]
     public function delete(
         int $productId,
         ProductRepository $productRepository,
     ): Response {
-        $product = $productRepository->findOrFail($productId);
-        $productRepository->remove($product);
+        $productRepository->remove($productRepository->findOrFail($productId));
 
         return $this->json([], status: Response::HTTP_NO_CONTENT);
     }
@@ -116,22 +147,32 @@ class ProductController extends AbstractController
      *
      * @throws ProductNotFoundException
      */
-    #[Route('/v1/product/toggle-status/{productId}', name: 'v1_product_toggle_status', methods: ['PATCH'])]
+    #[Route(
+        '/v1/product/toggle-status/{productId}',
+        name: 'v1_product_toggle_status',
+        methods: ['PATCH']
+    )]
     #[OA\Tag(name: 'Product')]
     #[OA\Response(
         response: 200,
         description: 'Product status changed',
         content: new OA\JsonContent(ref: new Model(type: Product::class))
     )]
-    #[OA\Response(response: 404, description: 'Product not found', attachables: [
-        new Model(type: ErrorResponse::class),
-    ])]
+    #[OA\Response(
+        response: 404,
+        description: 'Product not found',
+        attachables: [
+            new Model(type: ErrorResponse::class),
+        ]
+    )]
     public function toggleStatus(
         int $productId,
         ProductRepository $productRepository,
     ): Response {
-        return $this->json($productRepository->changeStatus(
-            $productRepository->findOrFail($productId)
-        ));
+        return $this->json(
+            $productRepository->changeStatus(
+                $productRepository->findOrFail($productId)
+            )
+        );
     }
 }

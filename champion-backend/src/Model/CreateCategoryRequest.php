@@ -6,6 +6,7 @@ namespace App\Model;
 
 use OpenApi\Attributes as OA;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Type;
 
 class CreateCategoryRequest
@@ -14,9 +15,9 @@ class CreateCategoryRequest
     #[OA\Property(example: 'vehicles')]
     private string $name;
 
-    #[NotBlank]
-    #[OA\Property(example: true)]
+    #[NotNull]
     #[Type('bool')]
+    #[OA\Property(example: true)]
     private bool $status;
 
     public function getName(): string

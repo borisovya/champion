@@ -12,16 +12,26 @@ use Gesdinet\JWTRefreshTokenBundle\Model\AbstractRefreshToken;
 class RefreshToken extends AbstractRefreshToken
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
-    #[ORM\Column(type: 'integer')]
+    #[ORM\GeneratedValue(
+        strategy: 'IDENTITY'
+    )]
+    #[ORM\Column(
+        type: 'integer'
+    )]
     protected $id;
 
-    #[ORM\Column(type: 'string')]
+    #[ORM\Column(
+        type: 'string'
+    )]
     protected $refreshToken;
 
-    #[ORM\Column(type: 'string')]
+    #[ORM\Column(
+        type: 'string'
+    )]
     protected $username;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(
+        type: 'datetime'
+    )]
     protected $valid;
 }
