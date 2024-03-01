@@ -18,6 +18,9 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class PostController extends AbstractController
 {
+    /**
+     * Post list.
+     */
     #[Route(
         path: '/v1/post',
         name: 'v1_post_index',
@@ -71,7 +74,7 @@ class PostController extends AbstractController
         );
     }
 
-    /*
+    /**
      * Create new post.
      */
     #[Route(
