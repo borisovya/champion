@@ -9,25 +9,16 @@ import Button from 'primevue/button'
 
 import Paginator from 'primevue/paginator'
 import { useRouter } from 'vue-router'
+import { Category } from '@/types/Category'
+import { getRoleName } from '@/enum/Roles'
 
-const { partnersData, isLoading } = defineProps({
-  partnersData: {
-    type: Array as () => Partner[],
-    required: true
-  },
-  isLoading: {
-    type: Boolean,
-    required: true
-  }
-})
+interface Props {
+  partners: Partner[] | []
+}
 
 const route = useRouter()
-
-const dropdownValues = ref([
-  { name: 'Champion Id', code: 'championId' },
-  { name: 'Email', code: 'email' },
-  { name: 'Telegram', code: 'telegram' }
-])
+const props = defineProps<Props>()
+const partnersData = ref(props.partners)
 
 const filters = ref({
   searchValue: '',
@@ -40,7 +31,7 @@ const filters = ref({
   <div class="flex flex-column">
     <h3>Партнеры</h3>
 
-    <div v-if="!isLoading" class="flex flex-column justify-content-between">
+    <div v-if="partnersData?.length > 0" class="flex flex-column justify-content-between">
       <DataTable :value="partnersData" dataKey="id" :rows="filters.rows" class="full-height">
         <template #header>
           <div class="flex grid justify-content-between justify-content-center pt-2">
@@ -54,14 +45,6 @@ const filters = ref({
             </div>
             <div class="col-9 p-0">
               <div class="flex justify-content-end">
-                <Dropdown
-                  v-model="filters.fieldForSearch"
-                  :options="dropdownValues"
-                  optionLabel="name"
-                  optionValue="code"
-                  class="w-full w-12rem"
-                />
-
                 <span class="p-input-icon-left ml-4">
                   <i class="pi pi-search" />
                   <InputText v-model="filters.searchValue" placeholder="Введите значение" />
@@ -70,19 +53,20 @@ const filters = ref({
             </div>
           </div>
         </template>
-        <template v-if="partnersData.length === 0"
-          ><h4 class="flex justify-content-center mt-2">Партнеры не найдены.</h4>
-        </template>
 
-        <Column field="championId" header="Champion Id" style="min-width: 12rem; height: 60px" />
         <Column
-          field="championLogin"
-          header="Champion Login"
+          field="championPartnersLogin"
+          header="Champion Partners Login"
           style="min-width: 12rem; height: 60px"
         />
-        <Column field="email" header="Email" style="min-width: 12rem" />
-        <Column field="telegram" header="Телеграм" style="min-width: 14rem" />
-        <Column field="bonusBalance" header="Бонусный баланс" style="min-width: 12rem" />
+        <Column field="username" header="Email" style="min-width: 12rem" />
+        <Column field="telegramLogin" header="Телеграм" style="min-width: 14rem" />
+        <Column header="Роль" style="min-width: 14rem">
+          <template v-slot:body="{ data }">
+            {{ getRoleName((data as Partner).roles[0]) }}
+          </template>
+        </Column>
+        <Column field="balance" header="Бонусный баланс" style="min-width: 12rem" />
         <Column header="" style="min-width: 3rem">
           <template v-slot:header></template>
           <template v-slot:body="{ data }">
@@ -103,6 +87,25 @@ const filters = ref({
         :totalRecords="partnersData.length"
         :rowsPerPageOptions="[10, 20, 30]"
       />
+    </div>
+
+    <div v-else class="flex flex-column justify-content-between">
+      <div class="flex flex-column justify-content-between">
+        <div class="flex justify-content-start p-0">
+          <Button
+            outlined
+            icon="pi pi-plus"
+            label="Добавить партнерв"
+            @click="route.push('/admin/partner/create')"
+          />
+        </div>
+      </div>
+      <div
+        class="flex justify-content-center align-items-center"
+        style="height: 400px; font-size: 20px"
+      >
+        <p>Учетные записи партнеров не найдены.</p>
+      </div>
     </div>
   </div>
 </template>

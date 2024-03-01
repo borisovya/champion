@@ -1,3 +1,5 @@
+import type { Roles } from '@/enum/Roles'
+
 export interface PartnerCreate {
   name: string
   email: string
@@ -9,10 +11,10 @@ export interface PartnerCreate {
 
 export interface PartnerUpdate {
   id: number
-  name: string
-  email: string
-  telegram: string
-  championId: number
-  championLogin: string
-  bonusBalance: number
+  username: string
+  telegramLogin: string
+  championPartnersLogin: string
+  balance?: number
+  roles: Roles[]
+  userIdentifier: string
 }

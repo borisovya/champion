@@ -12,57 +12,82 @@ import { useConfirm } from 'primevue/useconfirm'
 import { useToast } from 'primevue/usetoast'
 import ConfirmDialog from 'primevue/confirmdialog'
 import useVuelidate from '@vuelidate/core'
-import { required, email, minValue, numeric } from '@/i18n/i18n-validators'
+import { email, minValue, numeric, required } from '@/i18n/i18n-validators'
+import { getPartner, updatePartner } from '@/http/partners/PartnersServices'
+import { useRoute, useRouter } from 'vue-router'
+import { isString } from 'lodash'
+import Dropdown from 'primevue/dropdown'
+import { Roles } from '@/enum/Roles'
 
 const confirm = useConfirm()
+const navigate = useRouter()
+const route = useRoute()
 const toast = useToast()
-const partner = ref<Partner | null>(null)
+
+const id = route.params.id
+const partner = ref<Partner | string | null>(null)
 const loading = ref(false)
 const isSaveDisabled = ref(true)
 
+const roleOptions = ref([
+  { name: 'Главный администратор', code: [Roles.SUPER_ADMIN] },
+  { name: 'Администратор', code: [Roles.ADMIN] },
+  { name: 'Партнер', code: [Roles.USER] }
+])
+
 const rules = computed(() => {
   return {
-    email: { required, email },
-    championId: { numeric, minValue: minValue(1) },
-    telegram: { required },
-    championLogin: { required },
-    bonusBalance: { required, numeric, minValue: minValue(1) }
+    username: { required, email },
+    telegramLogin: { required },
+    championPartnersLogin: { required },
+    balance: { required, numeric, minValue: minValue(0) },
+    roles: { required }
   }
 })
 const partnerFieldsData = reactive({
-  id: null,
+  id: Number(id),
   name: '',
-  email: '',
-  telegram: '',
-  championId: null,
-  championLogin: '',
-  bonusBalance: null,
+  username: '',
+  telegramLogin: '',
+  championPartnersLogin: '',
+  balance: null,
+  roles: null,
   messageForPartner: '',
   showMessageModal: false,
   showResetPasswordModal: false
 })
 
-onMounted(() => {
+onMounted(async () => {
   loading.value = true
-  setTimeout(() => {
-    partner.value = {
-      id: 1,
-      name: 'Ivan',
-      email: 'eeeee.mail.ru',
-      telegram: '@ivan',
-      championId: 1,
-      championLogin: '123fff',
-      bonusBalance: 1000
+
+  try {
+    const res = id && (await getPartner(id as string))
+
+    if (!isString(res)) {
+      partner.value = res as Partner
+
+      partnerFieldsData.id = (res as Partner).id
+      partnerFieldsData.username = (res as Partner).username
+      partnerFieldsData.telegramLogin = (res as Partner).telegramLogin
+      partnerFieldsData.championPartnersLogin = (res as Partner).championPartnersLogin
+      partnerFieldsData.roles = (res as Partner).roles
+      partnerFieldsData.balance = (res as Partner).balance
+      partnerFieldsData.userIdentifier = (res as Partner).userIdentifier
+    } else {
+      toast.add({ severity: 'error', summary: 'Ошибка', detail: res, life: 3000 })
+      navigate.back()
     }
-    ;(partnerFieldsData.id = partner.value.id),
-      (partnerFieldsData.name = partner.value.name),
-      (partnerFieldsData.email = partner.value.email),
-      (partnerFieldsData.telegram = partner.value.telegram),
-      (partnerFieldsData.championId = partner.value.championId),
-      (partnerFieldsData.championLogin = partner.value.championLogin),
-      (partnerFieldsData.bonusBalance = partner.value.bonusBalance),
-      (loading.value = false)
-  }, 100)
+  } catch {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Неудалось загрузить данные. Попробуйте еще раз.',
+      life: 3000
+    })
+    navigate.back()
+  } finally {
+    loading.value = false
+  }
 })
 const requireConfirmation = () => {
   confirm.require({
@@ -75,16 +100,16 @@ const requireConfirmation = () => {
   })
 }
 const getIsSaveDisabled = (): boolean => {
-  if (!partnerFieldsData.email) {
+  if (!partnerFieldsData.username) {
     return true
   }
-  if (!partnerFieldsData.telegram) {
+  if (!partnerFieldsData.telegramLogin) {
     return true
   }
-  if (!partnerFieldsData.championLogin) {
+  if (!partnerFieldsData.championPartnersLogin) {
     return true
   }
-  if (!partnerFieldsData.bonusBalance) {
+  if (!partnerFieldsData.balance) {
     return true
   }
 
@@ -92,12 +117,12 @@ const getIsSaveDisabled = (): boolean => {
     JSON.stringify(partner.value) ===
     JSON.stringify({
       id: partnerFieldsData.id,
-      name: partnerFieldsData.name,
-      email: partnerFieldsData.email,
-      telegram: partnerFieldsData.telegram,
-      championId: partnerFieldsData.championId,
-      championLogin: partnerFieldsData.championLogin,
-      bonusBalance: partnerFieldsData.bonusBalance
+      username: partnerFieldsData.username,
+      telegramLogin: partnerFieldsData.telegramLogin,
+      championPartnersLogin: partnerFieldsData.championPartnersLogin,
+      balance: partnerFieldsData.balance,
+      roles: partnerFieldsData.roles,
+      userIdentifier: partnerFieldsData.userIdentifier
     })
   ) {
     return true
@@ -123,26 +148,52 @@ const messageSendClickHandler = () => {
 const v$ = useVuelidate(rules, toRefs(partnerFieldsData))
 
 const onSubmit = async () => {
-  const isValid = await v$.value.$validate()
+  loading.value = true
 
-  console.log(partnerFieldsData)
-
-  if (!isValid) {
-    toast.add({
-      severity: 'error',
-      summary: 'Ошибка',
-      detail: 'Проверьте введенные данные.',
-      life: 3000
-    })
-    return
+  const updateRequest = {
+    id: partnerFieldsData.id,
+    username: partnerFieldsData.username,
+    telegramLogin: partnerFieldsData.telegramLogin,
+    championPartnersLogin: partnerFieldsData.championPartnersLogin,
+    //balance: partnerFieldsData.balance,
+    roles: partnerFieldsData.roles,
+    userIdentifier: ''
   }
 
-  toast.add({
-    severity: 'success',
-    summary: 'Confirmed',
-    detail: 'Данные пользователя успешно изменены.',
-    life: 3000
-  })
+  try {
+    const isValid = await v$.value.$validate()
+
+    if (!isValid) {
+      toast.add({
+        severity: 'error',
+        summary: 'Ошибка',
+        detail: 'Проверьте введенные данные.',
+        life: 3000
+      })
+      loading.value = false
+      return
+    }
+
+    const res = await updatePartner(updateRequest)
+
+    if (res) {
+      toast.add({
+        severity: 'success',
+        summary: 'Confirmed',
+        detail: 'Данные пользователя успешно изменены.',
+        life: 3000
+      })
+
+      partner.value = res as Partner
+      //await router.push('/admin/shop/categories')
+    } else {
+      toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
+    }
+  } catch (e) {
+    toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
+  } finally {
+    loading.value = false
+  }
 }
 
 watchEffect(() => {
@@ -155,7 +206,7 @@ watchEffect(() => {
   <Dialog
     v-model:visible="partnerFieldsData.showMessageModal"
     modal
-    :header="'Отправка сообщения ' + partnerFieldsData.telegram"
+    :header="'Отправка сообщения ' + partnerFieldsData.telegramLogin"
     :style="{ width: '45rem' }"
   >
     <span class="p-text-secondary block mb-3">Текст сообщения:</span>
@@ -206,7 +257,7 @@ watchEffect(() => {
     <ProgressBar v-if="!partner" mode="indeterminate" style="height: 6px"></ProgressBar>
 
     <form v-else class="p-grid p-fluid p-justify-center" @submit.prevent.stop="onSubmit">
-      <h3 class="ml-3">Данные партнера {{ partnerFieldsData.id }}:</h3>
+      <h3 class="ml-3">Данные партнера {{ partnerFieldsData.username }}:</h3>
 
       <div class="lg:flex border-round inputBlocksPaddingBottom">
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
@@ -218,11 +269,11 @@ watchEffect(() => {
               type="text"
               placeholder="Email"
               style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.email"
+              v-model="partnerFieldsData.username"
             />
           </span>
-          <span v-if="v$.email?.$errors[0]?.$message" class="text-red-400">
-            {{ v$.email?.$errors[0]?.$message }}
+          <span v-if="v$.username?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.username?.$errors[0]?.$message }}
           </span>
         </div>
 
@@ -235,71 +286,73 @@ watchEffect(() => {
               type="text"
               placeholder="Телеграм"
               style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.telegram"
+              v-model="partnerFieldsData.telegramLogin"
             />
           </span>
-          <div v-if="v$.telegram?.$errors[0]?.$message" class="text-red-400">
-            {{ v$.telegram?.$errors[0]?.$message }}
+          <div v-if="v$.telegramLogin?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.telegramLogin?.$errors[0]?.$message }}
           </div>
         </div>
       </div>
 
       <div class="lg:flex border-round inputBlocksPaddingTop">
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
-          <label for="championId">Champion Id</label>
-          <span class="p-input-icon-left">
-            <i class="pi pi-id-card" />
-            <InputText
-              id="championId"
-              type="number"
-              inputmode="numeric"
-              placeholder="Champion Id"
-              style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.championId"
-            />
-            <div v-if="v$.championId?.$errors[0]?.$message" class="text-red-400">
-              {{ v$.championId?.$errors[0]?.$message }}
-            </div>
-          </span>
-        </div>
-
-        <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
-          <label for="championLogin">Champion Login</label>
+          <label for="championPartnersLogin">Champion Partners Login</label>
           <span class="p-input-icon-left">
             <i class="pi pi-user" />
             <InputText
-              id="championLogin"
+              id="championPartnersLogin"
               type="text"
               placeholder="Телеграм"
               style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.championLogin"
+              v-model="partnerFieldsData.championPartnersLogin"
             />
-            <div v-if="v$.championLogin?.$errors[0]?.$message" class="text-red-400">
-              {{ v$.championLogin?.$errors[0]?.$message }}
-            </div>
           </span>
+          <div v-if="v$.championPartnersLogin?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.championPartnersLogin?.$errors[0]?.$message }}
+          </div>
         </div>
-      </div>
 
-      <div class="lg:flex border-round inputBlocksPaddingTop">
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
-          <label for="bonusBalance">Бонусный баланс</label>
+          <label for="balance">Бонусный баланс</label>
           <span class="p-input-icon-left">
             <i class="pi pi-wallet" />
             <InputText
-              id="bonusBalance"
+              id="balance"
               type="number"
               placeholder="Бонусный баланс"
               style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.bonusBalance"
+              v-model="partnerFieldsData.balance"
             />
-            <div v-if="v$.bonusBalance?.$errors[0]?.$message" class="text-red-400">
-              {{ v$.bonusBalance?.$errors[0]?.$message }}
-            </div>
           </span>
+          <div v-if="v$.balance?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.balance?.$errors[0]?.$message }}
+          </div>
+        </div>
+      </div>
+
+      <div
+        v-if="(partner as Partner)?.roles[0] === Roles.SUPER_ADMIN"
+        class="lg:flex border-round inputBlocksPaddingTop"
+      >
+        <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
+          <label for="role">Роль</label>
+          <span class="p-input-icon-left">
+            <i class="pi pi-user" />
+            <Dropdown
+              v-model="partnerFieldsData.roles"
+              optionLabel="name"
+              :options="roleOptions"
+              optionValue="code"
+              style="padding: 6px; width: 100%"
+            />
+          </span>
+          <div v-if="v$.roles?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.roles?.$errors[0]?.$message }}
+          </div>
         </div>
 
-        <div class="p-2 flex flex-column align-items-start justify-content-center lg:w-12"></div>
+        <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center"></div>
       </div>
 
       <div class="lg:flex border-round inputBlocksPaddingTop">
@@ -310,10 +363,17 @@ watchEffect(() => {
               icon="pi pi-envelope"
               text
               @click="partnerFieldsData.showMessageModal = true"
+              :disabled="loading"
             />
           </div>
           <div class="flex mr-2">
-            <Button label="Сбросить пароль" icon="pi pi-key" text @click="requireConfirmation()" />
+            <Button
+              label="Сбросить пароль"
+              icon="pi pi-key"
+              text
+              @click="requireConfirmation()"
+              :disabled="loading"
+            />
           </div>
           <div class="flex mr-2">
             <Button
@@ -322,13 +382,14 @@ watchEffect(() => {
               icon="pi pi-directions-alt"
               text
               @click="router.back()"
+              :disabled="loading"
             />
           </div>
           <div class="flex">
             <Button
               label="Сохранить"
               type="submit"
-              :disabled="isSaveDisabled"
+              :disabled="isSaveDisabled || loading"
               icon="pi pi-save"
               severity="success"
               text

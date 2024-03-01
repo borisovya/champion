@@ -131,6 +131,25 @@ const router = createRouter({
 router.beforeEach(async (to, from) => {
   const userStore = useUserStore()
   const user = userStore.getUser()
+  const token = getFromCookie('token')
+
+  if (to.meta.requiresAuth && !token) {
+    try {
+      if (to.meta.requiresAuth) {
+        return {
+          path: '/login',
+          // save the location we were at to come back later
+          query: { redirect: to.fullPath }
+        }
+      }
+    } catch {
+      return {
+        path: '/login',
+        // save the location we were at to come back later
+        query: { redirect: to.fullPath }
+      }
+    }
+  }
 
   if (to.meta.requiresAuth && !user) {
     try {

@@ -9,15 +9,19 @@ import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
 import type { Category } from '@/types/Category'
 import { deleteCategory, toggleCategoryStatus } from '@/http/categories/CategoriesServices'
+import { useConfirm } from 'primevue/useconfirm'
+import ConfirmDialog from 'primevue/confirmdialog'
 
 interface Props {
   categories: Category[]
 }
 
 const toast = useToast()
+const confirm = useConfirm()
 
 const props = defineProps<Props>()
 const categories = ref(props.categories)
+const idForDeleting = ref<number | null>(null)
 
 const route = useRouter()
 const loading = ref(false)
@@ -34,10 +38,9 @@ const toggleHandler = async (id: number) => {
       toast.add({
         severity: 'success',
         summary: 'Confirmed',
-        detail:
-          (res as Category).status === 0
-            ? 'Категория успешно деактивирована.'
-            : 'Категория успешно активирована.',
+        detail: (res as Category).status
+          ? 'Категория успешно деактивирована.'
+          : 'Категория успешно активирована.',
         life: 3000
       })
     } else {
@@ -48,6 +51,18 @@ const toggleHandler = async (id: number) => {
   } finally {
     loading.value = false
   }
+}
+
+const requireConfirmation = () => {
+  confirm.require({
+    group: 'headless',
+    header:
+      'Удаление категории повлечет удаление всех товаров, входящих в нее. Пожалуйста, подтвердите действие.',
+    message: 'Внимание!',
+    accept: () => {
+      deleteHandler(idForDeleting.value)
+    }
+  })
 }
 
 const deleteHandler = async (id: number) => {
@@ -74,6 +89,23 @@ const deleteHandler = async (id: number) => {
 <template>
   <div class="flex flex-column">
     <Toast />
+    <ConfirmDialog group="headless">
+      <template #container="{ message, acceptCallback, rejectCallback }">
+        <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+          <div
+            class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem -mt-8"
+          >
+            <i class="pi pi-question text-5xl"></i>
+          </div>
+          <span class="font-bold text-2xl block mb-2 mt-4">{{ (message as any).message }}</span>
+          <p class="mb-0">{{ (message as any).header }}</p>
+          <div class="flex align-items-center gap-2 mt-4">
+            <Button label="Удалить" @click="acceptCallback"></Button>
+            <Button label="Отменить" outlined @click="rejectCallback"></Button>
+          </div>
+        </div>
+      </template>
+    </ConfirmDialog>
     <h3>Категории товаров</h3>
     <div v-if="categories.length > 0" class="flex flex-column justify-content-between">
       <DataTable
@@ -98,7 +130,7 @@ const deleteHandler = async (id: number) => {
         <Column field="name" header="Название" style="max-width: 180px"></Column>
         <Column field="status" header="Статус" style="min-width: 150px">
           <template #body="slotProps">
-            <Tag v-if="slotProps.data.status === 1" severity="success" value="Активна"></Tag>
+            <Tag v-if="slotProps.data.status" severity="success" value="Активна"></Tag>
             <Tag v-else class="text-red-500" severity="danger" value="Не активна"></Tag>
           </template>
         </Column>
@@ -106,7 +138,7 @@ const deleteHandler = async (id: number) => {
           <template v-slot:header></template>
           <template v-slot:body="{ data }">
             <Button
-              v-if="data.status === 1"
+              v-if="data.status"
               title="Деактивировать"
               text
               rounded
@@ -137,7 +169,12 @@ const deleteHandler = async (id: number) => {
               severity="danger"
               title="Удалить"
               :disabled="loading"
-              @click="() => deleteHandler(data.id)"
+              @click="
+                () => {
+                  idForDeleting = data.id
+                  requireConfirmation()
+                }
+              "
             >
             </Button>
           </template>

@@ -46,7 +46,7 @@ const onSubmit = async () => {
 
     const res = await addCategories({
       name: shopCategoryFieldsData.name,
-      status: shopCategoryFieldsData.status ? 1 : 0
+      status: shopCategoryFieldsData.status
     })
 
     if (res) {
@@ -56,11 +56,13 @@ const onSubmit = async () => {
         detail: 'Категория успешно добавлена.',
         life: 3000
       })
-      loading.value = false
       await router.push('/admin/shop/categories')
+    } else {
+      toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
     }
   } catch (e) {
     toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
+  } finally {
     loading.value = false
   }
 }

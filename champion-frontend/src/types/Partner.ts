@@ -1,9 +1,11 @@
+import { Roles } from '@/enum/Roles'
+
 export interface Partner {
   id: number
-  name: string
-  email: string
-  telegram: string
-  championId: number
-  championLogin: string
-  bonusBalance: number
+  username: string
+  telegramLogin: string
+  championPartnersLogin: string
+  roles: Roles[]
+  userIdentifier: string
+  balance: number
 }

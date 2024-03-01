@@ -15,7 +15,7 @@ export const getCategories = async (): Promise<Category[] | []> => {
 
 export const addCategories = async (request: {
   name: string
-  status: 1 | 0
+  status: boolean
 }): Promise<any | null> => {
   try {
     const res = await axios.post(`v1/category`, request)

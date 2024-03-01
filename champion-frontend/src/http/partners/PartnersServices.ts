@@ -1,37 +1,41 @@
 import axios from '../axios.ts'
-import { GeneralResponse } from '../../types/GeneralResponse.ts'
-import { TransactionsHistory } from '../../types/responses/clientAccounts/TransactionsHistoryResponse.ts'
 import type { PartnerUpdate } from '@/types/requests/partners/Partner'
 import type { Partner } from '@/types/Partner'
+import type { Error } from '@/types/Error'
+import { isAxiosError } from 'axios'
 
-export const getPartnerList = async (): Promise<any | null> => {
+export const getPartnerList = async (): Promise<Partner[] | []> => {
   try {
-    const res = await axios.get<Partner[]>(`web-api/v1/partners`)
+    const res = await axios.get<Partner[]>(`v1/user`)
 
-    return res ? res.data : null
+    return res ? res.data : []
   } catch (e) {
+    return []
+  }
+}
+
+export const getPartner = async (id: number | string): Promise<Partner | string | null> => {
+  try {
+    const res = await axios.get<Partner>(`v1/user/${id}`)
+
+    return res && res.data
+  } catch (e) {
+    if (isAxiosError(e)) {
+      return e.response.data.message
+    }
     return null
   }
 }
 
-export const getPartner = async (request: {
-  id: number | string
-}): Promise<GeneralResponse<TransactionsHistory[]> | null> => {
+export const updatePartner = async (request: PartnerUpdate): Promise<Partner | string | null> => {
   try {
-    const res = await axios.get<Partner>(`web-api/v1/partner/${request.id}`)
-
-    return res ? res.data : null
-  } catch (e) {
-    return null
-  }
-}
-
-export const updatePartner = async (partnerId: string | number, request: PartnerUpdate) => {
-  try {
-    const response = await axios.post<Partner>('web-api/v1/partner/update/' + partnerId, request)
+    const response = await axios.patch<Partner>(`v1/user/${request.id}`, request)
 
     return response.data
   } catch (e) {
-    throw e
+    if (isAxiosError(e)) {
+      return e.response.data.message
+    }
+    return null
   }
 }
