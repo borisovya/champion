@@ -12,6 +12,7 @@ import type { News } from '@/types/News'
 import { deleteNews } from '@/http/news/NewsServices'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { useConfirm } from 'primevue/useconfirm'
+import {asset} from "@/helpers/StaticHelper";
 
 interface Props {
   news: News[] | []
@@ -22,8 +23,6 @@ const route = useRouter()
 const confirm = useConfirm()
 
 const props = defineProps<Props>()
-
-const backendUrl = import.meta.env.VITE_BACKEND_URL
 
 const filters = ref()
 const news = ref(props.news)
@@ -131,7 +130,7 @@ initFilters()
           <template #body="{ data }">
             <div class="flex align-content-center">
               <img
-                :src="`${backendUrl}${data.image}`"
+                :src="asset(data.image)"
                 :alt="'newsImage'"
                 class="h-4rem border-round overflow-hidden"
               />

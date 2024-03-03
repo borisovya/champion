@@ -16,8 +16,8 @@ import { News } from '@/types/News'
 import { useRoute, useRouter } from 'vue-router'
 import { isString } from 'lodash'
 import { deleteNews, getNews, newsBindImage, updateNews } from '@/http/news/NewsServices'
+import {asset} from "@/helpers/StaticHelper";
 
-const backendUrl = import.meta.env.VITE_BACKEND_URL
 const confirm = useConfirm()
 const navigate = useRouter()
 const toast = useToast()
@@ -239,7 +239,7 @@ watchEffect(() => {
             :src="
               newsFieldsData.newsImage
                 ? newsFieldsData.newsImage
-                : `${backendUrl}${newsFieldsData.image}`
+                : asset(newsFieldsData.image)
             "
             alt="Image"
             width="200"
