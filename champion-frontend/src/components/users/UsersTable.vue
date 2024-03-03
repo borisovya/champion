@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import {ref} from 'vue';
-import DataTable from 'primevue/datatable';
-import Column from 'primevue/column';
-import InputText from 'primevue/inputtext';
-import type {Partner} from '@/types/Partner';
-import Button from 'primevue/button';
-import { FilterMatchMode } from 'primevue/api';
-import {useRouter} from 'vue-router';
-import {getRoleName} from '@/enum/Roles';
+import { ref } from 'vue'
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import InputText from 'primevue/inputtext'
+import type { Partner } from '@/types/Partner'
+import Button from 'primevue/button'
+import { FilterMatchMode } from 'primevue/api'
+import { useRouter } from 'vue-router'
+import { getRoleName } from '@/enum/Roles'
 
 interface Props {
   partners: Partner[] | []
@@ -17,15 +17,15 @@ const route = useRouter()
 const props = defineProps<Props>()
 const partnersData = ref(props.partners)
 
-const filters = ref();
+const filters = ref()
 
 const initFilters = () => {
   filters.value = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  };
-};
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS }
+  }
+}
 
-initFilters();
+initFilters()
 </script>
 
 <template>
@@ -33,14 +33,15 @@ initFilters();
     <h3>Учетные записи</h3>
 
     <div v-if="partnersData?.length > 0" class="flex flex-column justify-content-between">
-      <DataTable :value="partnersData"
-                 v-model:filters="filters"
-                 dataKey="id"
-                 paginator
-                 :rows="5"
-                 :rowsPerPageOptions="[5, 10, 20]"
-                 class="full-height"
-                 :globalFilterFields="['username', 'telegramLogin', 'championPartnersLogin', 'balance']"
+      <DataTable
+        :value="partnersData"
+        v-model:filters="filters"
+        dataKey="id"
+        paginator
+        :rows="5"
+        :rowsPerPageOptions="[5, 10, 20]"
+        class="full-height"
+        :globalFilterFields="['username', 'telegramLogin', 'championPartnersLogin', 'balance']"
       >
         <template #header>
           <div class="flex grid justify-content-between justify-content-center pt-2">
@@ -56,10 +57,7 @@ initFilters();
               <div class="flex justify-content-end">
                 <span class="p-input-icon-left ml-4">
                   <i class="pi pi-search" />
-                  <InputText
-                      v-model="filters['global'].value"
-                      placeholder="Введите значение"
-                  />
+                  <InputText v-model="filters['global'].value" placeholder="Введите значение" />
                 </span>
               </div>
             </div>

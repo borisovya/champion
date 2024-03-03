@@ -7,9 +7,11 @@ import router from '@/router'
 import Toast from 'primevue/toast'
 import { useToast } from 'primevue/usetoast'
 import useVuelidate from '@vuelidate/core'
-import { required } from '@/i18n/i18n-validators'
+import { minLength, required } from '@/i18n/i18n-validators'
 import Image from 'primevue/image'
 import Textarea from 'primevue/textarea'
+import { createNews, newsBindImage } from '@/http/news/NewsServices'
+import type { News } from '@/types/News'
 
 const toast = useToast()
 const loading = ref(false)
@@ -17,24 +19,25 @@ const chooseFileComponent = ref(null)
 
 const rules = computed(() => {
   return {
-    title: { required },
-    text: { required },
-    newsImg: { required }
+    title: { required, minLength: minLength(2) },
+    description: { required, minLength: minLength(3) },
+    image: { required }
   }
 })
 const newsFieldsData = reactive({
   title: '',
-  text: '',
-  newsImg: ''
+  description: '',
+  image: null,
+  newsImage: ''
 })
 
 const v$ = useVuelidate(rules, toRefs(newsFieldsData))
 
 const setImg = (e) => {
-  const photo = e.target.files[0]
-  newsFieldsData.newsImg = URL.createObjectURL(photo)
+  newsFieldsData.image = e.target.files[0]
+  newsFieldsData.newsImage = URL.createObjectURL(e.target.files[0])
 
-  toast.add({ severity: 'info', summary: 'Success', detail: 'Фото загружено', life: 2000 })
+  toast.add({ severity: 'info', summary: 'Готово', detail: 'Фото загружено', life: 2000 })
 }
 
 const openFileUpload = () => {
@@ -44,9 +47,14 @@ const openFileUpload = () => {
 const onSubmit = async () => {
   loading.value = true
 
+  const createRequest = {
+    title: newsFieldsData.title,
+    description: newsFieldsData.description
+  }
+
   try {
     const isValid = await v$.value.$validate()
-    console.log(newsFieldsData)
+
     if (!isValid) {
       toast.add({
         severity: 'error',
@@ -56,19 +64,31 @@ const onSubmit = async () => {
       })
       loading.value = false
       return
+    } else {
+      const createNewsRes = await createNews(createRequest)
+
+      if (createNewsRes) {
+        await newsBindImage((createNewsRes as News).id, newsFieldsData.image)
+        toast.add({
+          severity: 'success',
+          summary: 'Готово',
+          detail: 'Новость успешно добавлена.',
+          life: 3000
+        })
+
+        await router.push('/admin/news')
+      } else {
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: 'Попробуйте еще раз.',
+          life: 3000
+        })
+      }
     }
-    toast.add({
-      severity: 'success',
-      summary: 'Confirmed',
-      detail: 'Новость успешно добавлена.',
-      life: 3000
-    })
-    setTimeout(() => {
-      loading.value = false
-      router.push('/admin/news')
-    }, 1000)
   } catch {
     toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
+  } finally {
     loading.value = false
   }
 }
@@ -86,8 +106,8 @@ const onSubmit = async () => {
         <div class="p-2 flex flex-column align-items-start justify-content-center lg:w-12">
           <label for="imgUrl" class="mb-2">Изображение</label>
           <Image
-            v-if="newsFieldsData.newsImg"
-            :src="newsFieldsData.newsImg"
+            v-if="newsFieldsData.newsImage"
+            :src="newsFieldsData.newsImage"
             alt="Image"
             width="200"
             class="cursor-pointer"
@@ -105,9 +125,10 @@ const onSubmit = async () => {
             name="imgUrl"
             ref="chooseFileComponent"
             style="display: none"
+            accept="image/jpeg, image/png, image/jpg"
           />
-          <span v-if="v$.newsImg?.$errors[0]?.$message" class="text-red-400">
-            {{ v$.newsImg?.$errors[0]?.$message }}
+          <span v-if="v$.image?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.image?.$errors[0]?.$message }}
           </span>
         </div>
 
@@ -142,11 +163,11 @@ const onSubmit = async () => {
               type="text"
               placeholder="Текст новости"
               style="padding: 1rem; width: 100%"
-              v-model="newsFieldsData.text"
+              v-model="newsFieldsData.description"
             />
           </span>
-          <span v-if="v$.text?.$errors[0]?.$message" class="text-red-400">
-            {{ v$.text?.$errors[0]?.$message }}
+          <span v-if="v$.description?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.description?.$errors[0]?.$message }}
           </span>
         </div>
       </div>

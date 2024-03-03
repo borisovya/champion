@@ -15,7 +15,7 @@ import { Roles } from '@/enum/Roles'
 import { Partner } from '@/types/Partner'
 import Dropdown from 'primevue/dropdown'
 import { useUserStore } from '@/store/useStore'
-import type {User} from '@/types/User';
+import type { User } from '@/types/User'
 
 const toast = useToast()
 const userStore = useUserStore()
@@ -84,7 +84,7 @@ const onSubmit = async () => {
       if (createPartnerRes) {
         toast.add({
           severity: 'success',
-          summary: 'Confirmed',
+          summary: 'Готово',
           detail: 'Учетная запись успешно добавлена.',
           life: 2000
         })

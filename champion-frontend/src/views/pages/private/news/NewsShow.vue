@@ -13,64 +13,105 @@ import { required } from '@/i18n/i18n-validators'
 import Image from 'primevue/image'
 import Textarea from 'primevue/textarea'
 import { News } from '@/types/News'
+import { useRoute, useRouter } from 'vue-router'
+import { isString } from 'lodash'
+import { deleteNews, getNews, newsBindImage, updateNews } from '@/http/news/NewsServices'
 
+const backendUrl = import.meta.env.VITE_BACKEND_URL
 const confirm = useConfirm()
+const navigate = useRouter()
 const toast = useToast()
 const news = ref<News | null>(null)
 const loading = ref(false)
 const isSaveDisabled = ref(true)
 const chooseFileComponent = ref(null)
+const route = useRoute()
+const id = route.params.id
 
 const rules = computed(() => {
   return {
     title: { required },
-    text: { required },
-    newsImg: { required }
+    description: { required },
+    showConfirm: { required },
+    image: { required }
   }
 })
 const newsFieldsData = reactive({
-  id: null,
   title: '',
-  text: '',
-  newsImg: '',
+  description: '',
+  image: null,
+  newsImage: '',
   showConfirm: false
 })
 
-onMounted(() => {
+onMounted(async () => {
   loading.value = true
-  setTimeout(() => {
-    ;(news.value = {
-      id: 1,
-      title: 'Новсть 1 Новсть 1 Новсть 1 Новсть 1 Новсть 1',
-      text: 'Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст Новсть 1 текст',
-      newsImg:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRSAO3VamUZJCAXcGJHTyJLWKb0NvMTbO-dcg&usqp=CAU'
-    }),
-      (newsFieldsData.id = news.value.id),
-      (newsFieldsData.title = news.value.title),
-      (newsFieldsData.text = news.value.text),
-      (newsFieldsData.newsImg = news.value.newsImg),
-      (loading.value = false)
-  }, 100)
+
+  try {
+    const res = id && (await getNews(id as string))
+
+    if (!isString(res)) {
+      news.value = res as News
+      newsFieldsData.title = (res as News).title
+      newsFieldsData.description = (res as News).description
+      newsFieldsData.image = (res as News).image
+    } else {
+      toast.add({ severity: 'error', summary: 'Ошибка', detail: res, life: 3000 })
+      navigate.back()
+    }
+  } catch {
+    toast.add({
+      severity: 'error',
+      summary: 'Ошибка',
+      detail: 'Не удалось загрузить данные. Попробуйте еще раз.',
+      life: 3000
+    })
+    navigate.back()
+  } finally {
+    loading.value = false
+  }
 })
+
 const requireConfirmation = () => {
   confirm.require({
     group: 'headless',
-    header: 'Уверены, что хотите удалить новость?',
-    message: 'Пожалуйста, подтвердите действие.',
+    header: 'Вы действительно хотите удалить новость? Пожалуйста, подтвердите действие.',
+    message: 'Внимание!',
     accept: () => {
-      toast.add({ severity: 'success', summary: 'Новость успешно удалена', life: 3000 })
+      deleteHandler()
     }
   })
+}
+
+const deleteHandler = async () => {
+  loading.value = true
+  try {
+    const res = await deleteNews(id as string)
+    if (res === 204) {
+      navigate.back()
+      toast.add({
+        severity: 'success',
+        summary: 'Готово',
+        detail: 'Новость успешно удалена.',
+        life: 3000
+      })
+    } else {
+      toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
+    }
+  } catch {
+    toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
+  } finally {
+    loading.value = false
+  }
 }
 const getIsSaveDisabled = (): boolean => {
   if (!newsFieldsData.title) {
     return true
   }
-  if (!newsFieldsData.text) {
+  if (!newsFieldsData.description) {
     return true
   }
-  if (!newsFieldsData.newsImg) {
+  if (!newsFieldsData.image) {
     return true
   }
 
@@ -78,8 +119,8 @@ const getIsSaveDisabled = (): boolean => {
     JSON.stringify(news.value) ===
     JSON.stringify({
       title: newsFieldsData.title,
-      text: newsFieldsData.text,
-      newsImg: newsFieldsData.newsImg
+      text: newsFieldsData.description,
+      newsImg: newsFieldsData.image
     })
   ) {
     return true
@@ -91,10 +132,10 @@ const getIsSaveDisabled = (): boolean => {
 const v$ = useVuelidate(rules, toRefs(newsFieldsData))
 
 const onUpload = (e) => {
-  const photo = e.target.files[0]
-  newsFieldsData.newsImg = URL.createObjectURL(photo)
+  newsFieldsData.image = e.target.files[0]
+  newsFieldsData.newsImage = URL.createObjectURL(e.target.files[0])
 
-  toast.add({ severity: 'info', summary: 'Success', detail: 'Фото загружено', life: 2000 })
+  toast.add({ severity: 'info', summary: 'Готово', detail: 'Фото загружено', life: 2000 })
 }
 
 const openFileUpload = () => {
@@ -104,9 +145,14 @@ const openFileUpload = () => {
 const onSubmit = async () => {
   loading.value = true
 
+  const updateRequest = {
+    title: newsFieldsData.title,
+    description: newsFieldsData.description
+  }
+
   try {
     const isValid = await v$.value.$validate()
-    console.log(newsFieldsData)
+
     if (!isValid) {
       toast.add({
         severity: 'error',
@@ -116,19 +162,41 @@ const onSubmit = async () => {
       })
       loading.value = false
       return
+    } else {
+      const updateNewsRes = await updateNews(id as string, updateRequest)
+
+      if (isString(updateNewsRes)) {
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: updateNewsRes,
+          life: 3000
+        })
+        return
+      }
+
+      if (updateNewsRes) {
+        await newsBindImage((updateNewsRes as News).id, newsFieldsData.image)
+        toast.add({
+          severity: 'success',
+          summary: 'Готово',
+          detail: 'Новость успешно изменена.',
+          life: 3000
+        })
+
+        await router.push('/admin/news')
+      } else {
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: 'Попробуйте еще раз.',
+          life: 3000
+        })
+      }
     }
-    toast.add({
-      severity: 'success',
-      summary: 'Confirmed',
-      detail: 'Новость успешно изменена.',
-      life: 3000
-    })
-    setTimeout(() => {
-      loading.value = false
-      router.push('/admin/news')
-    }, 1000)
   } catch {
     toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
+  } finally {
     loading.value = false
   }
 }
@@ -162,13 +230,17 @@ watchEffect(() => {
     <ProgressBar v-if="!news" mode="indeterminate" style="height: 6px"></ProgressBar>
 
     <form v-else class="p-grid p-fluid p-justify-center" @submit.prevent.stop="onSubmit">
-      <h3 class="ml-3">Новость №{{ newsFieldsData.id }}:</h3>
+      <h3 class="ml-3">Новость №{{ id }}:</h3>
 
       <div class="lg:flex border-round inputBlocksPaddingTop">
         <div class="p-2 flex flex-column align-items-start justify-content-center lg:w-12">
           <label for="imgUrl">Изображение</label>
           <Image
-            :src="newsFieldsData.newsImg"
+            :src="
+              newsFieldsData.newsImage
+                ? newsFieldsData.newsImage
+                : `${backendUrl}${newsFieldsData.image}`
+            "
             alt="Image"
             width="200"
             class="cursor-pointer"
@@ -180,9 +252,10 @@ watchEffect(() => {
             name="imgUrl"
             ref="chooseFileComponent"
             style="display: none"
+            accept="image/jpeg, image/png, image/jpg"
           />
-          <span v-if="v$.newsImg?.$errors[0]?.$message" class="text-red-400">
-            {{ v$.newsImg?.$errors[0]?.$message }}
+          <span v-if="v$.image?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.image?.$errors[0]?.$message }}
           </span>
         </div>
 
@@ -217,7 +290,7 @@ watchEffect(() => {
               type="text"
               placeholder="Текст новости"
               style="padding: 1rem; width: 100%"
-              v-model="newsFieldsData.text"
+              v-model="newsFieldsData.description"
             />
           </span>
         </div>
@@ -226,7 +299,7 @@ watchEffect(() => {
       <div class="lg:flex border-round inputBlocksPaddingTop">
         <div class="w-12 p-2 flex flex-wrap align-items-start justify-content-start">
           <div class="flex mr-2">
-            <Button label="Отменить" icon="pi pi-directions-alt" text @click="router.back()" />
+            <Button label="Назад" icon="pi pi-directions-alt" text @click="router.back()" />
           </div>
           <div class="flex mr-2">
             <Button

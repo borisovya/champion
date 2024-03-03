@@ -37,7 +37,7 @@ const toggleHandler = async (id: number) => {
       )
       toast.add({
         severity: 'success',
-        summary: 'Confirmed',
+        summary: 'Готово',
         detail: (res as Category).status
           ? 'Категория успешно деактивирована.'
           : 'Категория успешно активирована.',
@@ -73,7 +73,7 @@ const deleteHandler = async (id: number) => {
       categories.value = categories.value.filter((category) => category.id !== id)
       toast.add({
         severity: 'success',
-        summary: 'Confirmed',
+        summary: 'Готово',
         detail: 'Категория успешно удалена.',
         life: 3000
       })

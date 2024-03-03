@@ -52,7 +52,7 @@ const onSubmit = async () => {
     if (res) {
       toast.add({
         severity: 'success',
-        summary: 'Confirmed',
+        summary: 'Готово',
         detail: 'Категория успешно добавлена.',
         life: 3000
       })

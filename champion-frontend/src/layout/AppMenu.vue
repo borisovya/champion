@@ -11,7 +11,7 @@ const model = ref([
       { label: 'Новости', icon: 'pi pi-list', to: '/admin/news' },
       { label: 'Рассылка', icon: 'pi pi-send', to: '/admin/notifications' }
     ]
-  },
+  }
   // {
   //   label: 'V------Не будет в сайд баре-------V',
   //   items: [

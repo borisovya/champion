@@ -18,8 +18,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { isString } from 'lodash'
 import Dropdown from 'primevue/dropdown'
 import { Roles } from '@/enum/Roles'
-import type {User} from '@/types/User';
-import {useUserStore} from '@/store/useStore';
+import type { User } from '@/types/User'
+import { useUserStore } from '@/store/useStore'
 
 const confirm = useConfirm()
 const navigate = useRouter()
@@ -58,7 +58,8 @@ const partnerFieldsData = reactive({
   roles: null,
   messageForPartner: '',
   showMessageModal: false,
-  showResetPasswordModal: false
+  showResetPasswordModal: false,
+  userIdentifier: ''
 })
 
 onMounted(async () => {
@@ -85,7 +86,7 @@ onMounted(async () => {
     toast.add({
       severity: 'error',
       summary: 'Ошибка',
-      detail: 'Неудалось загрузить данные. Попробуйте еще раз.',
+      detail: 'Не удалось загрузить данные. Попробуйте еще раз.',
       life: 3000
     })
     navigate.back()
@@ -143,7 +144,7 @@ const messageSendClickHandler = () => {
   partnerFieldsData.messageForPartner = ''
   toast.add({
     severity: 'success',
-    summary: 'Confirmed',
+    summary: 'Готово',
     detail: 'Сообщение отправлено',
     life: 3000
   })
@@ -183,7 +184,7 @@ const onSubmit = async () => {
     if (res) {
       toast.add({
         severity: 'success',
-        summary: 'Confirmed',
+        summary: 'Готово',
         detail: 'Данные пользователя успешно изменены.',
         life: 3000
       })
@@ -381,7 +382,7 @@ watchEffect(() => {
           </div>
           <div class="flex mr-2">
             <Button
-              label="Отменить"
+              label="Назад"
               severity="danger"
               icon="pi pi-directions-alt"
               text

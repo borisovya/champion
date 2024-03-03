@@ -13,7 +13,7 @@ onMounted(async () => {
   loading.value = true
   try {
     const res = await getPartnerList()
-    partners.value = partners.value = [...res].sort((a, b) => b.id - a.id)
+    partners.value = [...res].sort((a, b) => b.id - a.id)
   } catch (e) {
     console.log(e)
   } finally {

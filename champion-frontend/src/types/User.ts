@@ -1,4 +1,4 @@
-import type {Roles} from '@/enum/Roles';
+import type { Roles } from '@/enum/Roles'
 
 export interface User {
   championPartnersLogin: string
