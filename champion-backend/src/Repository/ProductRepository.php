@@ -7,7 +7,7 @@ namespace App\Repository;
 use App\Entity\Product;
 use App\Exception\CategoryNotFoundException;
 use App\Exception\ProductNotFoundException;
-use App\Model\CreateProductRequest;
+use App\Model\CrudProductRequest;
 use App\Service\FileService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -47,18 +47,37 @@ class ProductRepository extends ServiceEntityRepository
     /**
      * @throws CategoryNotFoundException
      */
-    public function store(CreateProductRequest $categoryRequest): Product
+    public function store(CrudProductRequest $createProductRequest): Product
     {
-        $category = $this->categoryRepository->findOrFail($categoryRequest->getCategory());
+        $category = $this->categoryRepository->findOrFail($createProductRequest->getCategory());
 
         $product = (new Product())
-            ->setName($categoryRequest->getName())
-            ->setStatus($categoryRequest->getStatus())
-            ->setDescription($categoryRequest->getDescription())
+            ->setName($createProductRequest->getName())
+            ->setStatus($createProductRequest->getStatus())
+            ->setDescription($createProductRequest->getDescription())
             ->setCategory($category)
-            ->setPrice($categoryRequest->getPrice());
+            ->setPrice($createProductRequest->getPrice());
 
         $this->_em->persist($product);
+        $this->_em->flush();
+
+        return $product;
+    }
+
+    /**
+     * @throws CategoryNotFoundException
+     */
+    public function reStore(Product $product, CrudProductRequest $updateProductRequest): Product
+    {
+        $category = $this->categoryRepository->findOrFail($updateProductRequest->getCategory());
+
+        $product
+            ->setName($updateProductRequest->getName())
+            ->setStatus($updateProductRequest->getStatus())
+            ->setDescription($updateProductRequest->getDescription())
+            ->setCategory($category)
+            ->setPrice($updateProductRequest->getPrice());
+
         $this->_em->flush();
 
         return $product;

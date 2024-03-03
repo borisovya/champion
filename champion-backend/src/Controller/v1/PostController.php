@@ -10,7 +10,7 @@ use App\Entity\Post;
 use App\Enum\UploadType;
 use App\Exception\PostNotFoundException;
 use App\Model\ErrorResponse;
-use App\Model\PostRequest;
+use App\Model\CrudPostRequest;
 use App\Repository\PostRepository;
 use App\Service\FileService;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -105,11 +105,11 @@ class PostController extends AbstractController
     )]
     #[OA\RequestBody(
         attachables: [
-            new Model(type: PostRequest::class),
+            new Model(type: CrudPostRequest::class),
         ]
     )]
     public function create(
-        #[RequestBody] PostRequest $createPostRequest,
+        #[RequestBody] CrudPostRequest $createPostRequest,
         PostRepository $postRepository,
     ): Response {
         return $this->json(
@@ -120,11 +120,13 @@ class PostController extends AbstractController
 
     /**
      * Update post.
+     *
+     * @throws PostNotFoundException
      */
     #[Route(
         path: '/v1/post/{postId}',
         name: 'v1_post_update',
-        methods: ['PATCH'],
+        methods: ['PUT'],
     )]
     #[OA\Tag(
         name: 'Post'
@@ -143,18 +145,18 @@ class PostController extends AbstractController
     )]
     #[OA\RequestBody(
         attachables: [
-            new Model(type: PostRequest::class),
+            new Model(type: CrudPostRequest::class),
         ]
     )]
     public function update(
         int $postId,
-        #[RequestBody] PostRequest $createPostRequest,
+        #[RequestBody] CrudPostRequest $updatePostRequest,
         PostRepository $postRepository,
     ): Response {
         return $this->json(
             $postRepository->reStore(
                 $postRepository->findOrFail($postId),
-                $createPostRequest
+                $updatePostRequest
             ),
         );
     }

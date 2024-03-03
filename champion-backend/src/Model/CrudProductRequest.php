@@ -7,7 +7,7 @@ namespace App\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class CreateProductRequest
+class CrudProductRequest
 {
     #[NotBlank]
     #[OA\Property(example: 'phone')]
@@ -33,7 +33,7 @@ class CreateProductRequest
         return $this->description;
     }
 
-    public function setDescription(?string $description): CreateProductRequest
+    public function setDescription(?string $description): CrudProductRequest
     {
         $this->description = $description;
 
@@ -45,7 +45,7 @@ class CreateProductRequest
         return $this->price;
     }
 
-    public function setPrice(int $price): CreateProductRequest
+    public function setPrice(int $price): CrudProductRequest
     {
         $this->price = $price;
 
@@ -57,7 +57,7 @@ class CreateProductRequest
         return $this->name;
     }
 
-    public function setName(string $name): CreateProductRequest
+    public function setName(string $name): CrudProductRequest
     {
         $this->name = $name;
 
@@ -69,7 +69,7 @@ class CreateProductRequest
         return $this->status;
     }
 
-    public function setStatus(bool $status): CreateProductRequest
+    public function setStatus(bool $status): CrudProductRequest
     {
         $this->status = $status;
 
@@ -81,7 +81,7 @@ class CreateProductRequest
         return $this->category;
     }
 
-    public function setCategory(int $category): CreateProductRequest
+    public function setCategory(int $category): CrudProductRequest
     {
         $this->category = $category;
 

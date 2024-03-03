@@ -7,7 +7,7 @@ namespace App\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-class PostRequest
+class CrudPostRequest
 {
     #[NotBlank]
     #[OA\Property(example: 'post 1')]

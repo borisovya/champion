@@ -8,7 +8,7 @@ use App\Entity\Product;
 use App\Enum\UploadType;
 use App\Exception\CategoryNotFoundException;
 use App\Exception\ProductNotFoundException;
-use App\Model\CreateProductRequest;
+use App\Model\CrudProductRequest;
 use App\Model\ErrorResponse;
 use App\Repository\ProductRepository;
 use App\Service\FileService;
@@ -106,14 +106,59 @@ class ProductController extends AbstractController
             new Model(type: ErrorResponse::class),
         ]
     )]
-    #[OA\RequestBody(attachables: [new Model(type: CreateProductRequest::class)])]
+    #[OA\RequestBody(attachables: [new Model(type: CrudProductRequest::class)])]
     public function create(
-        #[RequestBody] CreateProductRequest $createProductRequest,
+        #[RequestBody] CrudProductRequest $createProductRequest,
         ProductRepository $productRepository,
     ): Response {
         return $this->json(
             $productRepository->store($createProductRequest),
             Response::HTTP_CREATED,
+        );
+    }
+
+    /**
+     * Update product.
+     *
+     * @throws CategoryNotFoundException
+     * @throws ProductNotFoundException
+     */
+    #[Route(
+        path: '/v1/product/{productId}',
+        name: 'v1_product_update',
+        methods: ['PUT']
+    )]
+    #[OA\Tag(name: 'Product')]
+    #[OA\Response(
+        response: 200,
+        description: 'Update product',
+        content: new OA\JsonContent(ref: new Model(type: Product::class))
+    )]
+    #[OA\Response(
+        response: 400,
+        description: 'Validation failed',
+        attachables: [
+            new Model(type: ErrorResponse::class),
+        ]
+    )]
+    #[OA\Response(
+        response: 404,
+        description: 'Category not found',
+        attachables: [
+            new Model(type: ErrorResponse::class),
+        ]
+    )]
+    #[OA\RequestBody(attachables: [new Model(type: CrudProductRequest::class)])]
+    public function update(
+        int $productId,
+        #[RequestBody] CrudProductRequest $updateProductRequest,
+        ProductRepository $productRepository,
+    ): Response {
+        return $this->json(
+            $productRepository->reStore(
+                $productRepository->findOrFail($productId),
+                $updateProductRequest
+            ),
         );
     }
 
