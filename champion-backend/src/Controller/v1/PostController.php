@@ -9,8 +9,8 @@ use App\Attribute\RequestFile;
 use App\Entity\Post;
 use App\Enum\UploadType;
 use App\Exception\PostNotFoundException;
-use App\Model\CreatePostRequest;
 use App\Model\ErrorResponse;
+use App\Model\PostRequest;
 use App\Repository\PostRepository;
 use App\Service\FileService;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -65,7 +65,7 @@ class PostController extends AbstractController
     )]
     #[OA\Response(
         response: 200,
-        description: 'Get post list',
+        description: 'Show post info',
         content: new OA\JsonContent(
             type: 'array',
             items: new OA\Items(ref: new Model(type: Post::class))
@@ -105,16 +105,57 @@ class PostController extends AbstractController
     )]
     #[OA\RequestBody(
         attachables: [
-            new Model(type: CreatePostRequest::class),
+            new Model(type: PostRequest::class),
         ]
     )]
     public function create(
-        #[RequestBody] CreatePostRequest $createPostRequest,
+        #[RequestBody] PostRequest $createPostRequest,
         PostRepository $postRepository,
     ): Response {
         return $this->json(
             $postRepository->store($createPostRequest),
             Response::HTTP_CREATED,
+        );
+    }
+
+    /**
+     * Update post.
+     */
+    #[Route(
+        path: '/v1/post/{postId}',
+        name: 'v1_post_update',
+        methods: ['PATCH'],
+    )]
+    #[OA\Tag(
+        name: 'Post'
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Update post',
+        content: new OA\JsonContent(ref: new Model(type: Post::class))
+    )]
+    #[OA\Response(
+        response: 400,
+        description: 'Validation failed',
+        attachables: [
+            new Model(type: ErrorResponse::class),
+        ]
+    )]
+    #[OA\RequestBody(
+        attachables: [
+            new Model(type: PostRequest::class),
+        ]
+    )]
+    public function update(
+        int $postId,
+        #[RequestBody] PostRequest $createPostRequest,
+        PostRepository $postRepository,
+    ): Response {
+        return $this->json(
+            $postRepository->reStore(
+                $postRepository->findOrFail($postId),
+                $createPostRequest
+            ),
         );
     }
 
@@ -184,7 +225,7 @@ class PostController extends AbstractController
             mediaType: 'multipart/form-data',
             schema: new OA\Schema(
                 properties: [
-                    new OA\Property(property: "file", type: "file", format: "binary"),
+                    new OA\Property(property: 'file', type: 'file', format: 'binary'),
                 ]
             )
         )

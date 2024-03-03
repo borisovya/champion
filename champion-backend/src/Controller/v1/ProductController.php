@@ -215,7 +215,7 @@ class ProductController extends AbstractController
             mediaType: 'multipart/form-data',
             schema: new OA\Schema(
                 properties: [
-                    new OA\Property(property: "file", type: "file", format: "binary"),
+                    new OA\Property(property: 'file', type: 'file', format: 'binary'),
                 ]
             )
         )

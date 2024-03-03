@@ -6,7 +6,7 @@ namespace App\Repository;
 
 use App\Entity\Post;
 use App\Exception\PostNotFoundException;
-use App\Model\CreatePostRequest;
+use App\Model\PostRequest;
 use App\Service\FileService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -48,13 +48,24 @@ class PostRepository extends ServiceEntityRepository
         $this->_em->flush();
     }
 
-    public function store(CreatePostRequest $createPostRequest): Post
+    public function store(PostRequest $createPostRequest): Post
     {
         $post = (new Post())
             ->setTitle($createPostRequest->getTitle())
             ->setDescription($createPostRequest->getDescription());
 
         $this->_em->persist($post);
+        $this->_em->flush();
+
+        return $post;
+    }
+
+    public function reStore(Post $post, PostRequest $createPostRequest): Post
+    {
+        $post
+            ->setTitle($createPostRequest->getTitle())
+            ->setDescription($createPostRequest->getDescription());
+
         $this->_em->flush();
 
         return $post;
