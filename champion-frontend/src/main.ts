@@ -22,6 +22,7 @@ app.use(ConfirmationService)
 const userStore = useUserStore()
 
 const token = getFromCookie('token')
+// const token = localStorage.getItem('token')
 if (token) {
   userStore.setUser(JSON.parse(atob(token.split('.')[1])))
 }

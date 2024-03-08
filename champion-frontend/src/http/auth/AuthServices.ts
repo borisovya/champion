@@ -1,6 +1,7 @@
 import axios from '@/http/axios.ts'
 import type { Registration } from '@/types/requests/auth/Auth'
 import { isAxiosError } from 'axios'
+import {getFromCookie} from '@/helpers/CookieHelper';
 
 export const signIn = async (credentials: {
   username: string
@@ -61,7 +62,21 @@ export const signOut = async (request: { token: string }): Promise<boolean> => {
 
 export const resetPassword = async (request: { email: string }) => {
   try {
-    await axios.post('web-api/v1/reset-password', { ...request })
+    await axios.post('v1/reset-password', { ...request })
+  } catch (e) {
+    throw e
+  }
+}
+
+export const refreshAuth = async (): Promise<number | string> => {
+  try {
+    const res = await axios.get('v1/auth/refresh')
+
+    if(res.status === 200) {
+      return res.data.token
+    } else {
+      return res.status
+    }
   } catch (e) {
     throw e
   }

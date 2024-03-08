@@ -29,9 +29,9 @@ onBeforeUnmount(() => {
 const onTopBarMenuButton = () => {
   topbarMenuActive.value = !topbarMenuActive.value
 }
-const onProfileClick = () => {
+const onProfileClick = async () => {
   topbarMenuActive.value = false
-  router.push('/')
+  await router.push('/')
 }
 
 const topbarMenuClasses = computed(() => {
@@ -76,7 +76,8 @@ const onExitClickHandler = async () => {
     if (res) {
       userStore.removeUser()
       deleteFromCookie('token')
-      router.push('/')
+      deleteFromCookie('refresh_token')
+      await router.push('/')
     } else {
       toast.add({
         severity: 'error',

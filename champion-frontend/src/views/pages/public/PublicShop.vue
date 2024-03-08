@@ -21,6 +21,7 @@ const loggOff = async () => {
     if (res) {
       userStore.removeUser()
       deleteFromCookie('token')
+      deleteFromCookie('refresh_token')
       await router.push('/login')
     } else {
       toast.add({

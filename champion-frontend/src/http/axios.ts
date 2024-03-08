@@ -1,5 +1,6 @@
 import axios from 'axios'
-import { deleteFromCookie, getFromCookie } from '@/helpers/CookieHelper'
+import {deleteFromCookie, getFromCookie, setCookie} from '@/helpers/CookieHelper';
+import {refreshAuth} from '@/http/auth/AuthServices';
 
 axios.defaults.withCredentials = true
 
@@ -27,9 +28,16 @@ axios.interceptors.response.use(
   (response) => {
     return response
   },
-  (error) => {
+  async (error) => {
+
     if (error.response?.status === 401) {
-      deleteFromCookie('token')
+      const res = await refreshAuth()
+      if(isNumber(res) && res !== 200) {
+        deleteFromCookie('token')
+        deleteFromCookie('refresh_token')
+      } else {
+        setCookie('token', res)
+      }
     }
 
     return Promise.reject(error)

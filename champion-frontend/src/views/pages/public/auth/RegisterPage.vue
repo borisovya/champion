@@ -213,11 +213,11 @@ const submit = async () => {
 
           <div class="text-center mt-5">
             <a
-              href="/admin"
-              class="font-lg no-underline cursor-pointer text-xl"
+              href="/login"
+              class="font-lg no-underline cursor-pointer font-medium "
               style="color: #a815edff"
             >
-              На главную
+              Перейти на страницу входа
             </a>
           </div>
         </div>
@@ -225,5 +225,3 @@ const submit = async () => {
     </div>
   </div>
 </template>
-
-<style scoped></style>

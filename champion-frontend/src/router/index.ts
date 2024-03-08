@@ -132,6 +132,7 @@ router.beforeEach(async (to, from) => {
   const userStore = useUserStore()
   const user = userStore.getUser()
   const token = getFromCookie('token')
+  // const token = localStorage.getItem('token')
 
   if (to.meta.requiresAuth && !token) {
     try {

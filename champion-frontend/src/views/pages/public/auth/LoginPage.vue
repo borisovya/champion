@@ -51,6 +51,8 @@ const submit = async () => {
         userStore.setUser(JSON.parse(atob(loginResponse.split('.')[1])))
 
         setCookie('token', loginResponse)
+        // localStorage.setItem('token', loginResponse)
+
         toast.add({
           severity: 'success',
           summary: 'Вы успешно зарегистрированы.',
@@ -160,16 +162,6 @@ const submit = async () => {
             >
             </Button>
           </form>
-
-          <div class="text-center mt-5">
-            <a
-              href="/admin"
-              class="font-lg no-underline cursor-pointer text-xl"
-              style="color: #a815edff"
-            >
-              На главную
-            </a>
-          </div>
         </div>
       </div>
     </div>
