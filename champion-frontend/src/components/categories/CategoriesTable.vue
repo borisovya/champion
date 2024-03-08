@@ -100,8 +100,8 @@ const deleteHandler = async (id: number) => {
           <span class="font-bold text-2xl block mb-2 mt-4">{{ (message as any).message }}</span>
           <p class="mb-0">{{ (message as any).header }}</p>
           <div class="flex align-items-center gap-2 mt-4">
-            <Button label="Удалить" @click="acceptCallback"></Button>
-            <Button label="Отменить" outlined @click="rejectCallback"></Button>
+            <Button label="Отменить" outlined @click="rejectCallback"/>
+            <Button label="Удалить" @click="acceptCallback"/>
           </div>
         </div>
       </template>

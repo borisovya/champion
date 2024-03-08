@@ -15,7 +15,6 @@ import Tag from 'primevue/tag'
 import Textarea from 'primevue/textarea'
 import {createProduct, productBindImage} from '@/http/shop/ShopServices';
 import type {CreateProductRequest} from '@/types/requests/shop/Product';
-import type {Category} from '@/types/Category';
 import {getCategories} from '@/http/categories/CategoriesServices';
 import type {Product} from '@/types/Products';
 import {isString} from 'lodash';
@@ -26,14 +25,14 @@ const chooseFileComponent = ref(null)
 
 const rules = computed(() => {
   return {
-    title: { required },
+    name: { required },
     image: { required },
     price: { required, numeric, minValue: minValue(1) },
     category: { required }
   }
 })
 const productCreateFieldsData = reactive({
-  title: '',
+  name: '',
   description: '',
   price: null,
   status: true,
@@ -72,11 +71,11 @@ const onSubmit = async () => {
 
   try {
     const createProductRequest: CreateProductRequest = {
-      title: productCreateFieldsData.title,
+      name: productCreateFieldsData.name,
       description: productCreateFieldsData.description,
       status: productCreateFieldsData.status,
-      price: productCreateFieldsData.price,
-      category: productCreateFieldsData.category
+      price: Number(productCreateFieldsData.price),
+      category: Number(productCreateFieldsData.category)
     }
     const isValid = await v$.value.$validate()
     if (!isValid) {
@@ -173,11 +172,11 @@ const onSubmit = async () => {
               type="text"
               placeholder="Название товара"
               style="padding: 1rem; width: 100%"
-              v-model="productCreateFieldsData.title"
+              v-model="productCreateFieldsData.name"
             />
           </span>
-          <span v-if="v$.title?.$errors[0]?.$message" class="text-red-400">
-            {{ v$.title?.$errors[0]?.$message }}
+          <span v-if="v$.name?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.name?.$errors[0]?.$message }}
           </span>
         </div>
 

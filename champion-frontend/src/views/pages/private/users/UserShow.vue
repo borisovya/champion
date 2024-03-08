@@ -251,8 +251,8 @@ watchEffect(() => {
         <span class="font-bold text-2xl block mb-2 mt-4">{{ (message as any).message }}</span>
         <p class="mb-0">{{ (message as any).header }}</p>
         <div class="flex align-items-center gap-2 mt-4">
-          <Button label="Сбросить" @click="acceptCallback"></Button>
           <Button label="Отменить" outlined @click="rejectCallback"></Button>
+          <Button label="Сбросить" @click="acceptCallback"></Button>
         </div>
       </div>
     </template>
@@ -363,6 +363,16 @@ watchEffect(() => {
       <div class="lg:flex border-round inputBlocksPaddingTop">
         <div class="w-12 p-2 flex flex-wrap align-items-start justify-content-start">
           <div class="flex mr-2">
+            <div class="flex mr-2">
+              <Button
+                  label="Назад"
+                  severity="info"
+                  icon="pi pi-directions-alt"
+                  text
+                  @click="router.back()"
+                  :disabled="loading"
+              />
+            </div>
             <Button
               label="Отправить сообщение"
               icon="pi pi-envelope"
@@ -380,16 +390,7 @@ watchEffect(() => {
               :disabled="loading"
             />
           </div>
-          <div class="flex mr-2">
-            <Button
-              label="Назад"
-              severity="danger"
-              icon="pi pi-directions-alt"
-              text
-              @click="router.back()"
-              :disabled="loading"
-            />
-          </div>
+
           <div class="flex">
             <Button
               label="Сохранить"

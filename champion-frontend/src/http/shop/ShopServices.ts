@@ -1,12 +1,8 @@
 import { isAxiosError } from 'axios'
 import axios from '@/http/axios'
-import type { News } from '@/types/News'
-import type { CreateNewsRequest } from '@/types/requests/news/News'
 import type {Product} from '@/types/Products';
 import type {CreateProductRequest} from '@/types/requests/shop/Product';
-import {Category} from '@/types/Category';
 import {Error} from '@/types/Error';
-import {isString} from 'lodash';
 
 export const getProductList = async (): Promise<Product[] | []> => {
   try {
@@ -48,7 +44,7 @@ export const updateProduct = async (
 
 export const createProduct = async (request: CreateProductRequest): Promise<Product | string | null> => {
   try {
-    const response = await axios.post<Product>(`v1/post`, request)
+    const response = await axios.post<Product>(`v1/product`, request)
 
     return response.data
   } catch (e) {
@@ -72,19 +68,19 @@ export const toggleProductStatus = async (
   }
 }
 
-// export const deleteNews = async (postId: number | string): Promise<number> => {
-//   try {
-//     const response = await axios.delete(`v1/post/${postId}`)
-//
-//     return response.status
-//   } catch (e) {
-//     if (isAxiosError(e)) {
-//       return e.response.status
-//     }
-//     return null
-//   }
-// }
-//
+export const deleteProduct = async (productId: number | string): Promise<number> => {
+  try {
+    const response = await axios.delete(`v1/product/${productId}`)
+
+    return response.status
+  } catch (e) {
+    if (isAxiosError(e)) {
+      return e.response.status
+    }
+    return null
+  }
+}
+
 export const productBindImage = async (productId: number | string, file: File): Promise<Product> => {
   try {
     const response = await axios.post<Product>(

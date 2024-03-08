@@ -10,11 +10,10 @@ import Toast from 'primevue/toast';
 import {useToast} from 'primevue/usetoast';
 import {useConfirm} from 'primevue/useconfirm';
 import {FilterMatchMode} from 'primevue/api';
-import {deleteNews} from '@/http/news/NewsServices';
 import {asset} from '@/helpers/StaticHelper';
 import ConfirmDialog from 'primevue/confirmdialog';
-import {toggleCategoryStatus} from '@/http/categories/CategoriesServices';
-import {Category} from '@/types/Category';
+import Tag from 'primevue/tag';
+import {deleteProduct, toggleProductStatus} from '@/http/shop/ShopServices';
 
 interface Props {
   products: Product[] | [];
@@ -50,7 +49,7 @@ const requireConfirmation = (id: number) => {
 const deleteHandler = async (id: number) => {
   loading.value = true;
   try {
-    const res = await deleteNews(id);
+    const res = await deleteProduct(id);
     if (res === 204) {
       products.value = products.value.filter((product) => (product as Product).id !== id);
       toast.add({
@@ -73,35 +72,36 @@ const deleteHandler = async (id: number) => {
 };
 
 const toggleHandler = async (id: number) => {
-  loading.value = true
+  loading.value = true;
   try {
-    const res = await toggleCategoryStatus(id)
+    const res = await toggleProductStatus(id);
 
-    if ((res as Category).id) {
+    if ((res as Product).id) {
       products.value = products.value.map((product) =>
-          product.id === id ? { ...product, status: (res as Product).status } : product
-      )
+          product.id === id ? {...product, status: (res as Product).status} : product
+      );
       toast.add({
         severity: 'success',
         summary: 'Готово',
-        detail: (res as Category).status
+        detail: !(res as Product).status
             ? 'Продукт успешно деактивирован.'
             : 'Продукт успешно активирован.',
         life: 3000
-      })
-    } else {
-      toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
+      });
     }
-  } catch {
-    toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
-  } finally {
-    loading.value = false
+    else {
+      toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
+    }
   }
-}
+  catch {
+    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
+  }
+  finally {
+    loading.value = false;
+  }
+};
 
 initFilters();
-
-
 </script>
 
 <template>
@@ -119,8 +119,8 @@ initFilters();
             <span class="font-bold text-2xl block mb-2 mt-4">{{ (message as any).message }}</span>
             <p class="mb-0">{{ (message as any).header }}</p>
             <div class="flex align-items-center gap-2 mt-4">
-              <Button label="Удалить" @click="acceptCallback"></Button>
               <Button label="Отменить" outlined @click="rejectCallback"></Button>
+              <Button label="Удалить" @click="acceptCallback"></Button>
             </div>
           </div>
         </template>
@@ -136,7 +136,7 @@ initFilters();
             :rows="5"
             :rowsPerPageOptions="[5, 10, 20]"
             class="full-height"
-            :globalFilterFields="['title', 'description', 'price', 'category']"
+            :globalFilterFields="['name', 'description', 'price', 'category.name']"
         >
           <template #header>
             <div class="flex grid justify-content-between justify-content-center pt-2">
@@ -144,7 +144,7 @@ initFilters();
                 <Button
                     outlined
                     icon="pi pi-box"
-                    label="Добавить новость"
+                    label="Добавить товар"
                     @click="route.push('/admin/shop/create')"
                 />
               </div>
@@ -173,7 +173,7 @@ initFilters();
               </div>
             </template>
           </Column>
-          <Column field="title" header="Название товара" style="width: 20rem"></Column>
+          <Column field="name" header="Название товара" style="width: 20rem"></Column>
           <Column field="description" header="Описание"></Column>
           <Column field="price" header="Цена"></Column>
           <Column field="category" header="Категория">
@@ -181,7 +181,13 @@ initFilters();
               {{ (data as Product).category?.name ?? ' - ' }}
             </template>
           </Column>
-          <Column header="" style="width: 8rem">
+          <Column field="status" header="Статус товара">
+            <template #body="slotProps">
+              <Tag v-if="slotProps.data.status" severity="success" value="Активен"></Tag>
+              <Tag v-else class="text-red-500" severity="danger" value="Не активен"></Tag>
+            </template>
+          </Column>
+          <Column header="" style="width: 10rem">
             <template v-slot:header></template>
             <template v-slot:body="{ data }">
               <Button
@@ -190,7 +196,7 @@ initFilters();
                   size="large"
                   icon="pi pi-eye"
                   severity="secondary"
-                  @click="route.push(`/admin/product/show/${data.id}`)"
+                  @click="route.push(`/admin/shop/show/${data.id}`)"
               />
               <Button
                   v-if="data.status"
@@ -222,7 +228,7 @@ initFilters();
                   size="large"
                   icon="pi pi-trash"
                   severity="danger"
-                  @click=" () => { requireConfirmation(data.id) }"
+                  @click="() => requireConfirmation(data.id)"
               />
             </template>
           </Column>

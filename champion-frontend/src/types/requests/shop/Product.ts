@@ -1,5 +1,5 @@
 export interface CreateProductRequest {
-  title: string,
+  name: string,
   description: string,
   status: boolean,
   price: number,

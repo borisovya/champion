@@ -18,7 +18,13 @@ import Tag from 'primevue/tag';
 import Textarea from 'primevue/textarea';
 import {useRoute, useRouter} from 'vue-router';
 import {isString} from 'lodash';
-import {getProduct, productBindImage, updateProduct} from '@/http/shop/ShopServices';
+import {
+  deleteProduct,
+  getProduct,
+  productBindImage,
+  toggleProductStatus,
+  updateProduct
+} from '@/http/shop/ShopServices';
 import {getCategories} from '@/http/categories/CategoriesServices';
 import type {CreateProductRequest} from '@/types/requests/shop/Product';
 import {asset} from '@/helpers/StaticHelper';
@@ -37,17 +43,17 @@ const id = route.params.id;
 
 const rules = computed(() => {
   return {
-    title: {required},
+    name: {required},
     image: {required},
     price: {required, numeric, minValue: minValue(1)},
     category: {required},
   };
 });
 const productFieldsData = reactive({
-  title: '',
+  name: '',
   description: '',
   price: null,
-  status: false,
+  status: null,
   category: null,
   imgUrl: '',
   image: null,
@@ -73,8 +79,11 @@ onMounted(async () => {
 
     if (!isString(res)) {
       product.value = res as Product;
-      productFieldsData.title = (res as Product).title;
+      productFieldsData.name = (res as Product).name;
       productFieldsData.description = (res as Product).description;
+      productFieldsData.price = (res as Product).price;
+      productFieldsData.status = (res as Product).status;
+      productFieldsData.category = (res as Product).category.id;
       productFieldsData.image = (res as Product).image;
     } else {
       toast.add({severity: 'error', summary: 'Ошибка', detail: res, life: 3000});
@@ -97,17 +106,41 @@ onMounted(async () => {
 const requireConfirmation = () => {
   confirm.require({
     group: 'headless',
-    header: product.value?.status
-        ? 'Уверены, что хотите деакивировать товар?'
-        : 'Уверены, что хотите акивировать товар?',
-    message: 'Пожалуйста, подтвердите действие.',
+    header: `Вы действительно хотите удалить данный товар? Пожалуйста, подтвердите действие.`,
+    message: 'Внимание!',
     accept: () => {
-      toast.add({severity: 'success', summary: 'Товар деактивирован', life: 3000});
+      deleteHandler();
     }
   });
 };
+
+const deleteHandler = async () => {
+  loading.value = true;
+  try {
+    const res = await deleteProduct(Number(id));
+    if (res === 204) {
+      toast.add({
+        severity: 'success',
+        summary: 'Готово',
+        detail: 'Товар ушспешно удален.',
+        life: 3000
+      });
+      await router.push('/admin/shop')
+    }
+    else {
+      toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
+    }
+  }
+  catch {
+    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
+  }
+  finally {
+    loading.value = false;
+  }
+};
+
 const getIsSaveDisabled = (): boolean => {
-  if (!productFieldsData.title) {
+  if (!productFieldsData.name) {
     return true;
   }
   if (!productFieldsData.price) {
@@ -122,20 +155,20 @@ const getIsSaveDisabled = (): boolean => {
 
   if (
       JSON.stringify({
-        title: product.value.title,
+        name: product.value.name,
         description: product.value.description,
         price: product.value.price,
         status: product.value.status,
-        category: product.value.category,
-        newsImg: product.value.image
+        category: product.value.category.id,
+        image: product.value.image
       }) ===
       JSON.stringify({
-        title: productFieldsData.title,
+        name: productFieldsData.name,
         description: productFieldsData.description,
         price: productFieldsData.price,
         status: productFieldsData.status,
         category: productFieldsData.category,
-        newsImg: productFieldsData.image
+        image: productFieldsData.image
       })
   ) {
     return true;
@@ -157,20 +190,47 @@ const openFileUpload = () => {
   chooseFileComponent.value.click();
 };
 
+const toggleHandler = async () => {
+  loading.value = true;
+  try {
+    const res = await toggleProductStatus(id as string);
+
+    if ((res as Product).id) {
+      product.value = res as Product
+      toast.add({
+        severity: 'success',
+        summary: 'Готово',
+        detail: !(res as Product).status
+            ? 'Продукт успешно деактивирован.'
+            : 'Продукт успешно активирован.',
+        life: 3000
+      });
+    }
+    else {
+      toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
+    }
+  }
+  catch {
+    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
+  }
+  finally {
+    loading.value = false;
+  }
+};
+
 const onSubmit = async () => {
   loading.value = true;
 
   const updateRequest: CreateProductRequest = {
-    title: productFieldsData.title,
+    name: productFieldsData.name,
     description: productFieldsData.description,
-    price: productFieldsData.price,
+    price: Number(productFieldsData.price),
     status: productFieldsData.status,
-    category: productFieldsData.category
+    category: Number(productFieldsData.category)
   };
 
   try {
     const isValid = await v$.value.$validate();
-
     if (!isValid) {
       toast.add({
         severity: 'error',
@@ -210,7 +270,7 @@ const onSubmit = async () => {
           life: 3000
         });
 
-        await router.push('/admin/products');
+        await router.push('/admin/shop');
       }
       else {
         toast.add({
@@ -248,11 +308,8 @@ watchEffect(() => {
         <span class="font-bold text-2xl block mb-2 mt-4">{{ (message as any).message }}</span>
         <p class="mb-0">{{ (message as any).header }}</p>
         <div class="flex align-items-center gap-2 mt-4">
-          <Button
-              :label="product.status ? 'Деактивировать' : 'Активировать'"
-              @click="acceptCallback"
-          ></Button>
-          <Button label="Отменить" outlined @click="rejectCallback"></Button>
+          <Button label="Отменить" outlined @click="rejectCallback"/>
+          <Button label="Удалиь" @click="acceptCallback" />
         </div>
       </div>
     </template>
@@ -266,7 +323,7 @@ watchEffect(() => {
     ></ProgressBar>
 
     <form v-else class="p-grid p-fluid p-justify-center" @submit.prevent.stop="onSubmit">
-      <h3 class="ml-3">Детали товара {{ productFieldsData.title }}:</h3>
+      <h3 class="ml-3">Детали товара {{ productFieldsData.name }}:</h3>
 
       <div class="lg:flex border-round inputBlocksPaddingTop">
         <div class="p-2 flex flex-column align-items-start justify-content-center lg:w-12">
@@ -307,11 +364,11 @@ watchEffect(() => {
                 type="text"
                 placeholder="Название товара"
                 style="padding: 1rem; width: 100%"
-                v-model="productFieldsData.title"
+                v-model="productFieldsData.name"
             />
           </span>
-          <span v-if="v$.title?.$errors[0]?.$message" class="text-red-400">
-            {{ v$.title?.$errors[0]?.$message }}
+          <span v-if="v$.name?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.name?.$errors[0]?.$message }}
           </span>
         </div>
 
@@ -398,19 +455,28 @@ watchEffect(() => {
 
       <div class="lg:flex border-round inputBlocksPaddingTop">
         <div class="w-12 p-2 flex flex-wrap align-items-start justify-content-start">
-          <div v-if="product.status" class="flex mr-2">
-            <Button label="Деактивировать" icon="pi pi-times" text @click="requireConfirmation()"/>
-          </div>
-          <div v-else class="flex mr-2">
-            <Button label="Активировать" icon="pi pi-check" text @click="requireConfirmation()"/>
-          </div>
           <div class="flex mr-2">
             <Button
-                label="Отменить"
-                severity="danger"
+                label="Назад"
+                severity="info"
                 icon="pi pi-directions-alt"
                 text
                 @click="router.back()"
+            />
+          </div>
+          <div v-if="product.status" class="flex mr-2">
+            <Button label="Деактивировать" icon="pi pi-times" text @click="toggleHandler"/>
+          </div>
+          <div v-else class="flex mr-2">
+            <Button label="Активировать" icon="pi pi-check" text @click="toggleHandler"/>
+          </div>
+          <div class="flex mr-2">
+            <Button
+                label="Удалить"
+                severity="danger"
+                icon="pi pi-directions-alt"
+                text
+                @click="requireConfirmation"
             />
           </div>
           <div class="flex">
