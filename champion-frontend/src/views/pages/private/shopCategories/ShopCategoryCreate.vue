@@ -45,7 +45,7 @@ const onSubmit = async () => {
     }
 
     const res = await addCategories({
-      name: shopCategoryFieldsData.name,
+      title: shopCategoryFieldsData.name,
       status: shopCategoryFieldsData.status
     })
 

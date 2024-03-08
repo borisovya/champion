@@ -1,5 +1,3 @@
-import type { PartnerUpdate } from '@/types/requests/partners/Partner'
-import type { Partner } from '@/types/Partner'
 import { isAxiosError } from 'axios'
 import axios from '@/http/axios'
 import type { News } from '@/types/News'
@@ -33,8 +31,7 @@ export const updateNews = async (
   request: CreateNewsRequest
 ): Promise<News | string | null> => {
   try {
-    const response = await axios.patch<News>(`v1/post/${id}`, request)
-
+    const response = await axios.put<News>(`v1/post/${id}`, request)
     return response.data
   } catch (e) {
     if (isAxiosError(e)) {

@@ -13,6 +13,12 @@ import Dropdown from 'primevue/dropdown'
 import RadioButton from 'primevue/radiobutton'
 import Tag from 'primevue/tag'
 import Textarea from 'primevue/textarea'
+import {createProduct, productBindImage} from '@/http/shop/ShopServices';
+import type {CreateProductRequest} from '@/types/requests/shop/Product';
+import type {Category} from '@/types/Category';
+import {getCategories} from '@/http/categories/CategoriesServices';
+import type {Product} from '@/types/Products';
+import {isString} from 'lodash';
 
 const toast = useToast()
 const loading = ref(false)
@@ -20,42 +26,41 @@ const chooseFileComponent = ref(null)
 
 const rules = computed(() => {
   return {
-    name: { required },
-    imgUrl: { required },
+    title: { required },
+    image: { required },
     price: { required, numeric, minValue: minValue(1) },
-    categoryId: { required, numeric, minValue: minValue(1) }
+    category: { required }
   }
 })
-const productFieldsData = reactive({
-  name: '',
+const productCreateFieldsData = reactive({
+  title: '',
   description: '',
   price: null,
-  active: true,
-  categoryId: 1,
+  status: true,
+  category: null,
+  image: null,
   imgUrl: ''
 })
-const categories = ref<{ name: String; code: Number }[] | null>(null)
+const categories = ref<{ name: string, code: number }[] | null>(null)
 
-onMounted(() => {
+onMounted(async () => {
   loading.value = true
-  setTimeout(() => {
-    categories.value = [
-      { name: 'Электроника', code: 1 },
-      { name: 'Одежда', code: 2 },
-      { name: 'Транспорт', code: 3 },
-      { name: 'Аксесуары', code: 4 }
-    ]
-    loading.value = false
-  }, 100)
+  const categoryList = await getCategories()
+  if(categoryList) {
+    categories.value = categoryList.map(category => {
+      return { name: category.name, code: category.id }
+    })
+  }
+  loading.value = false
 })
 
-const v$ = useVuelidate(rules, toRefs(productFieldsData))
+const v$ = useVuelidate(rules, toRefs(productCreateFieldsData))
 
 const setImg = (e) => {
-  const photo = e.target.files[0]
-  productFieldsData.imgUrl = URL.createObjectURL(photo)
+  productCreateFieldsData.image = e.target.files[0]
+  productCreateFieldsData.imgUrl = URL.createObjectURL(e.target.files[0])
 
-  toast.add({ severity: 'info', summary: 'Success', detail: 'Фото загружено', life: 2000 })
+  toast.add({ severity: 'info', summary: 'Готово', detail: 'Фото загружено', life: 2000 })
 }
 
 const openFileUpload = () => {
@@ -66,8 +71,14 @@ const onSubmit = async () => {
   loading.value = true
 
   try {
+    const createProductRequest: CreateProductRequest = {
+      title: productCreateFieldsData.title,
+      description: productCreateFieldsData.description,
+      status: productCreateFieldsData.status,
+      price: productCreateFieldsData.price,
+      category: productCreateFieldsData.category
+    }
     const isValid = await v$.value.$validate()
-    console.log(v$.value)
     if (!isValid) {
       toast.add({
         severity: 'error',
@@ -77,19 +88,36 @@ const onSubmit = async () => {
       })
       loading.value = false
       return
+    } else {
+      const createProductRes = await createProduct(createProductRequest)
+
+      if(isString(createProductRes)){
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: 'Попробуйте еще раз.',
+          life: 3000
+        })
+        return
+      }
+
+      if(createProductRes) {
+        await productBindImage((createProductRes as Product).id, productCreateFieldsData.image)
+        toast.add({
+          severity: 'success',
+          summary: 'Confirmed',
+          detail: 'Товар успешно добавлен.',
+          life: 3000
+        })
+        await router.push('/admin/shop')
+      } else {
+        toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
+      }
     }
-    toast.add({
-      severity: 'success',
-      summary: 'Confirmed',
-      detail: 'Товар успешно добавлен.',
-      life: 3000
-    })
-    setTimeout(() => {
-      loading.value = false
-      router.push('/admin/shop')
-    }, 1000)
   } catch {
     toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
+
+  } finally {
     loading.value = false
   }
 }
@@ -98,18 +126,18 @@ const onSubmit = async () => {
 <template>
   <Toast />
   <div class="card" style="height: calc(100vh - 9rem); overflow: auto">
-    <ProgressBar v-if="!categories" mode="indeterminate" style="height: 6px"></ProgressBar>
+    <ProgressBar v-if="loading" mode="indeterminate" style="height: 6px"></ProgressBar>
 
     <form v-else class="p-grid p-fluid p-justify-center" @submit.prevent.stop="onSubmit">
       <h3 class="ml-3">Добавление товара:</h3>
 
-      <div class="lg:flex border-round inputBlocksPaddingTop">
+      <div class="lg:flex border-round inputBlocksPaddingTop max-h-20">
         <div class="p-2 flex flex-column align-items-start justify-content-center lg:w-12">
           <label for="imgUrl" class="mb-2">Изображение</label>
           <Image
-            v-if="productFieldsData.imgUrl"
-            :src="productFieldsData.imgUrl"
-            alt="Image"
+            v-if="productCreateFieldsData.imgUrl"
+            :src="productCreateFieldsData.imgUrl"
+            alt="productImage"
             width="200"
             class="cursor-pointer"
             @click="openFileUpload"
@@ -123,12 +151,13 @@ const onSubmit = async () => {
           <input
             type="file"
             @change="setImg"
-            name="imgUrl"
+            name="image"
             ref="chooseFileComponent"
             style="display: none"
+            accept="image/jpeg, image/png, image/jpg"
           />
-          <span v-if="v$.imgUrl?.$errors[0]?.$message" class="text-red-400">
-            {{ v$.imgUrl?.$errors[0]?.$message }}
+          <span v-if="v$.image?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.image?.$errors[0]?.$message }}
           </span>
         </div>
 
@@ -144,11 +173,11 @@ const onSubmit = async () => {
               type="text"
               placeholder="Название товара"
               style="padding: 1rem; width: 100%"
-              v-model="productFieldsData.name"
+              v-model="productCreateFieldsData.title"
             />
           </span>
-          <span v-if="v$.name?.$errors[0]?.$message" class="text-red-400">
-            {{ v$.name?.$errors[0]?.$message }}
+          <span v-if="v$.title?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.title?.$errors[0]?.$message }}
           </span>
         </div>
 
@@ -156,12 +185,16 @@ const onSubmit = async () => {
           <label for="categoryId">Категория</label>
           <span class="p-input-icon-left">
             <Dropdown
-              v-model="productFieldsData.categoryId"
+              v-model="productCreateFieldsData.category"
               :options="categories"
               optionLabel="name"
               optionValue="code"
               style="padding: 6px; width: 100%"
             />
+          </span>
+
+          <span v-if="v$.category?.$errors[0]?.$message" class="text-red-400">
+            {{ v$.category?.$errors[0]?.$message }}
           </span>
         </div>
       </div>
@@ -176,7 +209,7 @@ const onSubmit = async () => {
               inputmode="numeric"
               placeholder="Цена"
               style="padding: 1rem; width: 100%"
-              v-model="productFieldsData.price"
+              v-model="productCreateFieldsData.price"
             />
           </span>
           <span v-if="v$.price?.$errors[0]?.$message" class="text-red-400">
@@ -186,14 +219,14 @@ const onSubmit = async () => {
 
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
           <div class="lg:w-12 p-2 flex align-items-center justify-content-start">
-            <label for="status" class="ml-1 mr-2">Статус:</label>
+            <label for="status" class="ml-1 mr-2">Статус товара:</label>
             <div class="flex flex-wrap gap-3">
               <div class="flex align-items-center">
                 <RadioButton
-                  v-model="productFieldsData.active"
+                  v-model="productCreateFieldsData.status"
                   inputId="active"
-                  name="active"
-                  :checked="productFieldsData.active"
+                  name="status"
+                  :checked="productCreateFieldsData.status"
                   :value="true"
                 />
                 <label for="active" class="ml-2">
@@ -202,10 +235,10 @@ const onSubmit = async () => {
               </div>
               <div class="flex align-items-center">
                 <RadioButton
-                  v-model="productFieldsData.active"
+                  v-model="productCreateFieldsData.status"
                   inputId="inActive"
-                  name="active"
-                  :checked="!productFieldsData.active"
+                  name="status"
+                  :checked="!productCreateFieldsData.status"
                   :value="false"
                 />
                 <label for="inActive" class="ml-2">
@@ -227,7 +260,7 @@ const onSubmit = async () => {
               type="text"
               placeholder="Описание товара"
               style="padding: 1rem; width: 100%"
-              v-model="productFieldsData.description"
+              v-model="productCreateFieldsData.description"
             />
           </span>
         </div>

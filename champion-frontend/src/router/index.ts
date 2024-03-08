@@ -92,7 +92,7 @@ const router = createRouter({
     },
     {
       path: '/login',
-      name: 'login',
+      title: 'login',
       component: () => import('@/views/pages/public/auth/LoginPage.vue'),
       beforeEnter: (to, from, next) => {
         const user = getFromCookie('token')
@@ -105,7 +105,7 @@ const router = createRouter({
     },
     {
       path: '/register',
-      name: 'register',
+      title: 'register',
       component: () => import('@/views/pages/public/auth/RegisterPage.vue'),
       beforeEnter: (to, from, next) => {
         const user = getFromCookie('token')
@@ -118,7 +118,7 @@ const router = createRouter({
     },
     {
       path: '/password-reset',
-      name: 'password-reset',
+      title: 'password-reset',
       component: () => import('@/views/pages/public/auth/PasswordReset.vue')
     },
     {

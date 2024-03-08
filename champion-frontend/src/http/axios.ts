@@ -30,7 +30,6 @@ axios.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       deleteFromCookie('token')
-      deleteFromCookie('refresh_token')
     }
 
     return Promise.reject(error)

@@ -21,7 +21,7 @@ const loggOff = async () => {
     if (res) {
       userStore.removeUser()
       deleteFromCookie('token')
-      router.push('/login')
+      await router.push('/login')
     } else {
       toast.add({
         severity: 'error',
@@ -45,7 +45,7 @@ const loggOff = async () => {
   <Toast position="top-right" />
   <h1>Скоро тут будет магаз, а пока кликай по кнопке</h1>
 
-  <div v-if="user">User data: {{ user.username }}</div>
+  <div v-if="user">User data: {{ user.username ?? '-' }}</div>
 
   <div v-if="user" class="mt-2 mb-2">
     <Button @click="loggOff" severity="danger"> LOG OFF</Button>

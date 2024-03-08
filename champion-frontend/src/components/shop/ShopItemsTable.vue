@@ -1,53 +1,97 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import DataTable from 'primevue/datatable'
-import Column from 'primevue/column'
-import InputText from 'primevue/inputtext'
-import Tag from 'primevue/tag'
-import Dropdown from 'primevue/dropdown'
-import Button from 'primevue/button'
+import {ref} from 'vue';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
+import {useRouter} from 'vue-router';
+import {Product} from '@/types/Products';
+import Toast from 'primevue/toast';
+import {useToast} from 'primevue/usetoast';
+import {useConfirm} from 'primevue/useconfirm';
+import {FilterMatchMode} from 'primevue/api';
+import {deleteNews} from '@/http/news/NewsServices';
+import {asset} from '@/helpers/StaticHelper';
+import ConfirmDialog from 'primevue/confirmdialog';
+import {toggleCategoryStatus} from '@/http/categories/CategoriesServices';
+import {Category} from '@/types/Category';
 
-const toast = useToast()
-import Paginator from 'primevue/paginator'
-import { useRouter } from 'vue-router'
-import { Product } from '@/types/Products'
-import Toast from 'primevue/toast'
-import { useToast } from 'primevue/usetoast'
+interface Props {
+  products: Product[] | [];
+}
 
-const { products, isLoading } = defineProps({
-  products: {
-    type: Array as () => Product[],
-    required: true
-  },
-  isLoading: {
-    type: Boolean,
-    required: true
+const props = defineProps<Props>();
+
+const toast = useToast();
+const confirm = useConfirm();
+const route = useRouter();
+
+const loading = ref(false);
+const filters = ref();
+const products = ref(props.products);
+
+const initFilters = () => {
+  filters.value = {
+    global: {value: null, matchMode: FilterMatchMode.CONTAINS}
+  };
+};
+
+const requireConfirmation = (id: number) => {
+  confirm.require({
+    group: 'headless',
+    header: `Вы действительно хотите удалить данный товар? Пожалуйста, подтвердите действие.`,
+    message: 'Внимание!',
+    accept: () => {
+      deleteHandler(id);
+    }
+  });
+};
+
+const deleteHandler = async (id: number) => {
+  loading.value = true;
+  try {
+    const res = await deleteNews(id);
+    if (res === 204) {
+      products.value = products.value.filter((product) => (product as Product).id !== id);
+      toast.add({
+        severity: 'success',
+        summary: 'Готово',
+        detail: 'Товар ушспешно удален.',
+        life: 3000
+      });
+    }
+    else {
+      toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
+    }
   }
-})
+  catch {
+    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
+  }
+  finally {
+    loading.value = false;
+  }
+};
 
-const route = useRouter()
-const loading = ref(false)
-const dropdownValues = ref([
-  { name: 'Id товара', code: 'id' },
-  { name: 'Название', code: 'name' },
-  { name: 'Категория', code: 'categoryId' }
-])
-
-const filters = ref({
-  searchValue: '',
-  fieldForSearch: 'name',
-  rows: 5
-})
-
-const deactivateHandler = () => {
+const toggleHandler = async (id: number) => {
   loading.value = true
   try {
-    toast.add({
-      severity: 'success',
-      summary: 'Confirmed',
-      detail: 'Товар успешно деактивирован.',
-      life: 3000
-    })
+    const res = await toggleCategoryStatus(id)
+
+    if ((res as Category).id) {
+      products.value = products.value.map((product) =>
+          product.id === id ? { ...product, status: (res as Product).status } : product
+      )
+      toast.add({
+        severity: 'success',
+        summary: 'Готово',
+        detail: (res as Category).status
+            ? 'Продукт успешно деактивирован.'
+            : 'Продукт успешно активирован.',
+        life: 3000
+      })
+    } else {
+      toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
+    }
   } catch {
     toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
   } finally {
@@ -55,124 +99,155 @@ const deactivateHandler = () => {
   }
 }
 
-const activateHandler = () => {
-  loading.value = true
-  try {
-    toast.add({
-      severity: 'success',
-      summary: 'Confirmed',
-      detail: 'Товар успешно активирован.',
-      life: 3000
-    })
-  } catch {
-    toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
-  } finally {
-    loading.value = false
-  }
-}
+initFilters();
+
+
 </script>
 
 <template>
   <div class="flex flex-column">
-    <Toast />
-    <h3>Витрина</h3>
-    <div v-if="!isLoading" class="flex flex-column justify-content-between">
-      <DataTable :value="products" tableStyle="min-width: 50rem">
-        <template #header>
-          <div class="flex flex-wrap align-items-center justify-content-between gap-2">
-            <!--              <span class="text-xl text-900 font-bold">Товары</span>-->
-            <!--              <Button icon="pi pi-refresh" rounded raised />-->
+    <div class="flex flex-column">
+      <Toast/>
+      <ConfirmDialog group="headless">
+        <template #container="{ message, acceptCallback, rejectCallback }">
+          <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
+            <div
+                class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem -mt-8"
+            >
+              <i class="pi pi-question text-5xl"></i>
+            </div>
+            <span class="font-bold text-2xl block mb-2 mt-4">{{ (message as any).message }}</span>
+            <p class="mb-0">{{ (message as any).header }}</p>
+            <div class="flex align-items-center gap-2 mt-4">
+              <Button label="Удалить" @click="acceptCallback"></Button>
+              <Button label="Отменить" outlined @click="rejectCallback"></Button>
+            </div>
           </div>
-
-          <div class="flex grid justify-content-between justify-content-center pt-2">
-            <div class="flex justify-content-start col-3 p-0">
+        </template>
+      </ConfirmDialog>
+      <h3>Витрина</h3>
+      <div v-if="products?.length > 0" class="flex flex-column justify-content-between">
+        <DataTable
+            :value="products"
+            tableStyle="min-width: 50rem"
+            v-model:filters="filters"
+            dataKey="id"
+            paginator
+            :rows="5"
+            :rowsPerPageOptions="[5, 10, 20]"
+            class="full-height"
+            :globalFilterFields="['title', 'description', 'price', 'category']"
+        >
+          <template #header>
+            <div class="flex grid justify-content-between justify-content-center pt-2">
+              <div class="flex justify-content-start col-3 p-0">
+                <Button
+                    outlined
+                    icon="pi pi-box"
+                    label="Добавить новость"
+                    @click="route.push('/admin/shop/create')"
+                />
+              </div>
+              <div class="col-9 p-0">
+                <div class="flex justify-content-end">
+                <span class="p-input-icon-left ml-4">
+                  <i class="pi pi-search"/>
+                  <InputText
+                      v-model="filters['global'].value"
+                      style="min-width: 250px"
+                      placeholder="Поиск товаров"
+                  />
+                </span>
+                </div>
+              </div>
+            </div>
+          </template>
+          <Column field="newsImg" header="Изображение" style="width: 12rem">
+            <template #body="{ data }">
+              <div class="flex align-content-center">
+                <img
+                    :src="asset(data.image)"
+                    :alt="'productImage'"
+                    class="h-4rem border-round overflow-hidden"
+                />
+              </div>
+            </template>
+          </Column>
+          <Column field="title" header="Название товара" style="width: 20rem"></Column>
+          <Column field="description" header="Описание"></Column>
+          <Column field="price" header="Цена"></Column>
+          <Column field="category" header="Категория">
+            <template v-slot:body="{ data }">
+              {{ (data as Product).category?.name ?? ' - ' }}
+            </template>
+          </Column>
+          <Column header="" style="width: 8rem">
+            <template v-slot:header></template>
+            <template v-slot:body="{ data }">
               <Button
+                  text
+                  rounded
+                  size="large"
+                  icon="pi pi-eye"
+                  severity="secondary"
+                  @click="route.push(`/admin/product/show/${data.id}`)"
+              />
+              <Button
+                  v-if="data.status"
+                  title="Деактивировать"
+                  text
+                  rounded
+                  size="large"
+                  icon="pi pi-times"
+                  severity="danger"
+                  @click="() => toggleHandler(data.id)"
+                  :disabled="loading"
+              >
+              </Button>
+              <Button
+                  v-else
+                  text
+                  rounded
+                  title="Активировать"
+                  size="large"
+                  icon="pi pi-check"
+                  severity="success"
+                  @click="() => toggleHandler(data.id)"
+                  :disabled="loading"
+              >
+              </Button>
+              <Button
+                  text
+                  rounded
+                  size="large"
+                  icon="pi pi-trash"
+                  severity="danger"
+                  @click=" () => { requireConfirmation(data.id) }"
+              />
+            </template>
+          </Column>
+          <template #footer> Всего товаров: {{ products ? products.length : 0 }}.</template>
+        </DataTable>
+      </div>
+
+      <div v-else class="flex flex-column justify-content-between">
+        <div class="flex flex-column justify-content-between">
+          <div class="flex justify-content-start p-0">
+            <Button
                 outlined
                 icon="pi pi-box"
                 label="Добавить товар"
                 @click="route.push('/admin/shop/create')"
-              />
-            </div>
-            <div class="col-9 p-0">
-              <div class="flex justify-content-end">
-                <Dropdown
-                  v-model="filters.fieldForSearch"
-                  :options="dropdownValues"
-                  optionLabel="name"
-                  optionValue="code"
-                  class="w-full w-12rem"
-                />
-
-                <span class="p-input-icon-left ml-4">
-                  <i class="pi pi-search" />
-                  <InputText v-model="filters.searchValue" placeholder="Введите значение" />
-                </span>
-              </div>
-            </div>
+            />
           </div>
-        </template>
-        <Column field="imgUrl" header="Изображение">
-          <template #body="slotProps">
-            <div class="flex align-content-center justify-content-center">
-              <img
-                :src="slotProps.data.imgUrl"
-                :alt="slotProps.data.image"
-                class="h-5rem border-round overflow-hidden"
-              />
-            </div>
-          </template>
-        </Column>
-        <Column field="name" header="Название"></Column>
-        <Column field="description" header="Описание"></Column>
-        <Column field="price" header="Цена"></Column>
-        <Column field="categoryId" header="Категория"></Column>
-        <Column field="active" header="Статус">
-          <template #body="slotProps">
-            <Tag v-if="slotProps.data.active" severity="success" value="Активен"></Tag>
-            <Tag v-else class="text-red-500" severity="danger" value="Не активен"></Tag>
-          </template>
-        </Column>
-        <Column header="" style="min-width: 3rem">
-          <template v-slot:header></template>
-          <template v-slot:body="{ data }">
-            <Button
-              v-if="data.active"
-              text
-              rounded
-              size="large"
-              icon="pi pi-times"
-              severity="danger"
-              @click="deactivateHandler"
-            >
-            </Button>
-            <Button
-              v-else
-              text
-              rounded
-              size="large"
-              icon="pi pi-check"
-              severity="success"
-              @click="activateHandler"
-            >
-            </Button>
-            <Button
-              text
-              rounded
-              size="large"
-              icon="pi pi-eye"
-              severity="secondary"
-              @click="route.push(`/admin/shop/show/${data.id}`)"
-            ></Button>
-          </template>
-        </Column>
-        <template #footer> Всего {{ products ? products.length : 0 }} товаров.</template>
-      </DataTable>
-
-      <Paginator
-        :rows="filters.rows"
-        :totalRecords="products.length"
-        :rowsPerPageOptions="[5, 10, 15]"
-      />
+        </div>
+        <div
+            class="flex justify-content-center align-items-center"
+            style="height: 400px; font-size: 20px"
+        >
+          <p>Товары не найдены.</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>

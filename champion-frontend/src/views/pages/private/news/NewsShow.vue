@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, toRefs, watchEffect } from 'vue'
-import ProgressBar from 'primevue/progressbar'
-import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
-import router from '@/router'
-import Toast from 'primevue/toast'
-import { useConfirm } from 'primevue/useconfirm'
-import { useToast } from 'primevue/usetoast'
-import ConfirmDialog from 'primevue/confirmdialog'
-import useVuelidate from '@vuelidate/core'
-import { required } from '@/i18n/i18n-validators'
-import Image from 'primevue/image'
-import Textarea from 'primevue/textarea'
-import { News } from '@/types/News'
-import { useRoute, useRouter } from 'vue-router'
-import { isString } from 'lodash'
-import { deleteNews, getNews, newsBindImage, updateNews } from '@/http/news/NewsServices'
-import {asset} from "@/helpers/StaticHelper";
+import {computed, onMounted, reactive, ref, toRefs, watchEffect} from 'vue';
+import ProgressBar from 'primevue/progressbar';
+import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
+import router from '@/router';
+import Toast from 'primevue/toast';
+import {useConfirm} from 'primevue/useconfirm';
+import {useToast} from 'primevue/usetoast';
+import ConfirmDialog from 'primevue/confirmdialog';
+import useVuelidate from '@vuelidate/core';
+import {required} from '@/i18n/i18n-validators';
+import Image from 'primevue/image';
+import Textarea from 'primevue/textarea';
+import {News} from '@/types/News';
+import {useRoute, useRouter} from 'vue-router';
+import {isString} from 'lodash';
+import {deleteNews, getNews, newsBindImage, updateNews} from '@/http/news/NewsServices';
+import {asset} from '@/helpers/StaticHelper';
 
 const confirm = useConfirm()
 const navigate = useRouter()
@@ -116,7 +116,11 @@ const getIsSaveDisabled = (): boolean => {
   }
 
   if (
-    JSON.stringify(news.value) ===
+    JSON.stringify({
+      title: news.value.title,
+      text: news.value.description,
+      newsImg: news.value.image
+    } ) ===
     JSON.stringify({
       title: newsFieldsData.title,
       text: newsFieldsData.description,

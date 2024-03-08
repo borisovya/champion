@@ -115,7 +115,7 @@ const onExitClickHandler = async () => {
     </button>
 
     <div class="layout-topbar-menu" :class="topbarMenuClasses">
-      <div class="flex align-items-center ml-3 mb-3 lg:ml-0 lg:mb-0">
+      <div v-if="user" class="flex align-items-center ml-3 mb-3 lg:ml-0 lg:mb-0">
         <i class="pi pi-user mr-2"></i>
         <span>{{ user.username }}</span>
       </div>
