@@ -95,7 +95,7 @@ const router = createRouter({
       title: 'login',
       component: () => import('@/views/pages/public/auth/LoginPage.vue'),
       beforeEnter: (to, from, next) => {
-        const user = getFromCookie('token')
+        const user = getFromCookie(import.meta.env.VITE_ACCESS_TOKEN_COOKIE)
         if (user) {
           next('/')
         } else {
@@ -128,11 +128,10 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach(async (to, from) => {
+router.beforeEach(async (to) => {
   const userStore = useUserStore()
   const user = userStore.getUser()
-  const token = getFromCookie('token')
-  // const token = localStorage.getItem('token')
+  const token = getFromCookie(import.meta.env.VITE_ACCESS_TOKEN_COOKIE)
 
   if (to.meta.requiresAuth && !token) {
     try {

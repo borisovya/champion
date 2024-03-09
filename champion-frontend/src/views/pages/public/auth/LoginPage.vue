@@ -42,16 +42,15 @@ const submit = async () => {
         detail: 'Проверьте введенные данные.',
         life: 3000
       })
+
       loading.value = false
-      return
     } else {
       const loginResponse = await signIn(loginData)
 
       if (loginResponse && isString(loginResponse)) {
         userStore.setUser(JSON.parse(atob(loginResponse.split('.')[1])))
 
-        setCookie('token', loginResponse)
-        // localStorage.setItem('token', loginResponse)
+        setCookie(import.meta.env.VITE_ACCESS_TOKEN_COOKIE, loginResponse)
 
         toast.add({
           severity: 'success',

@@ -12,7 +12,7 @@ import type { News } from '@/types/News'
 import { deleteNews } from '@/http/news/NewsServices'
 import ConfirmDialog from 'primevue/confirmdialog'
 import { useConfirm } from 'primevue/useconfirm'
-import {asset} from "@/helpers/StaticHelper";
+import { asset } from '@/helpers/StaticHelper'
 
 interface Props {
   news: News[] | []

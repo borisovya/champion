@@ -1,7 +1,6 @@
 import axios from '@/http/axios.ts'
 import type { Registration } from '@/types/requests/auth/Auth'
 import { isAxiosError } from 'axios'
-import {getFromCookie} from '@/helpers/CookieHelper';
 
 export const signIn = async (credentials: {
   username: string
@@ -43,14 +42,6 @@ export const signUp = async (request: Registration): Promise<string | { message:
   }
 }
 
-export const pingPong = async (data?: any): Promise<boolean> => {
-  try {
-    return await axios.post('v1/auth/ping-pong', data)
-  } catch (e) {
-    return false
-  }
-}
-
 export const signOut = async (request: { token: string }): Promise<boolean> => {
   try {
     const res = await axios.post('v1/auth/sign-out', request)
@@ -61,23 +52,15 @@ export const signOut = async (request: { token: string }): Promise<boolean> => {
 }
 
 export const resetPassword = async (request: { email: string }) => {
-  try {
-    await axios.post('v1/reset-password', { ...request })
-  } catch (e) {
-    throw e
-  }
+  await axios.post('v1/reset-password', { ...request })
 }
 
 export const refreshAuth = async (): Promise<number | string> => {
-  try {
-    const res = await axios.get('v1/auth/refresh')
+  const res = await axios.get('v1/auth/refresh')
 
-    if(res.status === 200) {
-      return res.data.token
-    } else {
-      return res.status
-    }
-  } catch (e) {
-    throw e
+  if (res.status === 200) {
+    return res.data.token
+  } else {
+    return res.status
   }
 }

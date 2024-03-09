@@ -21,8 +21,8 @@ app.use(ConfirmationService)
 
 const userStore = useUserStore()
 
-const token = getFromCookie('token')
-// const token = localStorage.getItem('token')
+const token = getFromCookie(import.meta.env.VITE_ACCESS_TOKEN_COOKIE)
+
 if (token) {
   userStore.setUser(JSON.parse(atob(token.split('.')[1])))
 }

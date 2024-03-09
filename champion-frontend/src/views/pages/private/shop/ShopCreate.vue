@@ -13,11 +13,11 @@ import Dropdown from 'primevue/dropdown'
 import RadioButton from 'primevue/radiobutton'
 import Tag from 'primevue/tag'
 import Textarea from 'primevue/textarea'
-import {createProduct, productBindImage} from '@/http/shop/ShopServices';
-import type {CreateProductRequest} from '@/types/requests/shop/Product';
-import {getCategories} from '@/http/categories/CategoriesServices';
-import type {Product} from '@/types/Products';
-import {isString} from 'lodash';
+import { createProduct, productBindImage } from '@/http/shop/ShopServices'
+import type { CreateProductRequest } from '@/types/requests/shop/Product'
+import { getCategories } from '@/http/categories/CategoriesServices'
+import type { Product } from '@/types/Products'
+import { isString } from 'lodash'
 
 const toast = useToast()
 const loading = ref(false)
@@ -40,13 +40,13 @@ const productCreateFieldsData = reactive({
   image: null,
   imgUrl: ''
 })
-const categories = ref<{ name: string, code: number }[] | null>(null)
+const categories = ref<{ name: string; code: number }[] | null>(null)
 
 onMounted(async () => {
   loading.value = true
   const categoryList = await getCategories()
-  if(categoryList) {
-    categories.value = categoryList.map(category => {
+  if (categoryList) {
+    categories.value = categoryList.map((category) => {
       return { name: category.name, code: category.id }
     })
   }
@@ -90,7 +90,7 @@ const onSubmit = async () => {
     } else {
       const createProductRes = await createProduct(createProductRequest)
 
-      if(isString(createProductRes)){
+      if (isString(createProductRes)) {
         toast.add({
           severity: 'error',
           summary: 'Ошибка',
@@ -100,7 +100,7 @@ const onSubmit = async () => {
         return
       }
 
-      if(createProductRes) {
+      if (createProductRes) {
         await productBindImage((createProductRes as Product).id, productCreateFieldsData.image)
         toast.add({
           severity: 'success',
@@ -110,12 +110,16 @@ const onSubmit = async () => {
         })
         await router.push('/admin/shop')
       } else {
-        toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
+        toast.add({
+          severity: 'error',
+          summary: 'Ошибка',
+          detail: 'Попробуйте еще раз.',
+          life: 3000
+        })
       }
     }
   } catch {
     toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
-
   } finally {
     loading.value = false
   }

@@ -1,8 +1,6 @@
-import type { Partner } from '@/types/Partner'
 import axios from 'axios'
 import { Category } from '@/types/Category'
 import type { Error } from '@/types/Error'
-
 export const getCategories = async (): Promise<Category[] | []> => {
   try {
     const res = await axios.get(`v1/category`)
@@ -16,7 +14,7 @@ export const getCategories = async (): Promise<Category[] | []> => {
 export const addCategories = async (request: {
   name: string
   status: boolean
-}): Promise<any | null> => {
+}): Promise<Category | null> => {
   try {
     const res = await axios.post(`v1/category`, request)
 

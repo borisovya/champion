@@ -1,8 +1,8 @@
 import { isAxiosError } from 'axios'
 import axios from '@/http/axios'
-import type {Product} from '@/types/Products';
-import type {CreateProductRequest} from '@/types/requests/shop/Product';
-import {Error} from '@/types/Error';
+import type { Product } from '@/types/Products'
+import type { CreateProductRequest } from '@/types/requests/shop/Product'
+import { Error } from '@/types/Error'
 
 export const getProductList = async (): Promise<Product[] | []> => {
   try {
@@ -42,13 +42,14 @@ export const updateProduct = async (
   }
 }
 
-export const createProduct = async (request: CreateProductRequest): Promise<Product | string | null> => {
+export const createProduct = async (
+  request: CreateProductRequest
+): Promise<Product | string | null> => {
   try {
     const response = await axios.post<Product>(`v1/product`, request)
 
     return response.data
   } catch (e) {
-
     if (isAxiosError(e)) {
       return e.response.data.message
     }
@@ -56,13 +57,11 @@ export const createProduct = async (request: CreateProductRequest): Promise<Prod
   }
 }
 
-export const toggleProductStatus = async (
-  id: number | string
-): Promise<Product | Error | null> => {
+export const toggleProductStatus = async (id: number | string): Promise<Product | Error | null> => {
   try {
     const res = await axios.patch(`v1/product/toggle-status/${id}`)
 
-      return res.data ?? res
+    return res.data ?? res
   } catch (e) {
     return null
   }
@@ -81,7 +80,10 @@ export const deleteProduct = async (productId: number | string): Promise<number>
   }
 }
 
-export const productBindImage = async (productId: number | string, file: File): Promise<Product> => {
+export const productBindImage = async (
+  productId: number | string,
+  file: File
+): Promise<Product> => {
   try {
     const response = await axios.post<Product>(
       `v1/product/bind-image/${productId}`,

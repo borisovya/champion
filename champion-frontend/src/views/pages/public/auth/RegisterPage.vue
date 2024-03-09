@@ -53,14 +53,13 @@ const submit = async () => {
         life: 3000
       })
       loading.value = false
-      return
     } else {
       const registrationResponse = await signUp(registrationData)
 
       if (registrationResponse && isString(registrationResponse)) {
         userStore.setUser(JSON.parse(atob(registrationResponse.split('.')[1])))
 
-        setCookie('token', registrationResponse)
+        setCookie(import.meta.env.VITE_ACCESS_TOKEN_COOKIE, registrationResponse)
         toast.add({
           severity: 'success',
           summary: 'Вы успешно зарегистрированы.',
@@ -214,7 +213,7 @@ const submit = async () => {
           <div class="text-center mt-5">
             <a
               href="/login"
-              class="font-lg no-underline cursor-pointer font-medium "
+              class="font-lg no-underline cursor-pointer font-medium"
               style="color: #a815edff"
             >
               Перейти на страницу входа

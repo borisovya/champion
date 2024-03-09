@@ -1,6 +1,6 @@
 import axios from 'axios'
-import {deleteFromCookie, getFromCookie, setCookie} from '@/helpers/CookieHelper';
-import {refreshAuth} from '@/http/auth/AuthServices';
+import { deleteFromCookie, getFromCookie, setCookie } from '@/helpers/CookieHelper'
+import { refreshAuth } from '@/http/auth/AuthServices'
 
 axios.defaults.withCredentials = true
 
@@ -11,7 +11,7 @@ axios.defaults.headers.common['Accept'] = 'application/json'
 
 axios.interceptors.request.use(
   (config) => {
-    const token = getFromCookie('token')
+    const token = getFromCookie(import.meta.env.VITE_ACCESS_TOKEN_COOKIE)
 
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`
@@ -29,14 +29,13 @@ axios.interceptors.response.use(
     return response
   },
   async (error) => {
-
     if (error.response?.status === 401) {
       const res = await refreshAuth()
-      if(isNumber(res) && res !== 200) {
-        deleteFromCookie('token')
-        deleteFromCookie('refresh_token')
+      if (isNumber(res) && res !== 200) {
+        deleteFromCookie(import.meta.env.VITE_ACCESS_TOKEN_COOKIE)
+        deleteFromCookie(import.meta.env.VITE_REFRESH_TOKEN_COOKIE)
       } else {
-        setCookie('token', res)
+        setCookie(import.meta.env.VITE_ACCESS_TOKEN_COOKIE, res)
       }
     }
 

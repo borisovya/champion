@@ -118,7 +118,7 @@ const getIsSaveDisabled = (): boolean => {
     return true
   }
 
-  if (
+  return (
     JSON.stringify(partner.value) ===
     JSON.stringify({
       id: partnerFieldsData.id,
@@ -129,11 +129,7 @@ const getIsSaveDisabled = (): boolean => {
       roles: partnerFieldsData.roles,
       userIdentifier: partnerFieldsData.userIdentifier
     })
-  ) {
-    return true
-  }
-
-  return false
+  )
 }
 const messageCancelClickHandler = () => {
   partnerFieldsData.showMessageModal = false
@@ -365,12 +361,12 @@ watchEffect(() => {
           <div class="flex mr-2">
             <div class="flex mr-2">
               <Button
-                  label="Назад"
-                  severity="info"
-                  icon="pi pi-directions-alt"
-                  text
-                  @click="router.back()"
-                  :disabled="loading"
+                label="Назад"
+                severity="info"
+                icon="pi pi-directions-alt"
+                text
+                @click="router.back()"
+                :disabled="loading"
               />
             </div>
             <Button

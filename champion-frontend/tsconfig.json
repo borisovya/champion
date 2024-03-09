@@ -14,10 +14,14 @@
     }
   ],
   "compilerOptions": {
+    "module": "esnext",
+    "target": "esnext",
+    "moduleResolution": "node",
+    "exclude": ["node_modules"],
     "baseUrl": ".",
     "paths": {
-      "types": ["vite/client"],
-      "@/*": ["src/*"]
+      "types": ["vite","vite/client"],
+      "@/*": ["src/*"],
     }
   }
 }

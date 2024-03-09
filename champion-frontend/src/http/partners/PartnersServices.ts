@@ -1,9 +1,7 @@
 import axios from '../axios.ts'
 import type { PartnerUpdate } from '@/types/requests/partners/Partner'
 import type { Partner } from '@/types/Partner'
-import type { Error } from '@/types/Error'
 import { isAxiosError } from 'axios'
-
 export const getPartnerList = async (): Promise<Partner[] | []> => {
   try {
     const res = await axios.get<Partner[]>(`v1/user`)

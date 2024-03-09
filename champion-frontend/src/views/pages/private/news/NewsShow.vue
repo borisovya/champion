@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import {computed, onMounted, reactive, ref, toRefs, watchEffect} from 'vue';
-import ProgressBar from 'primevue/progressbar';
-import InputText from 'primevue/inputtext';
-import Button from 'primevue/button';
-import router from '@/router';
-import Toast from 'primevue/toast';
-import {useConfirm} from 'primevue/useconfirm';
-import {useToast} from 'primevue/usetoast';
-import ConfirmDialog from 'primevue/confirmdialog';
-import useVuelidate from '@vuelidate/core';
-import {required} from '@/i18n/i18n-validators';
-import Image from 'primevue/image';
-import Textarea from 'primevue/textarea';
-import {News} from '@/types/News';
-import {useRoute, useRouter} from 'vue-router';
-import {isString} from 'lodash';
-import {deleteNews, getNews, newsBindImage, updateNews} from '@/http/news/NewsServices';
-import {asset} from '@/helpers/StaticHelper';
+import { computed, onMounted, reactive, ref, toRefs, watchEffect } from 'vue'
+import ProgressBar from 'primevue/progressbar'
+import InputText from 'primevue/inputtext'
+import Button from 'primevue/button'
+import router from '@/router'
+import Toast from 'primevue/toast'
+import { useConfirm } from 'primevue/useconfirm'
+import { useToast } from 'primevue/usetoast'
+import ConfirmDialog from 'primevue/confirmdialog'
+import useVuelidate from '@vuelidate/core'
+import { required } from '@/i18n/i18n-validators'
+import Image from 'primevue/image'
+import Textarea from 'primevue/textarea'
+import { News } from '@/types/News'
+import { useRoute, useRouter } from 'vue-router'
+import { isString } from 'lodash'
+import { deleteNews, getNews, newsBindImage, updateNews } from '@/http/news/NewsServices'
+import { asset } from '@/helpers/StaticHelper'
 
 const confirm = useConfirm()
 const navigate = useRouter()
@@ -115,22 +115,18 @@ const getIsSaveDisabled = (): boolean => {
     return true
   }
 
-  if (
+  return (
     JSON.stringify({
       title: news.value.title,
       text: news.value.description,
       newsImg: news.value.image
-    } ) ===
+    }) ===
     JSON.stringify({
       title: newsFieldsData.title,
       text: newsFieldsData.description,
       newsImg: newsFieldsData.image
     })
-  ) {
-    return true
-  }
-
-  return false
+  )
 }
 
 const v$ = useVuelidate(rules, toRefs(newsFieldsData))
@@ -240,11 +236,7 @@ watchEffect(() => {
         <div class="p-2 flex flex-column align-items-start justify-content-center lg:w-12">
           <label for="imgUrl">Изображение</label>
           <Image
-            :src="
-              newsFieldsData.newsImage
-                ? newsFieldsData.newsImage
-                : asset(newsFieldsData.image)
-            "
+            :src="newsFieldsData.newsImage ? newsFieldsData.newsImage : asset(newsFieldsData.image)"
             alt="Image"
             width="200"
             class="cursor-pointer"
@@ -303,7 +295,13 @@ watchEffect(() => {
       <div class="lg:flex border-round inputBlocksPaddingTop">
         <div class="w-12 p-2 flex flex-wrap align-items-start justify-content-start">
           <div class="flex mr-2">
-            <Button label="Назад" severity="info" icon="pi pi-directions-alt" text @click="router.back()" />
+            <Button
+              label="Назад"
+              severity="info"
+              icon="pi pi-directions-alt"
+              text
+              @click="router.back()"
+            />
           </div>
           <div class="flex mr-2">
             <Button

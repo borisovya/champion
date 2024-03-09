@@ -12,7 +12,7 @@ import Image from 'primevue/image'
 import Textarea from 'primevue/textarea'
 import { createNews, newsBindImage } from '@/http/news/NewsServices'
 import type { News } from '@/types/News'
-import {isString} from 'lodash';
+import { isString } from 'lodash'
 
 const toast = useToast()
 const loading = ref(false)
@@ -68,7 +68,7 @@ const onSubmit = async () => {
     } else {
       const createNewsRes = await createNews(createRequest)
 
-      if(isString(createNewsRes)){
+      if (isString(createNewsRes)) {
         toast.add({
           severity: 'error',
           summary: 'Ошибка',

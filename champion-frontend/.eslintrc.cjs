@@ -12,12 +12,12 @@ module.exports = {
     'eslint:recommended',
     '@vue/typescript/recommended',
   ],
-  parserOptions: {
-    ecmaVersion: 'latest'
-  },
 
   ignorePatterns: ['dist', '.eslintrc.cjs'],
-  parser: '@typescript-eslint/parser',
+  parser: "vue-eslint-parser",
+  parserOptions: {
+    "parser": "@typescript-eslint/parser",
+  },
 
   plugins: [
     "vue",

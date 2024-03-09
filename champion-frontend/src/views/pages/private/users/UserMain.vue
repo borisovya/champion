@@ -3,7 +3,6 @@ import PartnersTable from '@/components/users/UsersTable.vue'
 import { onMounted, ref } from 'vue'
 import type { Partner } from '@/types/Partner'
 import ProgressBar from 'primevue/progressbar'
-import { getCategories } from '@/http/categories/CategoriesServices'
 import { getPartnerList } from '@/http/partners/PartnersServices'
 
 const partners = ref<Partner[]>([])

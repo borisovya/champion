@@ -72,11 +72,11 @@ const isOutsideClicked = (event) => {
 
 const onExitClickHandler = async () => {
   try {
-    const res = await signOut({ token: getFromCookie('token') })
+    const res = await signOut({ token: getFromCookie(import.meta.env.VITE_ACCESS_TOKEN_COOKIE) })
     if (res) {
       userStore.removeUser()
-      deleteFromCookie('token')
-      deleteFromCookie('refresh_token')
+      deleteFromCookie(import.meta.env.VITE_ACCESS_TOKEN_COOKIE)
+      deleteFromCookie(import.meta.env.VITE_REFRESH_TOKEN_COOKIE)
       await router.push('/')
     } else {
       toast.add({
