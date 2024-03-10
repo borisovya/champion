@@ -14,9 +14,9 @@ export const setCookie = (key: string, value: string | number | object) => {
     value = JSON.stringify(value)
   }
 
-  document.cookie = `${key}=${value}`
+  document.cookie = `${key}=${value};path=/`
 }
 
 export const deleteFromCookie = (key: string) => {
-  setCookie(key, '')
+  document.cookie = `${key}='';path=/;max-age=0`
 }

@@ -55,12 +55,13 @@ export const resetPassword = async (request: { email: string }) => {
   await axios.post('v1/reset-password', { ...request })
 }
 
-export const refreshAuth = async (): Promise<number | string> => {
-  const res = await axios.get('v1/auth/refresh')
+export const getNetAccessToken = async (): Promise<string | null> => {
+  try {
+    const res = await axios.get('v1/auth/refresh')
 
-  if (res.status === 200) {
-    return res.data.token
-  } else {
-    return res.status
+    return res?.data.token
+  }
+  catch (e) {
+    throw null
   }
 }

@@ -14,8 +14,8 @@ import ShopCategoryCreate from '@/views/pages/private/shopCategories/ShopCategor
 import NewsMain from '@/views/pages/private/news/NewsMain.vue'
 import NewsCreate from '@/views/pages/private/news/NewsCreate.vue'
 import NewsShow from '@/views/pages/private/news/NewsShow.vue'
-import { getFromCookie } from '@/helpers/CookieHelper'
 import { useUserStore } from '@/store/useStore'
+import { getUserFromToken, refreshToken } from '@/helpers/TokenHelper'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,7 +24,7 @@ const router = createRouter({
       path: '/',
       children: [
         {
-          path: '/',
+          path: '',
           component: PublicShop,
           meta: {
             requiresAuth: true
@@ -41,51 +41,52 @@ const router = createRouter({
       },
       children: [
         {
-          path: '/admin',
+          path: '',
+          name: 'admin-index',
           component: Partners
         },
         {
-          path: '/admin/partner/show/:id',
+          path: 'partner/show/:id',
           component: PartnersShow
         },
         {
-          path: '/admin/partner/create',
+          path: 'partner/create',
           component: PartnerCreate
         },
         {
-          path: '/admin/shop',
+          path: 'shop',
           component: Shop
         },
         {
-          path: '/admin/shop/create',
+          path: 'shop/create',
           component: ShopCreate
         },
         {
-          path: '/admin/shop/show/:id',
+          path: 'shop/show/:id',
           component: ShopShow
         },
         {
-          path: '/admin/shop/categories',
+          path: 'shop/categories',
           component: ShopCategories
         },
         {
-          path: '/admin/shop/category/create',
+          path: 'shop/category/create',
           component: ShopCategoryCreate
         },
         {
-          path: '/admin/news',
+          path: 'news',
           component: NewsMain
         },
         {
-          path: '/admin/news/create',
+          path: 'news/create',
           component: NewsCreate
         },
         {
-          path: '/admin/news/show/:id',
+          path: 'news/show/:id',
           component: NewsShow
         },
         {
-          path: '/admin/notifications',
+          path: 'notifications',
           component: Notification
         }
       ]
@@ -93,33 +94,27 @@ const router = createRouter({
     {
       path: '/login',
       title: 'login',
+      name: 'login',
       component: () => import('@/views/pages/public/auth/LoginPage.vue'),
-      beforeEnter: (to, from, next) => {
-        const user = getFromCookie(import.meta.env.VITE_ACCESS_TOKEN_COOKIE)
-        if (user) {
-          next('/')
-        } else {
-          next()
-        }
+      meta: {
+        requiresNotAuth: true
       }
     },
     {
       path: '/register',
       title: 'register',
       component: () => import('@/views/pages/public/auth/RegisterPage.vue'),
-      beforeEnter: (to, from, next) => {
-        const user = getFromCookie('token')
-        if (user) {
-          next('/')
-        } else {
-          next()
-        }
+      meta: {
+        requiresNotAuth: true
       }
     },
     {
       path: '/password-reset',
       title: 'password-reset',
-      component: () => import('@/views/pages/public/auth/PasswordReset.vue')
+      component: () => import('@/views/pages/public/auth/PasswordReset.vue'),
+      meta: {
+        requiresNotAuth: true
+      }
     },
     {
       path: '/:path(.*)',
@@ -129,57 +124,21 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to) => {
-  const userStore = useUserStore()
-  const user = userStore.getUser()
-  const token = getFromCookie(import.meta.env.VITE_ACCESS_TOKEN_COOKIE)
+  const user = useUserStore().getUser()
 
-  if (to.meta.requiresAuth && !token) {
-    try {
-      if (to.meta.requiresAuth) {
-        return {
-          path: '/login',
-          // save the location we were at to come back later
-          query: { redirect: to.fullPath }
-        }
-      }
-    } catch {
-      return {
-        path: '/login',
-        // save the location we were at to come back later
-        query: { redirect: to.fullPath }
-      }
-    }
+  if (to.meta.requiresNotAuth && user) {
+    return { name: 'admin-index' }
   }
 
   if (to.meta.requiresAuth && !user) {
     try {
-      if (to.meta.requiresAuth) {
-        return {
-          path: '/login',
-          // save the location we were at to come back later
-          query: { redirect: to.fullPath }
-        }
-      }
-    } catch {
-      return {
-        path: '/login',
-        // save the location we were at to come back later
-        query: { redirect: to.fullPath }
-      }
-    }
-  }
+      await refreshToken()
 
-  if (to.meta.requiresAuth && to.meta.role === 'admin' && user) {
-    try {
-      if (user?.roles.every((role) => role === 'ROLE_USER')) {
-        return {
-          path: '/'
-        }
-      }
+      useUserStore().setUser(getUserFromToken())
+
+      return to
     } catch {
-      return {
-        path: '/login'
-      }
+      return { name: 'login' }
     }
   }
 })

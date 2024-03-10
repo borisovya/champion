@@ -6,6 +6,7 @@
 parameters:
     exceptions:
         Symfony\Component\HttpKernel\Exception\NotFoundHttpException: { code: 404 }
+        Symfony\Component\Security\Core\Exception\AccessDeniedException: { code: 403 }
         App\Exception\UserAlreadyExistsException: {code: 409, hidden: false}
         App\Exception\UserNotFoundException: {code: 404, hidden: false}
         App\Exception\CategoryNotFoundException: {code: 404, hidden: false}

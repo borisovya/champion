@@ -1,6 +1,6 @@
 import axios from 'axios'
-import { deleteFromCookie, getFromCookie, setCookie } from '@/helpers/CookieHelper'
-import { refreshAuth } from '@/http/auth/AuthServices'
+import { flushTokenize, refreshToken } from '@/helpers/TokenHelper'
+import router from '@/router'
 
 axios.defaults.withCredentials = true
 
@@ -9,37 +9,46 @@ axios.defaults.baseURL = `/api`
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.headers.common['Accept'] = 'application/json'
 
-axios.interceptors.request.use(
-  (config) => {
-    const token = getFromCookie(import.meta.env.VITE_ACCESS_TOKEN_COOKIE)
-
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`
-    }
-
-    return config
-  },
-  (error) => {
-    return Promise.reject(error)
-  }
-)
-
 axios.interceptors.response.use(
   (response) => {
     return response
   },
   async (error) => {
-    if (error.response?.status === 401) {
-      const res = await refreshAuth()
-      if (isNumber(res) && res !== 200) {
-        deleteFromCookie(import.meta.env.VITE_ACCESS_TOKEN_COOKIE)
-        deleteFromCookie(import.meta.env.VITE_REFRESH_TOKEN_COOKIE)
-      } else {
-        setCookie(import.meta.env.VITE_ACCESS_TOKEN_COOKIE, res)
-      }
+    const status = Number(error.response.status)
+
+    if (/v\d+\/auth\/sign-in$/.test(error.config.url) && status === 401) {
+      return new Promise((resolve, reject) => {
+        reject(error)
+      })
     }
 
-    return Promise.reject(error)
+    if (/v\d+\/auth\/refresh$/.test(error.config.url) && status === 401) {
+      await router.push({
+        name: 'login'
+      })
+
+      return new Promise((resolve, reject) => {
+        reject(error)
+      })
+    }
+
+    if (status !== 401 && status !== 403) {
+      return new Promise((resolve, reject) => {
+        reject(error)
+      })
+    }
+    else {
+      flushTokenize()
+      await refreshToken()
+    }
+
+    return new Promise((resolve, reject) => {
+      axios.request(error.config).then(response => {
+        resolve(response)
+      }).catch((error) => {
+        reject(error)
+      })
+    })
   }
 )
 

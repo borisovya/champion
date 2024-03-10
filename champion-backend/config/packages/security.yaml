@@ -43,9 +43,12 @@ security:
     access_control:
         - { path: ^/api/v1/auth/sign-up, roles: PUBLIC_ACCESS }
         - { path: ^/api/v1/auth/sign-in, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/auth/refresh, roles: PUBLIC_ACCESS }
         - { path: ^/api/doc, roles: PUBLIC_ACCESS }
 
         - { path: ^/api/v1/category, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/v1/product, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/v1/post, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/api/v1/user, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
