@@ -9,6 +9,19 @@ axios.defaults.baseURL = `/api`
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.headers.common['Accept'] = 'application/json'
 
+axios.interceptors.request.use(
+  (config) => {
+    if (/v\d+\/auth\/sign-in$/.test(config.url)) {
+      flushTokenize()
+    }
+
+    return config
+  },
+  (error) => {
+    return Promise.reject(error)
+  }
+)
+
 axios.interceptors.response.use(
   (response) => {
     return response
