@@ -7,6 +7,7 @@ const model = ref([
     items: [
       { label: 'Учетные записи', icon: 'pi pi-users', to: '/admin' },
       { label: 'Витрина', icon: 'pi pi-shopping-bag', to: '/admin/shop' },
+      { label: 'Заказы', icon: 'pi pi-cart-plus', to: '/admin/orders' },
       { label: 'Категории товаров', icon: 'pi pi-sliders-h', to: '/admin/shop/categories' },
       { label: 'Новости', icon: 'pi pi-list', to: '/admin/news' },
       { label: 'Рассылка', icon: 'pi pi-send', to: '/admin/notifications' }

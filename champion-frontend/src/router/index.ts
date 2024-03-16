@@ -16,6 +16,7 @@ import NewsCreate from '@/views/pages/private/news/NewsCreate.vue'
 import NewsShow from '@/views/pages/private/news/NewsShow.vue'
 import { useUserStore } from '@/store/useStore'
 import { getUserFromToken, refreshToken } from '@/helpers/TokenHelper'
+import OrderspMain from '@/views/pages/private/orders/OrderspMain.vue';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -72,6 +73,10 @@ const router = createRouter({
         {
           path: 'shop/category/create',
           component: ShopCategoryCreate
+        },
+        {
+          path: 'orders',
+          component: OrderspMain
         },
         {
           path: 'news',
