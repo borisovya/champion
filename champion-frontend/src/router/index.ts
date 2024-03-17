@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import {createRouter, createWebHistory, useRoute} from 'vue-router';
 import AppLayout from '@/layout/AppLayout.vue'
 import Shop from '@/views/pages/private/shop/ShopMain.vue'
 import Partners from '@/views/pages/private/users/UserMain.vue'
@@ -17,6 +17,7 @@ import NewsShow from '@/views/pages/private/news/NewsShow.vue'
 import { useUserStore } from '@/store/useStore'
 import { getUserFromToken, refreshToken } from '@/helpers/TokenHelper'
 import OrderspMain from '@/views/pages/private/orders/OrderspMain.vue';
+import {getFromCookie} from '@/helpers/CookieHelper';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -128,8 +129,9 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach(async (to) => {
+router.beforeEach(async (to, from) => {
   const user = useUserStore().getUser()
+  const token = getFromCookie('access_token')
 
   if (to.meta.requiresNotAuth && user) {
     return { name: 'admin-index' }
@@ -145,6 +147,10 @@ router.beforeEach(async (to) => {
     } catch {
       return { name: 'login' }
     }
+  }
+
+  if ((to.name === 'login' || to.name === 'register') && token) {
+    router.back()
   }
 })
 

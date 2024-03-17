@@ -48,7 +48,7 @@ onMounted(async () => {
             image: ''
           }
           ],
-        totalPrice: 800,
+        totalPrice: 1300,
         status: true,
         createdAt: '16.032024',
         username: 'partner1@maail.ru',
@@ -72,7 +72,7 @@ onMounted(async () => {
             },
             image: ''
           }],
-        totalPrice: 100,
+        totalPrice: 400,
         status: false,
         createdAt: '16.032024',
         username: 'partner2@maail.ru',
