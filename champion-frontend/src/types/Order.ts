@@ -7,4 +7,6 @@ export interface Order {
   totalPrice: number
   status: boolean
   createdAt: string
+  username: string
+  championPartnersLogin: string
 }

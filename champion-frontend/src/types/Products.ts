@@ -8,4 +8,5 @@ export interface Product {
   status: boolean
   category: Category
   image: string
+  qty?: number
 }
