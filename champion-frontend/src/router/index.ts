@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory, useRoute} from 'vue-router';
+import {createRouter, createWebHistory} from 'vue-router';
 import AppLayout from '@/layout/AppLayout.vue'
 import Shop from '@/views/pages/private/shop/ShopMain.vue'
 import Partners from '@/views/pages/private/users/UserMain.vue'
@@ -132,6 +132,7 @@ const router = createRouter({
 router.beforeEach(async (to, from) => {
   const user = useUserStore().getUser()
   const token = getFromCookie('access_token')
+  const userData = token && JSON.parse(atob(token.split('.')[1]))
 
   if (to.meta.requiresNotAuth && user) {
     return { name: 'admin-index' }
@@ -147,6 +148,10 @@ router.beforeEach(async (to, from) => {
     } catch {
       return { name: 'login' }
     }
+  }
+
+  if(to.meta.role === 'admin' && token && userData.roles[0] === 'ROLE_USER'){
+    return { name: '' }
   }
 
   if ((to.name === 'login' || to.name === 'register') && token) {
