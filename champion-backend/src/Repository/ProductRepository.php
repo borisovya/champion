@@ -7,9 +7,12 @@ namespace App\Repository;
 use App\Entity\Product;
 use App\Exception\CategoryNotFoundException;
 use App\Exception\ProductNotFoundException;
+use App\Exception\ProductsNotFoundException;
 use App\Model\CrudProductRequest;
 use App\Service\FileService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -42,6 +45,22 @@ class ProductRepository extends ServiceEntityRepository
         }
 
         return $product;
+    }
+
+    /**
+     * @return Product[]
+     *
+     * @throws ProductsNotFoundException
+     */
+    public function findOrFailByIds(array $productIds): Collection
+    {
+        $products = $this->findBy(['id' => $productIds]);
+
+        if (count($products) !== count($productIds)) {
+            throw new ProductsNotFoundException();
+        }
+
+        return new ArrayCollection($products);
     }
 
     /**

@@ -46,10 +46,11 @@ security:
         - { path: ^/api/v1/auth/refresh, roles: PUBLIC_ACCESS }
         - { path: ^/api/doc, roles: PUBLIC_ACCESS }
 
-        - { path: ^/api/v1/category, roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/api/v1/product, roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/api/v1/post, roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/api/v1/user, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/v1/category, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/product, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/post, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/user, roles: PUBLIC_ACCESS }
+        - { path: ^/api/v1/order, roles: PUBLIC_ACCESS }
 
 when@test:
     security:

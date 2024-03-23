@@ -9,11 +9,11 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Uid\Uuid;
 
-class FileService
+readonly class FileService
 {
     public function __construct(
-        private readonly Filesystem $fs,
-        private readonly string $uploadDir,
+        private Filesystem $fs,
+        private string $uploadDir,
     ) {
     }
 

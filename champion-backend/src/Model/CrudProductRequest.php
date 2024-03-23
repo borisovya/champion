@@ -6,6 +6,7 @@ namespace App\Model;
 
 use OpenApi\Attributes as OA;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 class CrudProductRequest
 {
@@ -16,7 +17,7 @@ class CrudProductRequest
     #[OA\Property(example: 'phone')]
     private ?string $description = null;
 
-    #[NotBlank]
+    #[NotNull]
     #[OA\Property(example: true)]
     private bool $status;
 
