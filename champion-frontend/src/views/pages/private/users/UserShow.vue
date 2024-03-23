@@ -1,53 +1,70 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, toRefs, watchEffect } from 'vue'
-import type { Partner } from '@/types/Partner'
-import ProgressBar from 'primevue/progressbar'
-import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
-import router from '@/router'
-import Textarea from 'primevue/textarea'
-import Dialog from 'primevue/dialog'
-import Toast from 'primevue/toast'
-import { useConfirm } from 'primevue/useconfirm'
-import { useToast } from 'primevue/usetoast'
-import ConfirmDialog from 'primevue/confirmdialog'
-import useVuelidate from '@vuelidate/core'
-import { email, minValue, numeric, required } from '@/i18n/i18n-validators'
-import { getPartner, updatePartner } from '@/http/partners/PartnersServices'
-import { useRoute, useRouter } from 'vue-router'
-import { isString } from 'lodash'
-import Dropdown from 'primevue/dropdown'
-import { Roles } from '@/enum/Roles'
-import type { User } from '@/types/User'
-import { useUserStore } from '@/store/useStore'
+import {computed, onMounted, reactive, ref, toRefs, watchEffect} from 'vue';
+import type {Partner} from '@/types/Partner';
+import ProgressBar from 'primevue/progressbar';
+import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
+import router from '@/router';
+import Textarea from 'primevue/textarea';
+import Dialog from 'primevue/dialog';
+import Toast from 'primevue/toast';
+import {useConfirm} from 'primevue/useconfirm';
+import {useToast} from 'primevue/usetoast';
+import ConfirmDialog from 'primevue/confirmdialog';
+import useVuelidate from '@vuelidate/core';
+import {email, minValue, numeric, required} from '@/i18n/i18n-validators';
+import {getPartner, updatePartner} from '@/http/partners/PartnersServices';
+import {useRoute, useRouter} from 'vue-router';
+import {isString} from 'lodash';
+import Dropdown from 'primevue/dropdown';
+import SplitButton from 'primevue/splitbutton';
+import {Roles} from '@/enum/Roles';
+import type {User} from '@/types/User';
+import {useUserStore} from '@/store/useStore';
 
-const confirm = useConfirm()
-const navigate = useRouter()
-const route = useRoute()
-const toast = useToast()
+const confirm = useConfirm();
+const navigate = useRouter();
+const route = useRoute();
+const toast = useToast();
 
-const id = route.params.id
-const partner = ref<Partner | string | null>(null)
-const loading = ref(false)
-const isSaveDisabled = ref(true)
-const userStore = useUserStore()
-const accountData = userStore.getUser()
+const id = route.params.id;
+const partner = ref<Partner | string | null>(null);
+const loading = ref(false);
+const isSaveDisabled = ref(true);
+const userStore = useUserStore();
+const accountData = userStore.getUser();
 
 const roleOptions = ref([
-  { name: 'Главный администратор', code: [Roles.SUPER_ADMIN] },
-  { name: 'Администратор', code: [Roles.ADMIN] },
-  { name: 'Партнер', code: [Roles.USER] }
-])
+  {name: 'Главный администратор', code: [Roles.SUPER_ADMIN]},
+  {name: 'Администратор', code: [Roles.ADMIN]},
+  {name: 'Партнер', code: [Roles.USER]}
+]);
+
+const bonusButtonOptions = [
+  {
+    label: 'Добавить баллы',
+    command: () => {
+      partnerFieldsData.showAddBonusModal = true;
+      console.log(partnerFieldsData);
+    }
+  },
+  {
+    label: 'Списать баллы',
+    command: () => {
+      partnerFieldsData.showReduceBonusModal = true;
+    }
+  },
+];
 
 const rules = computed(() => {
   return {
-    username: { required, email },
-    telegramLogin: { required },
-    championPartnersLogin: { required },
-    balance: { required, numeric, minValue: minValue(0) },
-    roles: { required }
-  }
-})
+    username: {required, email},
+    telegramLogin: {required},
+    championPartnersLogin: {required},
+    balance: {required, numeric, minValue: minValue(0)},
+    roles: {required}
+  };
+});
 const partnerFieldsData = reactive({
   id: Number(id),
   name: '',
@@ -55,101 +72,114 @@ const partnerFieldsData = reactive({
   telegramLogin: '',
   championPartnersLogin: '',
   balance: null,
+  addBonusAmount: null,
+  reduceBonusAmount: null,
   roles: null,
   messageForPartner: '',
   showMessageModal: false,
   showResetPasswordModal: false,
+  showAddBonusModal: false,
+  showReduceBonusModal: false,
   userIdentifier: ''
-})
+});
 
 onMounted(async () => {
-  loading.value = true
+  loading.value = true;
 
   try {
-    const res = id && (await getPartner(id as string))
+    const res = id && (await getPartner(id as string));
 
     if (!isString(res)) {
-      partner.value = res as Partner
+      partner.value = res as Partner;
 
-      partnerFieldsData.id = (res as Partner).id
-      partnerFieldsData.username = (res as Partner).username
-      partnerFieldsData.telegramLogin = (res as Partner).telegramLogin
-      partnerFieldsData.championPartnersLogin = (res as Partner).championPartnersLogin
-      partnerFieldsData.roles = (res as Partner).roles
-      partnerFieldsData.balance = (res as Partner).balance
-      partnerFieldsData.userIdentifier = (res as Partner).userIdentifier
-    } else {
-      toast.add({ severity: 'error', summary: 'Ошибка', detail: res, life: 3000 })
-      navigate.back()
+      partnerFieldsData.id = (res as Partner).id;
+      partnerFieldsData.username = (res as Partner).username;
+      partnerFieldsData.telegramLogin = (res as Partner).telegramLogin;
+      partnerFieldsData.championPartnersLogin = (res as Partner).championPartnersLogin;
+      partnerFieldsData.roles = (res as Partner).roles;
+      partnerFieldsData.balance = (res as Partner).balance;
+      partnerFieldsData.userIdentifier = (res as Partner).userIdentifier;
     }
-  } catch {
+    else {
+      toast.add({severity: 'error', summary: 'Ошибка', detail: res, life: 3000});
+      navigate.back();
+    }
+  }
+  catch {
     toast.add({
       severity: 'error',
       summary: 'Ошибка',
       detail: 'Не удалось загрузить данные. Попробуйте еще раз.',
       life: 3000
-    })
-    navigate.back()
-  } finally {
-    loading.value = false
+    });
+    navigate.back();
   }
-})
+  finally {
+    loading.value = false;
+  }
+});
 const requireConfirmation = () => {
   confirm.require({
     group: 'headless',
     header: 'Уверены, что хотите сбросить пароль?',
     message: 'Пожалуйста, подтвердите действие.',
     accept: () => {
-      toast.add({ severity: 'success', summary: 'Пароль успешно сброшен', life: 3000 })
+      toast.add({severity: 'success', summary: 'Пароль успешно сброшен', life: 3000});
     }
-  })
-}
+  });
+};
 const getIsSaveDisabled = (): boolean => {
   if (!partnerFieldsData.username) {
-    return true
+    return true;
   }
   if (!partnerFieldsData.telegramLogin) {
-    return true
+    return true;
   }
   if (!partnerFieldsData.championPartnersLogin) {
-    return true
+    return true;
   }
   if (!partnerFieldsData.balance) {
-    return true
+    return true;
   }
 
   return (
-    JSON.stringify(partner.value) ===
-    JSON.stringify({
-      id: partnerFieldsData.id,
-      username: partnerFieldsData.username,
-      telegramLogin: partnerFieldsData.telegramLogin,
-      championPartnersLogin: partnerFieldsData.championPartnersLogin,
-      balance: partnerFieldsData.balance,
-      roles: partnerFieldsData.roles,
-      userIdentifier: partnerFieldsData.userIdentifier
-    })
-  )
-}
-const messageCancelClickHandler = () => {
-  partnerFieldsData.showMessageModal = false
-  partnerFieldsData.messageForPartner = ''
-}
+      JSON.stringify(partner.value) ===
+      JSON.stringify({
+        id: partnerFieldsData.id,
+        username: partnerFieldsData.username,
+        telegramLogin: partnerFieldsData.telegramLogin,
+        championPartnersLogin: partnerFieldsData.championPartnersLogin,
+        balance: partnerFieldsData.balance,
+        roles: partnerFieldsData.roles,
+        userIdentifier: partnerFieldsData.userIdentifier
+      })
+  );
+};
+const modalCancelClickHandler = () => {
+  partnerFieldsData.showMessageModal = false;
+  partnerFieldsData.messageForPartner = '';
+
+  partnerFieldsData.showAddBonusModal = false;
+  partnerFieldsData.addBonusAmount = null;
+
+  partnerFieldsData.showReduceBonusModal = false;
+  partnerFieldsData.reduceBonusAmount = null;
+};
 const messageSendClickHandler = () => {
-  partnerFieldsData.showMessageModal = false
-  partnerFieldsData.messageForPartner = ''
+  partnerFieldsData.showMessageModal = false;
+  partnerFieldsData.messageForPartner = '';
   toast.add({
     severity: 'success',
     summary: 'Готово',
     detail: 'Сообщение отправлено',
     life: 3000
-  })
-}
+  });
+};
 
-const v$ = useVuelidate(rules, toRefs(partnerFieldsData))
+const v$ = useVuelidate(rules, toRefs(partnerFieldsData));
 
 const onSubmit = async () => {
-  loading.value = true
+  loading.value = true;
 
   const updateRequest = {
     id: partnerFieldsData.id,
@@ -159,10 +189,10 @@ const onSubmit = async () => {
     //balance: partnerFieldsData.balance,
     roles: partnerFieldsData.roles,
     userIdentifier: ''
-  }
+  };
 
   try {
-    const isValid = await v$.value.$validate()
+    const isValid = await v$.value.$validate();
 
     if (!isValid) {
       toast.add({
@@ -170,12 +200,12 @@ const onSubmit = async () => {
         summary: 'Ошибка',
         detail: 'Проверьте введенные данные.',
         life: 3000
-      })
-      loading.value = false
-      return
+      });
+      loading.value = false;
+      return;
     }
 
-    const res = await updatePartner(updateRequest)
+    const res = await updatePartner(updateRequest);
 
     if (res) {
       toast.add({
@@ -183,55 +213,171 @@ const onSubmit = async () => {
         summary: 'Готово',
         detail: 'Данные пользователя успешно изменены.',
         life: 3000
-      })
+      });
 
-      partner.value = res as Partner
+      partner.value = res as Partner;
       //await router.push('/admin/shop/categories')
-    } else {
-      toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
     }
-  } catch (e) {
-    toast.add({ severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000 })
-  } finally {
-    loading.value = false
+    else {
+      toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
+    }
   }
-}
+  catch (e) {
+    toast.add({severity: 'error', summary: 'Ошибка', detail: 'Попробуйте еще раз.', life: 3000});
+  }
+  finally {
+    loading.value = false;
+  }
+};
+
+const bonusOperation = () => {
+  if (partnerFieldsData.addBonusAmount) {
+    toast.add({
+      severity: 'success',
+      summary: 'Готово',
+      detail: `Баллы начислены ${partnerFieldsData.addBonusAmount}`,
+      life: 3000
+    });
+    partnerFieldsData.showAddBonusModal = false;
+    partnerFieldsData.addBonusAmount = null;
+    partnerFieldsData.messageForPartner = '';
+  }
+  else {
+    toast.add({
+      severity: 'success',
+      summary: 'Готово',
+      detail: `Баллы списаны  ${partnerFieldsData.reduceBonusAmount}`,
+      life: 3000
+    });
+    partnerFieldsData.showReduceBonusModal = false;
+    partnerFieldsData.reduceBonusAmount = null;
+    partnerFieldsData.messageForPartner = '';
+  }
+};
 
 watchEffect(() => {
-  isSaveDisabled.value = getIsSaveDisabled()
-})
+  isSaveDisabled.value = getIsSaveDisabled();
+});
 </script>
 
 <template>
-  <Toast />
+  <Toast/>
   <Dialog
-    v-model:visible="partnerFieldsData.showMessageModal"
-    modal
-    :header="'Отправка сообщения ' + partnerFieldsData.telegramLogin"
-    :style="{ width: '45rem' }"
+      v-model:visible="partnerFieldsData.showMessageModal"
+      modal
+      :header="'Отправка сообщения ' + partnerFieldsData.telegramLogin"
+      :style="{ width: '45rem' }"
   >
     <span class="p-text-secondary block mb-3">Текст сообщения:</span>
     <div class="flex align-items-center gap-3 mb-3">
       <Textarea
-        id="message"
-        rows="7"
-        v-model="partnerFieldsData.messageForPartner"
-        class="flex-auto"
-        autocomplete="off"
+          id="message"
+          rows="7"
+          v-model="partnerFieldsData.messageForPartner"
+          class="flex-auto"
+          autocomplete="off"
       />
     </div>
     <div class="flex justify-content-end gap-2">
       <Button
-        type="button"
-        label="Отменить"
-        severity="secondary"
-        @click="messageCancelClickHandler"
+          type="button"
+          label="Отменить"
+          severity="secondary"
+          @click="modalCancelClickHandler"
       ></Button>
       <Button
-        type="button"
-        label="Отправить"
-        :disabled="!partnerFieldsData.messageForPartner"
-        @click="messageSendClickHandler"
+          type="button"
+          label="Отправить"
+          :disabled="!partnerFieldsData.messageForPartner"
+          @click="messageSendClickHandler"
+      ></Button>
+    </div>
+  </Dialog>
+  <Dialog
+      v-model:visible="partnerFieldsData.showAddBonusModal"
+      modal
+      :header="'Начисление баллов'"
+      :style="{ width: '45rem' }"
+  >
+    <span class="p-text-secondary block mb-3">Количество  баллов:</span>
+    <div class="flex align-items-center gap-3 mb-3">
+      <span class="p-input-icon-left" style="width: 100%">
+            <i class="pi pi-wallet"/>
+            <InputText
+                type="number"
+                placeholder="Количество баллов"
+                style="padding: 1rem; padding-left: 3rem; width: 100%"
+                v-model="partnerFieldsData.addBonusAmount"
+            />
+          </span>
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+        <Textarea
+            id="message"
+            placeholder="Текст сообщения"
+            rows="7"
+            v-model="partnerFieldsData.messageForPartner"
+            class="flex-auto"
+            autocomplete="off"
+        />
+    </div>
+
+    <div class="flex justify-content-end gap-2">
+      <Button
+          type="button"
+          label="Отменить"
+          severity="secondary"
+          @click="modalCancelClickHandler"
+      ></Button>
+      <Button
+          type="button"
+          label="Начислить"
+          :disabled="!partnerFieldsData.addBonusAmount"
+          @click="bonusOperation"
+      ></Button>
+    </div>
+  </Dialog>
+  <Dialog
+      v-model:visible="partnerFieldsData.showReduceBonusModal"
+      modal
+      :header="'Списание баллов'"
+      :style="{ width: '45rem' }"
+  >
+    <span class="p-text-secondary block mb-3">Количество  баллов:</span>
+    <div class="flex align-items-center gap-3 mb-3">
+      <span class="p-input-icon-left" style="width: 100%">
+            <i class="pi pi-wallet"/>
+            <InputText
+                type="number"
+                placeholder="Количество баллов"
+                style="padding: 1rem; padding-left: 3rem; width: 100%"
+                v-model="partnerFieldsData.reduceBonusAmount"
+            />
+          </span>
+    </div>
+    <div class="flex align-items-center gap-3 mb-3">
+        <Textarea
+            id="message"
+            placeholder="Текст сообщения"
+            rows="7"
+            v-model="partnerFieldsData.messageForPartner"
+            class="flex-auto"
+            autocomplete="off"
+        />
+    </div>
+
+    <div class="flex justify-content-end gap-2">
+      <Button
+          type="button"
+          label="Отменить"
+          severity="secondary"
+          @click="modalCancelClickHandler"
+      ></Button>
+      <Button
+          type="button"
+          label="Списать"
+          :disabled="!partnerFieldsData.reduceBonusAmount"
+          @click="bonusOperation"
       ></Button>
     </div>
   </Dialog>
@@ -240,7 +386,7 @@ watchEffect(() => {
     <template #container="{ message, acceptCallback, rejectCallback }">
       <div class="flex flex-column align-items-center p-5 surface-overlay border-round">
         <div
-          class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem -mt-8"
+            class="border-circle bg-primary inline-flex justify-content-center align-items-center h-6rem w-6rem -mt-8"
         >
           <i class="pi pi-question text-5xl"></i>
         </div>
@@ -264,13 +410,13 @@ watchEffect(() => {
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
           <label for="email">Email</label>
           <span class="p-input-icon-left">
-            <i class="pi pi-at" />
+            <i class="pi pi-at"/>
             <InputText
-              id="email"
-              type="text"
-              placeholder="Email"
-              style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.username"
+                id="email"
+                type="text"
+                placeholder="Email"
+                style="padding: 1rem; padding-left: 3rem; width: 100%"
+                v-model="partnerFieldsData.username"
             />
           </span>
           <span v-if="v$.username?.$errors[0]?.$message" class="text-red-400">
@@ -281,13 +427,13 @@ watchEffect(() => {
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
           <label for="telegram">Телеграм</label>
           <span class="p-input-icon-left">
-            <i class="pi pi-send" />
+            <i class="pi pi-send"/>
             <InputText
-              id="telegram"
-              type="text"
-              placeholder="Телеграм"
-              style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.telegramLogin"
+                id="telegram"
+                type="text"
+                placeholder="Телеграм"
+                style="padding: 1rem; padding-left: 3rem; width: 100%"
+                v-model="partnerFieldsData.telegramLogin"
             />
           </span>
           <div v-if="v$.telegramLogin?.$errors[0]?.$message" class="text-red-400">
@@ -300,13 +446,13 @@ watchEffect(() => {
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
           <label for="championPartnersLogin">Champion Partners Login</label>
           <span class="p-input-icon-left">
-            <i class="pi pi-user" />
+            <i class="pi pi-user"/>
             <InputText
-              id="championPartnersLogin"
-              type="text"
-              placeholder="Телеграм"
-              style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.championPartnersLogin"
+                id="championPartnersLogin"
+                type="text"
+                placeholder="Телеграм"
+                style="padding: 1rem; padding-left: 3rem; width: 100%"
+                v-model="partnerFieldsData.championPartnersLogin"
             />
           </span>
           <div v-if="v$.championPartnersLogin?.$errors[0]?.$message" class="text-red-400">
@@ -317,13 +463,15 @@ watchEffect(() => {
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
           <label for="balance">Бонусный баланс</label>
           <span class="p-input-icon-left">
-            <i class="pi pi-wallet" />
+            <i class="pi pi-wallet"/>
             <InputText
-              id="balance"
-              type="number"
-              placeholder="Бонусный баланс"
-              style="padding: 1rem; padding-left: 3rem; width: 100%"
-              v-model="partnerFieldsData.balance"
+                id="balance"
+                type="number"
+                placeholder="Бонусный баланс"
+                style="padding: 1rem; padding-left: 3rem; width: 100%"
+                v-model="partnerFieldsData.balance"
+                :value="partnerFieldsData.balance ? partnerFieldsData.balance : 0"
+                disabled="true"
             />
           </span>
           <div v-if="v$.balance?.$errors[0]?.$message" class="text-red-400">
@@ -333,19 +481,19 @@ watchEffect(() => {
       </div>
 
       <div
-        v-if="(accountData as User).roles[0] === Roles.SUPER_ADMIN"
-        class="lg:flex border-round inputBlocksPaddingTop"
+          v-if="(accountData as User).roles[0] === Roles.SUPER_ADMIN"
+          class="lg:flex border-round inputBlocksPaddingTop"
       >
         <div class="lg:w-12 p-2 flex flex-column align-items-start justify-content-center">
           <label for="role">Роль</label>
           <span class="p-input-icon-left">
-            <i class="pi pi-user" />
+            <i class="pi pi-user"/>
             <Dropdown
-              v-model="partnerFieldsData.roles"
-              optionLabel="name"
-              :options="roleOptions"
-              optionValue="code"
-              style="padding: 6px; width: 100%"
+                v-model="partnerFieldsData.roles"
+                optionLabel="name"
+                :options="roleOptions"
+                optionValue="code"
+                style="padding: 6px; width: 100%"
             />
           </span>
           <div v-if="v$.roles?.$errors[0]?.$message" class="text-red-400">
@@ -361,40 +509,54 @@ watchEffect(() => {
           <div class="flex mr-2">
             <div class="flex mr-2">
               <Button
-                label="Назад"
-                severity="info"
-                icon="pi pi-directions-alt"
-                text
-                @click="router.back()"
-                :disabled="loading"
+                  label="Назад"
+                  severity="info"
+                  icon="pi pi-directions-alt"
+                  text
+                  @click="router.back()"
+                  :disabled="loading"
               />
             </div>
             <Button
-              label="Отправить сообщение"
-              icon="pi pi-envelope"
-              text
-              @click="partnerFieldsData.showMessageModal = true"
-              :disabled="loading"
+                label="Отправить сообщение"
+                icon="pi pi-envelope"
+                text
+                @click="partnerFieldsData.showMessageModal = true"
+                :disabled="loading"
             />
           </div>
           <div class="flex mr-2">
             <Button
-              label="Сбросить пароль"
-              icon="pi pi-key"
-              text
-              @click="requireConfirmation()"
-              :disabled="loading"
+                label="Сбросить пароль"
+                icon="pi pi-key"
+                text
+                @click="requireConfirmation()"
+                :disabled="loading"
+                severity="danger"
             />
+          </div>
+
+          <div class="flex mr-2">
+            <SplitButton
+                label="Добавить баллы"
+                @click="()=>{
+                  partnerFieldsData.showAddBonusModal = true
+                  console.log(partnerFieldsData)
+                }"
+                text
+                severity="info"
+                :model="bonusButtonOptions"/>
+
           </div>
 
           <div class="flex">
             <Button
-              label="Сохранить"
-              type="submit"
-              :disabled="isSaveDisabled || loading"
-              icon="pi pi-save"
-              severity="success"
-              text
+                label="Сохранить"
+                type="submit"
+                :disabled="isSaveDisabled || loading"
+                icon="pi pi-save"
+                severity="success"
+                text
             />
           </div>
         </div>
